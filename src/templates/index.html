@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
     <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8">
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Home</title>
         <link rel="stylesheet" href="{{url_for('static', filename ='css/index.css')}}">
         <link rel="stylesheet" href="{{url_for('static', filename ='css/card.css')}}">
@@ -47,8 +48,8 @@
                     </div>
                     <div class="cardSection">
                         <p><b>Lecture Times</b></p>
-                        <strong><a href="https://utoronto.zoom.us/j/89553548645" target="_blank" class="cardLinks">Wednesdays 3 - 4pm</a></strong>
-                        <strong><a href="https://utoronto.zoom.us/j/83378932991" target="_blank"class="cardLinks">Thursdays  9 - 11am</a></strong>
+                        <p><strong><a href="https://utoronto.zoom.us/j/89553548645" target="_blank" class="cardLinks">Wednesdays 3 - 4pm</a></strong></p>
+                        <p><strong><a href="https://utoronto.zoom.us/j/83378932991" target="_blank"class="cardLinks">Thursdays  9 - 11am</a></strong></p>
                     </div>
                 </div>
             </div>
@@ -304,8 +305,12 @@
                 <hr/>
                 <div class="cardContent">
                     <iframe src="https://calendar.google.com/calendar/embed?height=600&amp;wkst=1&amp;bgcolor=%23ffffff&amp;ctz=America%2FToronto&amp;src=ZjJvb2dxbmZvMXE3MjhrM2xjYnRyNHY0NzhAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ&amp;color=%23A79B8E" 
-                            width="1000" 
-                            height="600" 
+                            class="desktopCalendar"
+                            frameborder="0" 
+                            scrolling="no">
+                    </iframe>
+                    <iframe src="https://calendar.google.com/calendar/embed?height=400&amp;wkst=1&amp;bgcolor=%23ffffff&amp;ctz=America%2FToronto&amp;src=ZjJvb2dxbmZvMXE3MjhrM2xjYnRyNHY0NzhAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ&amp;color=%23A79B8E&amp;mode=WEEK" 
+                            class="mobileCalendar"
                             frameborder="0" 
                             scrolling="no">
                     </iframe>

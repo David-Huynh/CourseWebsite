@@ -19,6 +19,22 @@ h1{
 }
 /* Small Mobile Screen*/
 @media (min-width: 320px) {
+    .desktopCalendar{
+        visibility: collapse;
+        display: none;
+    }
+    .mobileCalendar{
+        width:100%;
+        height:400px; 
+    }
+    p{  
+        font-family: sans-serif;
+        font-size: 100%;
+    }
+    th,td{
+        font-family: sans-serif;
+        font-size: 100%;
+    }
     h1{
         font-size: 100%;
     }
@@ -32,6 +48,14 @@ h1{
 }
 /* Medium Mobile Screen */
 @media (min-width: 375px) {
+    p{
+        font-family: 'Roboto', sans-serif;
+        font-size: xx-large;
+    }
+    th,td{
+        font-family: 'Roboto', sans-serif;
+        font-size: xx-large;
+    }
     .content{
         padding:10px;
         padding-top: 120px;
@@ -43,6 +67,22 @@ h1{
 
 /* Desktop Screen */
 @media (min-width: 900px) {
+    .desktopCalendar{
+        width:100%;
+        height:600px; 
+        visibility: visible;
+        display: block;
+    }
+    .mobileCalendar{
+        visibility: collapse;
+        display: none;
+    }
+    p{
+        font-size: medium;
+    }
+    th,td{
+        font-size: medium;
+    }
     h1{
         font-size: x-large;
     }

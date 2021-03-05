@@ -24,11 +24,10 @@
 @media (min-width: 320px) {
     .cardTitle,
     .cardContent{
-        padding-left: 10px;
-        padding-right: 10px;
+        padding: 10px;
     }
     .cardTitle{
-        font-size: 100%;
+        font-size: xx-large;
     }
 }
 /* Tablet Screen and Bigger */
