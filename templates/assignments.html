@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8">
+        <title>Home</title>
+        <link rel="stylesheet" href="{{url_for('static', filename ='css/assignments.css')}}">
+        <link rel="stylesheet" href="{{url_for('static', filename ='css/card.css')}}">
+    </head>
+    <body>
+        {% extends "template.html" %}
+        {% block content %}
+        <div class="content">
+            <div class="card">
+                <h1 class="cardTitle">
+                    Assignments
+                </h1>
+                <hr/>
+                <div class="cardContent">
+                </div>
+            </div>
+            <div class="card">
+                <h1 class="cardTitle">
+                    <a name="#labs">
+                        Labs
+                    </a>
+                </h1>
+                <hr/>
+                <div class="cardContent">
+                </div>
+            </div>
+            <div class="card">
+                <h1 class="cardTitle">
+                    <a name="#feedback">
+                        Feedback
+                    </a>
+                </h1>
+                <hr/>
+                <div class="cardContent">
+                </div>
+            </div>
+        </div>
+        {% endblock %}
+    </body>
+</html>

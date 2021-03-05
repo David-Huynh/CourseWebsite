@@ -1,0 +1,21 @@
+/* Small Mobile Screen*/
+@media (min-width: 320px) {
+    .content{
+        padding:10px;
+        padding-top: 200px;
+    }
+}
+/*Medium Mobile Screen */
+@media (min-width: 375px) {
+    .content{
+        padding:10px;
+        padding-top: 120px;
+    }
+}
+/* Tablet Screen and Bigger */
+@media (min-width: 900px) {
+    .content{
+        padding:100px;
+        padding-top:70px;
+    }
+}

@@ -1,0 +1,45 @@
+/* Shared Card Styling*/
+.card{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    width: 100%;
+    background-color: white;
+    margin-bottom: 30px;
+    box-shadow:  2px 2px 10px #8E8E8E;
+}
+.cardContent{
+    color:black;
+}
+.cardLinks{
+    padding: 0;
+    margin: 0;
+}
+.cardSection{
+    padding-bottom: 10px;
+}
+
+/* Small Mobile Screen*/
+@media (min-width: 320px) {
+    .cardTitle,
+    .cardContent{
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    .cardTitle{
+        font-size: 100%;
+    }
+}
+/* Tablet Screen and Bigger */
+@media (min-width: 900px) {
+    .cardTitle,
+    .cardContent{
+        padding-left: 50px;
+        padding-top: 20px;
+        padding-bottom: 20px;
+    }
+    .cardTitle{
+        font-size: x-large;
+    }
+}

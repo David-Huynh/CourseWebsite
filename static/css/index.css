@@ -1,0 +1,57 @@
+h1{
+    color: #008EE2;
+}
+.content{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+/*Course Team*/
+.cardContent#teamGrid{
+    display: grid;
+    grid-template-rows: auto;
+    gap: 10px 10px;
+}
+/* Small Mobile Screen*/
+@media (min-width: 320px) {
+    h1{
+        font-size: 100%;
+    }
+    .content{
+        padding:10px;
+        padding-top: 200px;
+    }
+    .cardContent#teamGrid { 
+        grid-template-columns: repeat(2, 1fr); 
+    }
+}
+/* Medium Mobile Screen */
+@media (min-width: 375px) {
+    .content{
+        padding:10px;
+        padding-top: 120px;
+    }
+    .cardContent#teamGrid { 
+        grid-template-columns: repeat(2, 1fr); 
+    }
+}
+
+/* Desktop Screen */
+@media (min-width: 900px) {
+    h1{
+        font-size: x-large;
+    }
+    .content{
+        padding:100px;
+        padding-top:70px;
+    }
+    .cardContent#teamGrid { 
+        grid-template-columns: repeat(5, 1fr); 
+    }
+}
+
+
+
+  
