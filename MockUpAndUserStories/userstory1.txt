@@ -1,0 +1,1 @@
+“As a student user, the student must have access to basic info about the course that the website is for (ie. Instrutor name, course description and schedules.”
