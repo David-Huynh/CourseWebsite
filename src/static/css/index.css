@@ -11,6 +11,11 @@
     align-items: center;
 }
 
+
+.table#lectures{
+    grid-template-columns: repeat(6, auto);
+}
+/* Multicard Layout */
 .multiCard{
     display: grid;
     grid-template-columns:  1fr 1fr;
@@ -18,10 +23,12 @@
     width: 100%;
 }
 
-
+/*Card Title Links*/
 .titleLink{
     text-decoration: none;
 }
+
+/*Instructor Card Layout*/
 .cardContent#instructorGrid{
     display:grid;
     grid-template-columns: auto 1fr;
@@ -41,6 +48,13 @@ h1,p{
 }
 /* Small Mobile Screen*/
 @media (min-width: 320px) {
+    .multiCard{
+        display: grid;
+        grid-template-columns:  auto;
+        grid-template-rows: 1fr 1fr;
+        column-gap: 50px;
+        width: 100%;
+    }
     .desktopCalendar{
         visibility: collapse;
         display: none;
@@ -89,6 +103,10 @@ h1,p{
 
 /* Desktop Screen */
 @media (min-width: 900px) {
+    .multiCard{
+        grid-template-columns:  1fr 1fr;
+        grid-template-rows: auto;
+    }
     .desktopCalendar{
         width:100%;
         height:600px; 
