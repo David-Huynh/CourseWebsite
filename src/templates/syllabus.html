@@ -3,13 +3,34 @@
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8">
         <title>Home</title>
-        <link rel="stylesheet" href="{{url_for('static', filename ='css/assignments.css')}}">
-        <link rel="stylesheet" href="{{url_for('static', filename ='css/card.css')}}">
+        <link rel="stylesheet" href="../static/css/assignments.css">
+        <link rel="stylesheet" href="../static/css/card.css">
+        <link rel="stylesheet" href="../static/css/table.css">
+        <link rel="stylesheet" href="../static/css/mainlayout.css">
     </head>
     <body>
-        {% extends "template.html" %}
-        {% block content %}
-
-        {% endblock %}
+        <!-- Header Navigation Bar -->
+        <header>
+            <div id="headerNav">
+                <h3 id="navTitle">CSCB63</h3>
+                <nav>
+                    <ul class="desktopList">
+                        <li><a href="./index.html">Home</a></li>
+                        <li><a href="./index.html#courseTeam">Course Team</a></li>
+                        <li><a href="./assignments.html">Assignments</a></li>
+                        <li><a href="./assignments.html#labs">Labs</a></li>
+                        <li><a href="./assignments.html#feedback">Feedback</a></li>
+                        <li><a href="./syllabus.html">Syllabus</a></li>
+                        <li><a href="http://piazza.com/utoronto.ca/winter2021/cscb63h3slec01/home" target="_blank">Piazza</a></li>
+                        <li><a href="https://markus.utsc.utoronto.ca/cscb63w21" target="_blank">MarkUs</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+        <!-- Footer Credits -->
+        <footer>
+                Created by David Huynh and Collin Chan
+                <a href="https://www.utsc.utoronto.ca/cms/faculty-of-computer-science" target="_blank">Faculty of Computer Science at UofT</a>
+        </footer>
     </body>
 </html>

@@ -9,13 +9,7 @@
     margin-bottom: 30px;
     box-shadow:  2px 2px 10px #8E8E8E;
 }
-.cardContent{
-    color:black;
-}
-.cardLinks{
-    padding: 0;
-    margin: 0;
-}
+
 .cardSection{
     padding-bottom: 10px;
 }
@@ -27,19 +21,20 @@
         padding: 10px;
     }
     .cardTitle{
-        font-size: xx-large;
+        font-size: 40px;
     }
 }
 /* Tablet Screen and Bigger */
 @media (min-width: 900px) {
-    .cardTitle,
+    .cardTitle{
+        padding-left: 50px;
+        padding-right: 50px;
+        padding-top: 40px;
+        padding-bottom: 10px;
+    }
     .cardContent{
         padding-left: 50px;
-        padding-top: 20px;
-        padding-bottom: 20px;
         padding-right: 50px;
-    }
-    .cardTitle{
-        font-size: x-large;
+        padding-bottom: 30px;
     }
 }
