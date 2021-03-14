@@ -4,57 +4,12 @@
     padding-bottom: 50px;
 }
 
-.content{
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-}
-
-
-.table#lectures{
-    grid-template-columns: repeat(6, auto);
-}
-/* Multicard Layout */
-.multiCard{
-    display: grid;
-    grid-template-columns:  1fr 1fr;
-    column-gap: 50px;
-    width: 100%;
-}
-
-/*Card Title Links*/
-.titleLink{
-    text-decoration: none;
-}
-
-/*Instructor Card Layout*/
-.cardContent#instructorGrid{
-    display:grid;
-    grid-template-columns: auto 1fr;
-    column-gap: 20px;
-}
-
-/*Course Team Card*/
-.cardContent#teamGrid{
-    display: grid;
-    grid-template-rows: auto;
-    gap: 10px 10px;
-}
-
 /*Colors*/
 h1,p{
     color:#002A5C;
 }
 /* Small Mobile Screen*/
 @media (min-width: 320px) {
-    .multiCard{
-        display: grid;
-        grid-template-columns:  auto;
-        grid-template-rows: 1fr 1fr;
-        column-gap: 50px;
-        width: 100%;
-    }
     .desktopCalendar{
         visibility: collapse;
         display: none;
@@ -63,50 +18,10 @@ h1,p{
         width:100%;
         height:400px; 
     }
-    p{  
-        font-family: sans-serif;
-        font-size: 100%;
-    }
-    th,td{
-        font-family: sans-serif;
-        font-size: 100%;
-    }
-    h1{
-        font-size: 100%;
-    }
-    .content{
-        padding:10px;
-        padding-top: 200px;
-    }
-    .cardContent#teamGrid { 
-        grid-template-columns: repeat(2, 1fr); 
-    }
-}
-/* Medium Mobile Screen */
-@media (min-width: 375px) {
-    p{
-        font-family: 'Roboto', sans-serif;
-        font-size: xx-large;
-    }
-    th,td{
-        font-family: 'Roboto', sans-serif;
-        font-size: xx-large;
-    }
-    .content{
-        padding:10px;
-        padding-top: 120px;
-    }
-    .cardContent#teamGrid { 
-        grid-template-columns: repeat(2, 1fr); 
-    }
 }
 
 /* Desktop Screen */
 @media (min-width: 900px) {
-    .multiCard{
-        grid-template-columns:  1fr 1fr;
-        grid-template-rows: auto;
-    }
     .desktopCalendar{
         width:100%;
         height:600px; 
@@ -116,22 +31,6 @@ h1,p{
     .mobileCalendar{
         visibility: collapse;
         display: none;
-    }
-    p{
-        font-size: medium;
-    }
-    th,td{
-        font-size: medium;
-    }
-    h1{
-        font-size: x-large;
-    }
-    .content{
-        padding:100px;
-        padding-top:70px;
-    }
-    .cardContent#teamGrid { 
-        grid-template-columns: repeat(5, 1fr); 
     }
 }
 
