@@ -25,6 +25,9 @@
 .titleLink{
     text-decoration: none;
 }
+.titleLink:hover{
+    text-decoration: underline;
+}
 
 /*Instructor Card Layout*/
 .cardContent#instructorGrid{

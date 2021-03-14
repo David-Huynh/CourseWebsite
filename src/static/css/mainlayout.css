@@ -12,6 +12,13 @@ body {
 
     color: #002A5C;
     background-color: #F8F8F8;
+
+}
+.links{
+    text-decoration: none;
+}
+.links:hover{
+    text-decoration: underline;
 }
 /**START HEADER**/
 header{
