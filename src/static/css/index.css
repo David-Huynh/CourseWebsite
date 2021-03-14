@@ -10,25 +10,27 @@ h1,p{
 }
 /* Small Mobile Screen*/
 @media (min-width: 320px) {
-    .desktopCalendar{
+    #desktopCalendar{
+        background:url('https://raw.githubusercontent.com/niccokunzmann/open-web-calendar/master/static/img/loaders/circular-loader.gif') center center no-repeat;
         visibility: collapse;
         display: none;
     }
-    .mobileCalendar{
+    #mobileCalendar{
+        background:url('https://raw.githubusercontent.com/niccokunzmann/open-web-calendar/master/static/img/loaders/circular-loader.gif') center center no-repeat;
         width:100%;
-        height:400px; 
+        height:600px; 
     }
 }
 
 /* Desktop Screen */
 @media (min-width: 900px) {
-    .desktopCalendar{
+    #desktopCalendar{
         width:100%;
         height:600px; 
         visibility: visible;
         display: block;
     }
-    .mobileCalendar{
+    #mobileCalendar{
         visibility: collapse;
         display: none;
     }
