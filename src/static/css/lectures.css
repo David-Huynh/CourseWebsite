@@ -1,0 +1,18 @@
+/*Colors*/
+h1,p{
+    color:#002A5C;
+}
+
+/* Small Mobile Screen*/
+@media (min-width: 320px) {
+    #lecturePageTitle{
+        padding-top: 200px;
+    }
+}
+
+/* Desktop Screen */
+@media (min-width: 900px) {
+    #lecturePageTitle{
+        padding-top: 50px;
+    }
+}

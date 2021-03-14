@@ -20,6 +20,11 @@ body {
 .links:hover{
     text-decoration: underline;
 }
+.title{
+    font-size: 45px;
+    padding-top: 50px;
+    padding-bottom: 50px;
+}
 /**START HEADER**/
 header{
     position: fixed;
