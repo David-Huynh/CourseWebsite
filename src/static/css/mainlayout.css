@@ -50,17 +50,17 @@ nav{
     padding: 5px;
     display: block;
 }
-
 #headerNav li a{
     color: white;
     text-decoration: none;
     display: block;
     padding: 15px 5px;
 }
-#headerNav li:hover,#headerNav li a:hover{
+#headerNav li:hover, #headerNav li a:hover{
     background-color: #2D3B45;
 }
 /**END HEADER**/
+
 /* Page Content*/
 .content{
     display: flex;
@@ -90,7 +90,7 @@ footer a{
     color: white;
     text-decoration: none;
 }
-
+/**END FOOTER**/
 
 /* Phone Screen */
 @media (min-width: 320px) {

@@ -7,7 +7,7 @@
 }
 .tableCell{
     padding: 8px;
-    border: 1px solid black;
+    border: 1px solid #2D3B45;
 }
 .table#lectures{
     grid-template-columns: repeat(6, auto);
