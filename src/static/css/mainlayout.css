@@ -69,7 +69,8 @@ nav{
     padding: 15px 5px;
 }
 #headerNav li:hover, #headerNav li a:hover{
-    background-color: #2D3B45;
+    color: grey;
+    /*background-color: #2D3B45;*/
 }
 /**END HEADER**/
 

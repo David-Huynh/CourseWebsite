@@ -1,1 +1,1 @@
-"As a student user, the student must be able to access a Google Calendar displaying items/tests/course deadlines on a calendar interface after clicking on Calendar."
+"As a student user, the student must be able to access a calendar interface displaying items/tests/course deadlines after scrolling below Course Team on the Home page."
