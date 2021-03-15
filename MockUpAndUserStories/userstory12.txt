@@ -1,0 +1,1 @@
+"As a student user, the student must be able to access the course syllabus after clicking on the pdf link on the Home page under the course description."
