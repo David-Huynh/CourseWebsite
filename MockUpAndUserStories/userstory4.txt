@@ -1,1 +1,1 @@
-"As a student user, the student must be able to access tutorial materials after clicking on Tutorials."
+"As a student user, the student must be able to access tutorial materials below lecture materials under each week after clicking on Lectures & Tutorials."

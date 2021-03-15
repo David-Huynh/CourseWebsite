@@ -1,1 +1,1 @@
-"As a student user, the student must be able to access previous/upcoming term test questions/solutions after clicking on the Couse Work tab."
+"As a student user, the student must be able to access previous/upcoming term test questions/solutions in a single column layout after clicking on the Couse Work tab."
