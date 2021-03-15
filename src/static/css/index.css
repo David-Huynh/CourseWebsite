@@ -1,7 +1,12 @@
 /*Colors*/
-h1,p{
+h1{
     color:#002A5C;
 }
+
+p {
+    color: black;
+}
+
 /* Small Mobile Screen*/
 @media (min-width: 320px) {
     #desktopCalendar{

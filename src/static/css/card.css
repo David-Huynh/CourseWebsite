@@ -43,11 +43,6 @@
     gap: 10px 10px;
 }
 
-.subtitle {
-    color: #002A5C;
-    font-weight: bold;
-}
-
 /* Small Mobile Screen*/
 @media (min-width: 320px) {
     .cardTitle,
