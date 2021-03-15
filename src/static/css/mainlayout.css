@@ -28,6 +28,14 @@ body {
     color: #002A5C;
     text-decoration: underline;
 }
+.links#faculty{
+    color:white;
+    text-decoration: none;
+}
+.links#faculty:hover{
+    text-decoration-color:white;
+    text-decoration: underline;
+}
 .title{
     font-size: 45px;
     padding-top: 50px;
