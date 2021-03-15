@@ -17,6 +17,7 @@ body {
 .subtitle {
     color: #002A5C;
     font-weight: bold;
+    font-size: 18px;
 }
 
 .links{
@@ -101,10 +102,11 @@ footer{
 
     color: white;
     background-color: #002A5C;
-    font-size: 12px;
+    font-size: 15px;
     
     padding-top: 10px;
     padding-bottom: 5px;
+    height: 80px;
 }
 footer a{
     color: white;
