@@ -15,9 +15,11 @@ body {
 
 }
 .links{
+    color: black;
     text-decoration: none;
 }
 .links:hover{
+    color: #002A5C;
     text-decoration: underline;
 }
 .title{
