@@ -85,10 +85,17 @@ nav{
     display: block;
     padding: 15px 5px;
 }
-#headerNav li:hover, #headerNav li a:hover{
+#headerNav li #logout{
+    color: #4ab3fa;
+    text-decoration: none;
+    display: block;
+    padding: 15px 5px;
+}
+#headerNav li:hover, #headerNav li a:hover, #headerNav li #logout:hover{
     color: grey;
     /*background-color: #2D3B45;*/
 }
+
 /**END HEADER**/
 
 /* Page Content*/

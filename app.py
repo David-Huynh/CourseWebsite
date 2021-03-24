@@ -3,6 +3,10 @@ app = Flask(__name__, template_folder='./src/templates', static_folder='./src/st
 
 app.secret_key = "b'\x1a\xe3$e=(\xdc$\xf6\x95}\x00z\x1c\xae\xc2\n\x1a\x08\x85\x1f#9M\xff\xef=x\rg\x9c\xc9'"
 
+@app.before_request
+def before_request():
+    session.permanent = True
+
 @app.route('/')
 def home():
     if 'username' in session:
@@ -30,12 +34,17 @@ def links():
 def login():
     error = None
     if request.method == 'POST': 
-        if request.form['username'] != 'admin' or request.form['password'] != 'secret':
+        if request.form['username'] != 'admin' or request.form['password'] != 'thesecretestsecretpassword':
             error = 'Invalid credentials'
         else:
             session['username'] = request.form['username']
             return render_template("index.html")
     return render_template('login.html', error=error)
+@app.route('/logout')
+def logout():
+   # remove the username from the session if it is there
+   session.pop('username', None)
+   return redirect(url_for('home'))
     
 if __name__ == "__main__":
     app.run(debug=True)
