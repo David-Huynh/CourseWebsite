@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8">
+        <title>Login</title>
+        <link rel="stylesheet" href="{{url_for('static', filename ='css/login.css')}}">
+        <link rel="stylesheet" href="{{url_for('static', filename ='css/card.css')}}">
+        
+    </head>
+    <body>
+        <!-- Page Content -->
+        <div class="content">
+            <div class="card" id="login">
+                <div class="cardContent" id="login">
+                    <form method="post" id="login">
+                        <p>Username <input type=text name=username></p>
+                        <p>Name <input type=text name=name></p>
+                        <p>Password <input type=password name=password></p>
+                        <p><input type=submit value=Login></p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

@@ -1,7 +1,7 @@
-from flask import Flask, render_template, session, url_for, redirect, request
+from flask import Flask, render_template, session, url_for, redirect, request, flash
 app = Flask(__name__, template_folder='./src/templates', static_folder='./src/static')
 
-app.secret_key = "5siXpv0D_-iyU{?/DMX~"
+app.secret_key = "b'\x1a\xe3$e=(\xdc$\xf6\x95}\x00z\x1c\xae\xc2\n\x1a\x08\x85\x1f#9M\xff\xef=x\rg\x9c\xc9'"
 
 @app.route('/')
 def home():
@@ -28,14 +28,14 @@ def links():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    error = None
     if request.method == 'POST': 
-        session['username'] = request.form['username']
-        return redirect(url_for('index'))
-    return '''
-        <form method="post">
-            <p><input type=text name=username>
-            <p><input type=submit value=Login>
-        </form>
-    '''
+        if request.form['username'] != 'admin' or request.form['password'] != 'secret':
+            error = 'Invalid credentials'
+        else:
+            session['username'] = request.form['username']
+            return render_template("index.html")
+    return render_template('login.html', error=error)
+    
 if __name__ == "__main__":
     app.run(debug=True)
