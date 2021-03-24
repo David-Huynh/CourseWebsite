@@ -1,1 +1,0 @@
-“As a student user, the student must be able to access different aspects of the couse website (ie. be able to access Lectures)"

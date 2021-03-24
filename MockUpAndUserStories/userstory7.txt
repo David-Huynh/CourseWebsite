@@ -1,1 +1,0 @@
-"As a student user, the student must be able to access a calendar interface displaying items/tests/course deadlines after scrolling below Course Team on the Home page."
