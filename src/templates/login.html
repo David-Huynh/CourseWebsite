@@ -7,6 +7,7 @@
         <link rel="stylesheet" href="{{url_for('static', filename ='css/card.css')}}">
         <link rel="preconnect" href="https://fonts.gstatic.com">
         <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+        
     </head>
     <body>
         <!-- Page Content -->
@@ -15,22 +16,36 @@
             <h1 id="coursetitle">Design and Analysis of Data Structures</h1>
             <div class="card" id="login">
                 <form method="post">
+                    <!--Drop Menu to select the input Form-->
+                    <select name="dropmenu" id="dropmenu">
+                        <option value="Signin">Sign in</option>
+                        <option value="Register">Register</option>
+                    </select>
+                    <!-- Two unchanging inputs -->
                     <label for="username">Username</label>
                     <input id="username" type=text name=username placeholder="Student No./Instructor Code/TA Code" required>
 
-                    <!--<label for="fname">First Name</label>
-                    <input id="fname" type=text name=firstname placeholder="First Name" required>
-
-                    <label for="lname">Last Name</label>
-                    <input id="lname" type=text name=lastname placeholder="Last Name" required>-->
-
                     <label for="lname">Password</label>
                     <input type=password name=password required>
+                    <!-- Hidden Registration Form -->
+                    <div id="registerForm">
+                        <label for="fname">First Name</label>
+                        <input id="fname" type=text name=firstname placeholder="First Name">
 
-                    <input type=submit value="Sign in">
+                        <label for="lname">Last Name</label>
+                        <input id="lname" type=text name=lastname placeholder="Last Name">
+
+                        <label for="Creation Code">Creation Code</label>
+                        <input id="Creation Code" type=text name=creationcode placeholder="student=0, instructor=1, ta=2">
+
+                        <input type=submit value="Create Account">
+                    </div>
+
+                    <input type=submit value="Sign in" id="signinButton">
                 </form>
-                
             </div>
         </div>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="{{url_for('static', filename='javascript/index.js')}}"></script>
     </body>
 </html>
