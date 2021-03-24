@@ -5,20 +5,31 @@
         <title>Login</title>
         <link rel="stylesheet" href="{{url_for('static', filename ='css/login.css')}}">
         <link rel="stylesheet" href="{{url_for('static', filename ='css/card.css')}}">
-        
+        <link rel="preconnect" href="https://fonts.gstatic.com">
+        <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
     </head>
     <body>
         <!-- Page Content -->
-        <div class="content">
+        <div id="content">
+            <img src="/static/logo.png" id="logo">
+            <h1 id="coursetitle">Design and Analysis of Data Structures</h1>
             <div class="card" id="login">
-                <div class="cardContent" id="login">
-                    <form method="post" id="login">
-                        <p>Username <input type=text name=username></p>
-                        <p>Name <input type=text name=name></p>
-                        <p>Password <input type=password name=password></p>
-                        <p><input type=submit value=Login></p>
-                    </form>
-                </div>
+                <form method="post">
+                    <label for="username">Username</label>
+                    <input id="username" type=text name=username placeholder="Student No./Instructor Code/TA Code" required>
+
+                    <!--<label for="fname">First Name</label>
+                    <input id="fname" type=text name=firstname placeholder="First Name" required>
+
+                    <label for="lname">Last Name</label>
+                    <input id="lname" type=text name=lastname placeholder="Last Name" required>-->
+
+                    <label for="lname">Password</label>
+                    <input type=password name=password required>
+
+                    <input type=submit value="Sign in">
+                </form>
+                
             </div>
         </div>
     </body>

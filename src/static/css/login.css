@@ -1,3 +1,85 @@
+
+* {
+    margin: 0;
+    padding: 0;
+}
+html{
+    height: 100%;
+}
+body{
+    min-height: 100%;
+    background-color: #002A5C;
+    font-family: 'Roboto', sans-serif;
+}
+#content{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#logo{
+    margin-top: 75px;
+    width: 25%;
+    height: 15%;
+}
+#coursetitle{
+    font-family: 'Roboto', sans-serif;
+    color: white;
+    margin-top: 20px;
+    margin-bottom: 40px;
+
+    font-size: 100%;
+}
 #login{
-    width: fit-content;
+    min-width: 0;
+    width: 80%;
+    border-radius: 5px;
+    box-shadow: none;
+    padding: 30px;
+}
+
+label::after{
+    padding-left: 5px;
+    color: rgb(167, 0, 0);
+    font-size: small;
+    content: "*";
+}
+input{
+    width: 100%;
+    box-sizing: border-box;
+}
+input[type=text],input[type=password]{
+    margin-bottom: 10px;
+    padding: 10px 5px;
+
+    border: 1px solid #ccc;
+    border-radius: 5px;
+
+    
+}
+input[type=submit] {
+    background-color: #2f3e94;
+    color: white;
+    cursor: pointer;
+
+    padding: 10px;
+    margin-top: 10px;
+
+    border: none;
+    border-radius: 5px;
+    
+}
+input[type=submit]:hover {
+    background-color: #253174;
+}
+
+/* Tablet Screen and Bigger */
+@media (min-width: 900px) {
+    #coursetitle{
+        font-size: 2em;
+        font-weight: bolder;
+    }
+    #login{
+        width: 30%;
+    }
 }
