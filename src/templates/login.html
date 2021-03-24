@@ -7,7 +7,6 @@
         <link rel="stylesheet" href="{{url_for('static', filename ='css/card.css')}}">
         <link rel="preconnect" href="https://fonts.gstatic.com">
         <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
-        
     </head>
     <body>
         <!-- Page Content -->
@@ -21,12 +20,18 @@
                         <option value="Signin">Sign in</option>
                         <option value="Register">Register</option>
                     </select>
+                    <!--Drop Menu to select the registration type-->
+                    <select name="regtypemenu" id="regtypemenu">
+                        <option value="Student">Student</option>
+                        <option value="Instructor">Instructor & TA</option>
+                    </select>
                     <!-- Two unchanging inputs -->
                     <label for="username">Username</label>
                     <input id="username" type=text name=username placeholder="Student No./Instructor Code/TA Code" required>
 
                     <label for="lname">Password</label>
                     <input type=password name=password required>
+                    
                     <!-- Hidden Registration Form -->
                     <div id="registerForm">
                         <label for="fname">First Name</label>
@@ -34,7 +39,10 @@
 
                         <label for="lname">Last Name</label>
                         <input id="lname" type=text name=lastname placeholder="Last Name">
-
+                        <div id="studentForm">
+                            <label for="InstructorsCode">Instructor's Code</label>
+                            <input id="Instructors Code" type=text name=InstructorsCode placeholder="Your Instructors Code/Username">
+                        </div>
                         <label for="Creation Code">Creation Code</label>
                         <input id="Creation Code" type=text name=creationcode placeholder="student=0, instructor=1, ta=2">
 
@@ -46,6 +54,6 @@
             </div>
         </div>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-        <script src="{{url_for('static', filename='javascript/index.js')}}"></script>
+        <script src="{{url_for('static', filename='javascript/login.js')}}"></script>
     </body>
 </html>

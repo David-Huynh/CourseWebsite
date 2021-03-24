@@ -5,6 +5,9 @@ app = Flask(__name__, template_folder='./src/templates', static_folder='./src/st
 app.secret_key = "b'\x1a\xe3$e=(\xdc$\xf6\x95}\x00z\x1c\xae\xc2\n\x1a\x08\x85\x1f#9M\xff\xef=x\rg\x9c\xc9'"
 DATABASE = './assignment3.db'
 
+##TODO: Check if username AND password in the session correlate with a user in the database then display pages iff that is the case
+##TODO: Check whether username and password that is sent by POST request matches one in the database only then add them to the session and redirect them to the home screen
+
 ##DATABASE CONNECTION
 def get_db():
     db = getattr(g, '_database', None)
@@ -53,34 +56,27 @@ def links():
         return render_template("links.html")
     return redirect(url_for('login'))
 
-##LOGIN/LOGOUT/SIGNUP REQUESTS
+##LOGIN/SIGNUP REQUESTS
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     error = None
-    if request.method == 'POST': 
+    if request.method == 'POST':
+        ##If doesnt equal a username and password combination then return an error message
         if request.form['username'] != 'admin' or request.form['password'] != 'thesecretestsecretpassword':
             error = 'Invalid credentials'
         else:
             session['username'] = request.form['username']
+            session['password'] = request.form['password']
             return render_template("index.html")
     return render_template('login.html', error=error)
 
-@app.route('/signup', methods=['GET', 'POST'])
-def signup():
-    error = None
-    if request.method == 'POST': 
-        if request.form['username'] != 'admin' or request.form['password'] != 'thesecretestsecretpassword':
-            error = 'Invalid credentials'
-        else:
-            session['username'] = request.form['username']
-            return render_template("index.html")
-    return render_template('login.html', error=error)
-
+##LOGOUT REQUESTS
 @app.route('/logout')
 def logout():
-   # remove the username from the session if it is there
+   ## Removes the username and password from the session if it exists
    session.pop('username', None)
-   return redirect(url_for('home'))
+   session.pop('password', None)
+   return redirect(url_for('login'))
     
 if __name__ == "__main__":
     app.run(debug=True)

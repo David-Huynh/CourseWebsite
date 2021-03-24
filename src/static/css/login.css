@@ -72,9 +72,10 @@ input[type=submit] {
 input[type=submit]:hover {
     background-color: #253174;
 }
-#registerForm{
+#registerForm,#regtypemenu,#studentForm{
     display: none;
 }
+
 /* Tablet Screen and Bigger */
 @media (min-width: 900px) {
     #coursetitle{
