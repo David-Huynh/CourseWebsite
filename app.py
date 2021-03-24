@@ -1,4 +1,3 @@
-import os
 from flask import Flask, render_template, session, url_for, redirect, request
 app = Flask(__name__, template_folder='./src/templates', static_folder='./src/static')
 
@@ -11,15 +10,21 @@ def home():
     return redirect(url_for('login'))
 @app.route('/lectures')
 def lectures():
-    return render_template("lectures.html")
+    if 'username' in session:
+        return render_template("lectures.html")
+    return redirect(url_for('login'))
 
 @app.route('/coursework')
 def coursework():
-    return render_template("courseWork.html")
+    if 'username' in session:
+        return render_template("courseWork.html")
+    return redirect(url_for('login'))
 
 @app.route('/links')
 def links():
-    return render_template("links.html")
+    if 'username' in session:
+        return render_template("links.html")
+    return redirect(url_for('login'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
