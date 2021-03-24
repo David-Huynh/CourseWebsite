@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Parent Template</title>
+        <link rel="stylesheet" href="{{url_for('static', filename ='css/mainlayout.css')}}">
+    </head>
+    <body>
+        <!-- Header Navigation Bar -->
+        <header>
+            <div id="headerNav">
+                <h3 id="navTitle">CSCB63</h3>
+                <nav>
+                    <ul class="desktopList">
+                        <li><a href="{{url_for('.home')}}">Home</a></li>
+                        <li><a href="{{url_for('.lectures')}}">Lectures & Tutorials</a></li>
+                        <li><a href="{{url_for('.coursework')}}">Course Work</a></li>
+                        <li><a href="{{url_for('.links')}}">Links</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+        {%block content%}
+        {%endblock%}
+        <!-- Footer Credits -->
+        <footer>
+            Created by David Huynh and Collin Chan
+            <a href="https://www.utsc.utoronto.ca/cms/faculty-of-computer-science" target="_blank" class="links" id="faculty">Faculty of Computer Science at UofT</a>
+        </footer>
+    </body>
+</html>

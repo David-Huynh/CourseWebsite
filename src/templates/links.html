@@ -3,32 +3,18 @@
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8">
         <title>Links to Resources</title>
-        <link rel="stylesheet" href="../static/css/mainlayout.css">
-        <link rel="stylesheet" href="../static/css/courseWork.css">
-        <link rel="stylesheet" href="../static/css/card.css">
-        
+        <link rel="stylesheet" href="{{url_for('static', filename ='css/courseWork.css')}}">
+        <link rel="stylesheet" href="{{url_for('static', filename ='css/card.css')}}">
     </head>
     <body>
-        <!-- Header Navigation Bar -->
-        <header>
-            <div id="headerNav">
-                <h3 id="navTitle">CSCB63</h3>
-                <nav>
-                    <ul class="desktopList">
-                        <li><a href="./index.html">Home</a></li>
-                        <li><a href="./lectures.html">Lectures & Tutorials</a></li>
-                        <li><a href="./courseWork.html">Course Work</a></li>
-                        <li><a href="./links.html">Links</a></li>
-                    </ul>
-                </nav>
-            </div>
-        </header>
+        {% extends "template.html" %}
+        {% block content %}
         <!-- Page Content -->
         <div class="content">
             <h1 class="title" id="assignmentPageTitle">Links</h1>
             <!-- Tests Card -->
             <div class="card">
-                <a name="tests" href="./courseWork.html#tests" class="links">
+                <a name="resources" href="{{url_for('.links')}}#resources" class="links">
                     <h1 class="cardTitle">
                         
                         Additional Resources
@@ -71,10 +57,6 @@
                 </div>
             </div>
         </div>
-        <!-- Footer Credits -->
-        <footer>
-            Created by David Huynh and Collin Chan
-            <a href="https://www.utsc.utoronto.ca/cms/faculty-of-computer-science" target="_blank" class="links" id="faculty">Faculty of Computer Science at UofT</a>
-        </footer>
+        {% endblock %}
     </body>
 </html>

@@ -4,31 +4,18 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Home</title>
-        <link rel="stylesheet" href="../static/css/mainlayout.css">
-        <link rel="stylesheet" href="../static/css/index.css">
-        <link rel="stylesheet" href="../static/css/card.css">
+        <link rel="stylesheet" href="{{url_for('static', filename ='css/index.css')}}">
+        <link rel="stylesheet" href="{{url_for('static', filename ='css/card.css')}}">
     </head>
     <body>
-        <!-- Header Navigation Bar -->
-        <header>
-            <div id="headerNav">
-                <h3 id="navTitle">CSCB63</h3>
-                <nav>
-                    <ul class="desktopList">
-                        <li><a href="./index.html">Home</a></li>
-                        <li><a href="./lectures.html">Lectures & Tutorials</a></li>
-                        <li><a href="./courseWork.html">Course Work</a></li>
-                        <li><a href="./links.html">Links</a></li>
-                    </ul>
-                </nav>
-            </div>
-        </header>
+        {% extends "template.html" %}
+        {% block content %}
         <!-- Page Content -->
         <div class="content">
             <h1 class="title">Design and Analysis of Data Structures</h1>
             <!-- Course Info Card -->
             <div class="card">
-                <a name="courseInfo" href="./index.html#courseInfo" class="links">
+                <a name="courseInfo" href="{{url_for('.home')}}#courseInfo" class="links">
                     <h1 class="cardTitle">
                     About CSCB63...
                     </h1>
@@ -58,7 +45,7 @@
             <div class="multiCard">
                 <!-- Instructor Card-->
                 <div class="card">
-                    <a name="instructor" href="./index.html#instructor" class="links">
+                    <a name="instructor" href="{{url_for('.home')}}#instructor" class="links">
                         <h1 class="cardTitle">Instructor
                         </h1>
                     </a>
@@ -75,7 +62,7 @@
                 </div>
                 <!-- Timetable Card -->
                 <div class="card">
-                    <a name="timetable" href="./index.html#timetable" class="links">
+                    <a name="timetable" href="{{url_for('.home')}}#timetable" class="links">
                     <h1 class="cardTitle">
                     Timetable
                     </h1>
@@ -96,7 +83,7 @@
             </div>
             <!-- Course Team Card -->
             <div class="card">
-                <a name="courseTeam" href="./index.html#courseTeam" class="links">
+                <a name="courseTeam" href="{{url_for('.home')}}#courseTeam" class="links">
                     <h1 class="cardTitle">Course Team
                     </h1>
                 </a>
@@ -145,7 +132,7 @@
             </div>
             <!-- Calendar Card -->
             <div class="card">
-                <a name="calendar" href="./index.html#calendar" class="links">
+                <a name="calendar" href="{{url_for('.home')}}#calendar" class="links">
                     <h1 class="cardTitle">
                     Calendar
                     </h1>
@@ -164,10 +151,7 @@
                 </div>
             </div>
         </div>
-        <!-- Footer Credits -->
-        <footer>
-            Created by David Huynh and Collin Chan
-            <a href="https://www.utsc.utoronto.ca/cms/faculty-of-computer-science" target="_blank" class="links" id="faculty">Faculty of Computer Science at UofT</a>
-        </footer>
+        {% endblock %}
+        
     </body>
 </html>
