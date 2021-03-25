@@ -85,7 +85,7 @@ def login():
             elif t==1:
                 session['username'] = request.form['username']
                 session['password'] = request.form['password']
-                return render_template("index.html")
+                return redirect(url_for('home'))
         ##else: register the user then add the user to session and redirect them to home route and handle duplicate username error/ 
         else:
             ##Queries whether username exists already or not
@@ -106,7 +106,7 @@ def login():
                         .format(request.form['username'],request.form['firstname'],request.form['lastname'],request.form['email'],request.form['password'],request.form['InstructorsCode']))
                         session['username'] = request.form['username']
                         session['password'] = request.form['password']
-                        return render_template("index.html")
+                        return redirect(url_for('home'))
                     else:
                         error="Invalid instructor code"
                 elif request.form['creationcode'] =='1':
@@ -114,13 +114,13 @@ def login():
                         .format(request.form['username'],request.form['firstname'],request.form['lastname'],request.form['email'],request.form['password']))
                     session['username'] = request.form['username']
                     session['password'] = request.form['password']
-                    return render_template("index.html")
+                    return redirect(url_for('home'))
                 elif request.form['creationcode'] == '2':
                     insert_db("INSERT INTO ta (ta_code,first_name ,last_name ,email ,password ,office_hours ,tutorial_hours ,office_hours_link,tutorial_link) VALUES (\"{}\",\"{}\",\"{}\",\"{}\",\"{}\",'','','','')"
                         .format(request.form['username'],request.form['firstname'],request.form['lastname'],request.form['email'],request.form['password']))
                     session['username'] = request.form['username']
                     session['password'] = request.form['password']
-                    return render_template("index.html")
+                    return redirect(url_for('home'))
                 else:
                     error='invalid user type'
     print(error)
