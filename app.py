@@ -5,8 +5,7 @@ app = Flask(__name__, template_folder='./src/templates', static_folder='./src/st
 app.secret_key = "b'\x1a\xe3$e=(\xdc$\xf6\x95}\x00z\x1c\xae\xc2\n\x1a\x08\x85\x1f#9M\xff\xef=x\rg\x9c\xc9'"
 DATABASE = './assignment3.db'
 
-##TODO: Check if username AND password in the session correlate with a user in the database then display pages iff that is the case
-##TODO: Check whether username and password that is sent by POST request matches one in the database only then add them to the session and redirect them to the home screen
+
 
 ##DATABASE CONNECTION AND QUERY
 def make_dicts(cursor, row):
