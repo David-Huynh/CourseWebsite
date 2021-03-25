@@ -8,51 +8,59 @@ DATABASE = './assignment3.db'
 ##TODO: Check if username AND password in the session correlate with a user in the database then display pages iff that is the case
 ##TODO: Check whether username and password that is sent by POST request matches one in the database only then add them to the session and redirect them to the home screen
 
-##DATABASE CONNECTION
+##DATABASE CONNECTION AND QUERY
+def make_dicts(cursor, row):
+    return dict((cursor.description[idx][0], value)
+                for idx, value in enumerate(row))
 def get_db():
     db = getattr(g, '_database', None)
     if db is None:
         db = g._database = sqlite3.connect(DATABASE)
+        db.row_factory = make_dicts
     return db
-
-@app.teardown_appcontext
-def close_connection(exception):
-    db = getattr(g, '_database', None)
-    if db is not None:
-        db.close()
-
 def query_db(query, args=(), one=False):
     cur = get_db().execute(query, args)
     rv = cur.fetchall()
     cur.close()
     return (rv[0] if rv else None) if one else rv
 
+def insert_db(query, args=()):
+    db = get_db()
+    cur = db.execute(query, args)
+    db.commit()
+    cur.close()
+
 ##SESSION SETTINGS
 @app.before_request
 def before_request():
     session.permanent = True
-
+## ON APPLICATION CLOSE
+@app.teardown_appcontext
+def close_connection(exception):
+    db = getattr(g, '_database', None)
+    if db is not None:
+        db.close()
 ##WEB APP ROUTES
 @app.route('/')
 def home():
-    if 'username' in session:
+    if 'username' in session and 'password' in session:
         return render_template("index.html")
     return redirect(url_for('login'))
 @app.route('/lectures')
 def lectures():
-    if 'username' in session:
+    if 'username' in session and 'password' in session:
         return render_template("lectures.html")
     return redirect(url_for('login'))
 
 @app.route('/coursework')
 def coursework():
-    if 'username' in session:
+    if 'username' in session and 'password' in session:
         return render_template("courseWork.html")
     return redirect(url_for('login'))
 
 @app.route('/links')
 def links():
-    if 'username' in session:
+    if 'username' in session and 'password' in session:
         return render_template("links.html")
     return redirect(url_for('login'))
 
@@ -61,13 +69,61 @@ def links():
 def login():
     error = None
     if request.method == 'POST':
-        ##If doesnt equal a username and password combination then return an error message
-        if request.form['username'] != 'admin' or request.form['password'] != 'thesecretestsecretpassword':
-            error = 'Invalid credentials'
+        if request.form['firstname'] == '' and request.form['lastname'] == '':
+            ##Queries whether there is a username and password match in instructors table
+            qi = query_db("SELECT EXISTS(SELECT instructor_code,password FROM instructor WHERE (instructor_code=\"" + 
+            request.form['username'] + "\" AND password=\"" + request.form['password'] + "\")) AS \"col\"")
+            ##Queries whether there is a username and password match in ta table
+            qt = query_db("SELECT EXISTS(SELECT ta_code,password FROM ta WHERE (ta_code=\"" + 
+            request.form['username'] + "\" AND password=\"" + request.form['password'] + "\")) AS \"col\"")
+            ##Queries whether there is a username and password match in student table
+            qs = query_db("SELECT EXISTS(SELECT student_no,password FROM student WHERE (student_no=\"" + 
+            request.form['username'] + "\" AND password=\"" + request.form['password'] + "\")) AS \"col\"")
+            t = qi[0]["col"] + qt[0]["col"] + qs[0]["col"]
+            if t==0:
+                error = 'Invalid credentials'
+            elif t==1:
+                session['username'] = request.form['username']
+                session['password'] = request.form['password']
+                return render_template("index.html")
+        ##else: register the user then add the user to session and redirect them to home route and handle duplicate username error/ 
         else:
-            session['username'] = request.form['username']
-            session['password'] = request.form['password']
-            return render_template("index.html")
+            ##Queries whether username exists already or not
+            qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=\"" + request.form['username'] + "\")) AS \"col\"")
+            qt = query_db("SELECT EXISTS(SELECT ta_code FROM ta WHERE (ta_code=\"" + request.form['username'] + "\")) AS \"col\"")
+            qs = query_db("SELECT EXISTS(SELECT student_no FROM student WHERE (student_no=\"" + request.form['username'] + "\")) AS \"col\"")
+            t = 0
+            t = qi[0]["col"] + qt[0]["col"] + qs[0]["col"]
+            if t >= 1:
+                ##ERROR: user exits 
+                error='User already exists'
+            elif t == 0:
+                ##USER DOES NOT EXIST SO DETERMINE THE USER LEVEL AND CREATE THE RESPECTIVE USER ENTRY
+                if request.form['creationcode'] == '0':
+                    qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=\"" + request.form['InstructorsCode'] + "\")) AS \"col\"")
+                    if (qi[0]["col"] == 1):
+                        insert_db("INSERT INTO student (student_no ,first_name ,last_name ,email ,password ,ta_code,instructor_code) VALUES (\"{}\",\"{}\",\"{}\",\"{}\",\"{}\",\"nullTA\",\"{}\")"
+                        .format(request.form['username'],request.form['firstname'],request.form['lastname'],request.form['email'],request.form['password'],request.form['InstructorsCode']))
+                        session['username'] = request.form['username']
+                        session['password'] = request.form['password']
+                        return render_template("index.html")
+                    else:
+                        error="Invalid instructor code"
+                elif request.form['creationcode'] =='1':
+                    insert_db("INSERT INTO instructor (instructor_code, first_name, last_name, email, password, office_hours, tutorial_hours, office_hours_link, tutorial_link) VALUES (\"{}\",\"{}\",\"{}\",\"{}\",\"{}\",'','','','')"
+                        .format(request.form['username'],request.form['firstname'],request.form['lastname'],request.form['email'],request.form['password']))
+                    session['username'] = request.form['username']
+                    session['password'] = request.form['password']
+                    return render_template("index.html")
+                elif request.form['creationcode'] == '2':
+                    insert_db("INSERT INTO ta (ta_code,first_name ,last_name ,email ,password ,office_hours ,tutorial_hours ,office_hours_link,tutorial_link) VALUES (\"{}\",\"{}\",\"{}\",\"{}\",\"{}\",'','','','')"
+                        .format(request.form['username'],request.form['firstname'],request.form['lastname'],request.form['email'],request.form['password']))
+                    session['username'] = request.form['username']
+                    session['password'] = request.form['password']
+                    return render_template("index.html")
+                else:
+                    error='invalid user type'
+    print(error)
     return render_template('login.html', error=error)
 
 ##LOGOUT REQUESTS
