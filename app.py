@@ -1,6 +1,7 @@
 import sqlite3
-from flask import Flask, render_template, session, url_for, redirect, request, flash, g
+from flask import Flask, render_template, session, url_for, redirect, request, flash, g, make_response
 app = Flask(__name__, template_folder='./src/templates', static_folder='./src/static')
+import base64
 
 app.secret_key = "b'\x1a\xe3$e=(\xdc$\xf6\x95}\x00z\x1c\xae\xc2\n\x1a\x08\x85\x1f#9M\xff\xef=x\rg\x9c\xc9'"
 DATABASE = './assignment3.db'
@@ -39,12 +40,44 @@ def close_connection(exception):
     db = getattr(g, '_database', None)
     if db is not None:
         db.close()
+## PDF DOWNLOADER
+@app.route('/docs/<id>')
+def get_pdf(id=None):
+    if 'username' in session and 'password' in session:
+        if id is not None:
+            binary_pdf = get_binary_pdf_data_from_database(id=id)
+            response = make_response(binary_pdf)
+            response.headers['Content-Type'] = 'application/pdf'
+            response.headers['Content-Disposition'] = \
+                'attachment; filename=%s.pdf' % 'random'
+            return response
+    return redirect(url_for('login'))
 ##WEB APP ROUTES
 @app.route('/')
 def home():
     if 'username' in session and 'password' in session:
-        return render_template("index.html")
+        name = query_db("SELECT first_name FROM (SELECT instructor_code as username,first_name FROM instructor UNION SELECT ta_code as username,first_name FROM ta UNION SELECT student_no as username,first_name FROM student) WHERE username=\"{}\"".format(session['username']))
+        tas = query_db("SELECT * FROM ta")
+        student = query_db("SELECT * FROM student WHERE student_no=?",[session['username']])
+        ##Queries whether there is a username match in instructors table
+        qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=?)) AS \"col\"",[session['username']])
+        ##Queries whether there is a username match in ta table
+        qt = query_db("SELECT EXISTS(SELECT ta_code,password FROM ta WHERE (ta_code=?)) AS \"col\"",[session['username']])
+        if qi[0]["col"] == 1:
+            instructor = None
+        elif qt[0]["col"] == 1:
+            instructor = None
+        else:
+            instructor = query_db("SELECT * FROM instructor WHERE instructor_code=?",[student[0]["instructor_code"]])
+            if instructor[0]["instructor_picture"] != None:
+                instructor[0]["instructor_picture"] = base64.encodebytes(instructor[0]["instructor_picture"])
+            print(instructor)
+        for ta in tas:
+            if ta["ta_picture"] != None:
+                ta["ta_picture"]= base64.encodebytes(ta["ta_picture"])
+        return render_template("index.html", name=name[0]["first_name"].lower().capitalize(), tas=tas, instructor=instructor)
     return redirect(url_for('login'))
+
 @app.route('/lectures')
 def lectures():
     if 'username' in session and 'password' in session:
@@ -62,7 +95,11 @@ def links():
     if 'username' in session and 'password' in session:
         return render_template("links.html")
     return redirect(url_for('login'))
-
+@app.route('/profile')
+def profile():
+    if 'username' in session and 'password' in session:
+        return render_template("profile.html")
+    return redirect(url_for('login'))
 ##LOGIN/SIGNUP REQUESTS
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -70,14 +107,11 @@ def login():
     if request.method == 'POST':
         if request.form['firstname'] == '' and request.form['lastname'] == '':
             ##Queries whether there is a username and password match in instructors table
-            qi = query_db("SELECT EXISTS(SELECT instructor_code,password FROM instructor WHERE (instructor_code=\"" + 
-            request.form['username'] + "\" AND password=\"" + request.form['password'] + "\")) AS \"col\"")
+            qi = query_db("SELECT EXISTS(SELECT instructor_code,password FROM instructor WHERE (instructor_code=? AND password=?)) AS \"col\"",[request.form["username"],request.form["password"]])
             ##Queries whether there is a username and password match in ta table
-            qt = query_db("SELECT EXISTS(SELECT ta_code,password FROM ta WHERE (ta_code=\"" + 
-            request.form['username'] + "\" AND password=\"" + request.form['password'] + "\")) AS \"col\"")
+            qt = query_db("SELECT EXISTS(SELECT ta_code,password FROM ta WHERE (ta_code=? AND password=?)) AS \"col\"",[request.form["username"],request.form["password"]])
             ##Queries whether there is a username and password match in student table
-            qs = query_db("SELECT EXISTS(SELECT student_no,password FROM student WHERE (student_no=\"" + 
-            request.form['username'] + "\" AND password=\"" + request.form['password'] + "\")) AS \"col\"")
+            qs = query_db("SELECT EXISTS(SELECT student_no,password FROM student WHERE (student_no=? AND password=?)) AS \"col\"",[request.form["username"],request.form["password"]])
             t = qi[0]["col"] + qt[0]["col"] + qs[0]["col"]
             if t==0:
                 error = 'Invalid credentials'
@@ -88,9 +122,9 @@ def login():
         ##else: register the user then add the user to session and redirect them to home route and handle duplicate username error/ 
         else:
             ##Queries whether username exists already or not
-            qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=\"" + request.form['username'] + "\")) AS \"col\"")
-            qt = query_db("SELECT EXISTS(SELECT ta_code FROM ta WHERE (ta_code=\"" + request.form['username'] + "\")) AS \"col\"")
-            qs = query_db("SELECT EXISTS(SELECT student_no FROM student WHERE (student_no=\"" + request.form['username'] + "\")) AS \"col\"")
+            qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=?)) AS \"col\"",[request.form['username']])
+            qt = query_db("SELECT EXISTS(SELECT ta_code FROM ta WHERE (ta_code=?)) AS \"col\"",[request.form['username']])
+            qs = query_db("SELECT EXISTS(SELECT student_no FROM student WHERE (student_no=?)) AS \"col\"",[request.form['username']])
             t = 0
             t = qi[0]["col"] + qt[0]["col"] + qs[0]["col"]
             if t >= 1:
@@ -99,24 +133,24 @@ def login():
             elif t == 0:
                 ##USER DOES NOT EXIST SO DETERMINE THE USER LEVEL AND CREATE THE RESPECTIVE USER ENTRY
                 if request.form['creationcode'] == '0':
-                    qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=\"" + request.form['InstructorsCode'] + "\")) AS \"col\"")
+                    qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=?)) AS \"col\"",[request.form['InstructorsCode']])
                     if (qi[0]["col"] == 1):
-                        insert_db("INSERT INTO student (student_no ,first_name ,last_name ,email ,password ,ta_code,instructor_code) VALUES (\"{}\",\"{}\",\"{}\",\"{}\",\"{}\",\"nullTA\",\"{}\")"
-                        .format(request.form['username'],request.form['firstname'],request.form['lastname'],request.form['email'],request.form['password'],request.form['InstructorsCode']))
+                        insert_db("INSERT INTO student (student_no ,first_name ,last_name ,email ,password,instructor_code) VALUES (?,?,?,?,?,?)",
+                        [request.form['username'],request.form['firstname'],request.form['lastname'],request.form['email'],request.form['password'],request.form['InstructorsCode']])
                         session['username'] = request.form['username']
                         session['password'] = request.form['password']
                         return redirect(url_for('home'))
                     else:
                         error="Invalid instructor code"
                 elif request.form['creationcode'] =='1':
-                    insert_db("INSERT INTO instructor (instructor_code, first_name, last_name, email, password, office_hours, tutorial_hours, office_hours_link, tutorial_link) VALUES (\"{}\",\"{}\",\"{}\",\"{}\",\"{}\",'','','','')"
-                        .format(request.form['username'],request.form['firstname'],request.form['lastname'],request.form['email'],request.form['password']))
+                    insert_db("INSERT INTO instructor (instructor_code, first_name, last_name, email, password) VALUES (?,?,?,?,?)",
+                        [request.form['username'],request.form['firstname'],request.form['lastname'],request.form['email'],request.form['password']])
                     session['username'] = request.form['username']
                     session['password'] = request.form['password']
                     return redirect(url_for('home'))
                 elif request.form['creationcode'] == '2':
-                    insert_db("INSERT INTO ta (ta_code,first_name ,last_name ,email ,password ,office_hours ,tutorial_hours ,office_hours_link,tutorial_link) VALUES (\"{}\",\"{}\",\"{}\",\"{}\",\"{}\",'','','','')"
-                        .format(request.form['username'],request.form['firstname'],request.form['lastname'],request.form['email'],request.form['password']))
+                    insert_db("INSERT INTO ta (ta_code,first_name ,last_name ,email ,password) VALUES (?,?,?,?,?)",
+                        [request.form['username'],request.form['firstname'],request.form['lastname'],request.form['email'],request.form['password']])
                     session['username'] = request.form['username']
                     session['password'] = request.form['password']
                     return redirect(url_for('home'))

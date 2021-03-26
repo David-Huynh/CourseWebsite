@@ -6,11 +6,12 @@
         <title>Home</title>
         <link rel="stylesheet" href="{{url_for('static', filename ='css/index.css')}}">
         <link rel="stylesheet" href="{{url_for('static', filename ='css/card.css')}}">
+        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
     </head>
     <body>
         <!-- TODO:::: ADD A 'RANDOM' PDF TABLE OR SOMETHING TO SCHEMA TO ALLOW SYLLABUS TO BE UPLOADED  -->
 
-        <!-- TODO:::: UPDATE INSTRUCTOR CARD AND COURSE TEAM CARD TO PULL FROM DATABASE AND USE JQUERY TO REPEATEDLY GENERATE COMPONENTS -->
+        <!-- TODO:::: UPDATE INSTRUCTOR CARD AND TIMETABLE AND COURSE TEAM CARD TO PULL FROM DATABASE AND USE JINJA2 TO REPEATEDLY GENERATE COMPONENTS -->
         <!-- TODO:::: CHANGE COURSE TEAM CARD TO FLEXBOX INSTEAD OF GRID AND LET IT WRAP -->
         <!-- TODO:::: FIX ZOOMING IN PROBLEMS WITH HOME SCREEN (PROBLEM IS PROBABLY FIXED BY ABOVE TO TODOS BUT
          COULD ALSO BE THE GRID LAYOUT OUTSIDE THE INSTRUCTOR AND TIMETABLE CARDS) -->
@@ -18,7 +19,11 @@
         {% block content %}
         <!-- Page Content -->
         <div class="content">
-            <h1 class="title">Design and Analysis of Data Structures</h1>
+            {% if name %}
+                <h1 class="title">Hello, {{name}}</h1>
+            {% else %}
+                <h1 class="title">Design and Analysis of Data Structures</h1>
+            {% endif %}
             <!-- Course Info Card -->
             <div class="card">
                 <a name="courseInfo" href="{{url_for('.home')}}#courseInfo" class="links">
@@ -40,7 +45,7 @@
                     </div>
                     <div class="cardSection">
                         <p><b>Resources</b></p>
-                        <p><a href="../pdfs/fillerPDF.pdf" class="links" target="_blank">Syllabus</a></p>
+                        <p><a href="/lectures" class="syllabus" target="_blank">Syllabus</a></p>
                         <p>Latex: <a href="http://latex-project.org/ftp.html" class="links" target="_blank">Installation links</a></p>
                         <p>Latex Guide: <a href="http://tobi.oetiker.ch/lshort/lshort.pdf" class="links" target="_blank">Download</a></p>
                         <p>Latex Template: <a href="https://mathlab.utsc.utoronto.ca/bretscher/b63/lectures/template.tex" class="links" target="_blank">template.tex</a></p>
@@ -48,45 +53,78 @@
                 </div>
             </div>
             <!-- Instructor and Timetable Card -->
-            <div class="multiCard">
-                <!-- Instructor Card-->
-                <div class="card">
-                    <a name="instructor" href="{{url_for('.home')}}#instructor" class="links">
-                        <h1 class="cardTitle">Instructor
+            {% if instructor %}
+                <div class="multiCard">
+                    <!-- Instructor Card-->
+                    <div class="card" id="multi-left">
+                        <a name="instructor" href="{{url_for('.home')}}#instructor" class="links">
+                            <h1 class="cardTitle">Your Instructor
+                            </h1>
+                        </a>
+                        <div class="cardContent" id="instructorGrid">
+                            <div class="cardPicture">
+                                {% if instructor[0]["instructor_picture"] %}
+                                    <img src="data:image/png;base64,{{instructor[0]["instructor_picture"]}}" alt="Picture of Instructor">
+                                {% else %}
+                                    <img src="https://via.placeholder.com/150" alt="Picture of Instructor">
+                                {% endif %}
+                            </div>
+                            <div class="cardPicture">
+                                <b><p>{{instructor[0]["first_name"]}} {{instructor[0]["last_name"]}}</p></b>
+                                <p>Email: <a href="mailto:{{instructor[0]["email"]}}" class="links">{{instructor[0]["email"]}}</a></p>
+                                {% if instructor [0]["office"]%}
+                                    <p>Office: {{instructor[0]["office"]}}</p>
+                                {% else %}
+                                    <p>Office: Professor has yet to set</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Timetable Card -->
+                    <div class="card" id="multi">
+                        <a name="timetable" href="{{url_for('.home')}}#timetable" class="links">
+                        <h1 class="cardTitle">
+                        Timetable
                         </h1>
-                    </a>
-                    <div class="cardContent" id="instructorGrid">
-                        <div class="cardPicture">
-                            <img src="https://www.utsc.utoronto.ca/cms/sites/utsc.utoronto.ca.cms/files/styles/person-thumbnail/public/Anna_Bretscher.jpg?itok=fsOxaRe6" alt="Picture of Prof">
-                        </div>
-                        <div class="cardPicture">
-                            <b><p>Dr. Anna Brestcher</p></b>
-                            <p>Email: <a href="mailto:anna.bretscher@utoronto.ca" class="links">anna.bretscher@utoronto.ca</a></p>
-                            <p>Office: IC 493</p>
+                        </a>
+                        <div class="cardContent">
+                            <div class="cardSection">
+                                <p>Lecture Times:</p>
+                                {% if instructor[0]["first_lecture_time"] %}
+                                    {% if instructor[0]["first_lecture_link"] %}
+                                        <p><a href="{{instructor[0]["first_lecture_link"]}}" target="_blank" class="links">{{instructor[0]["first_lecture_time"]}}</a></p>
+                                    {% else %}
+                                        <p>{{instructor[0]["first_lecture_time"]}}</p>
+                                    {% endif %}
+                                {% else %}
+                                    <p>Unknown for now</p>
+                                {% endif %} 
+                                {% if instructor[0]["second_lecture_time"]%}
+                                    {% if instructor[0]["second_lecture_link"] %}
+                                        <p><a href="{{instructor[0]["second_lecture_link"]}}" target="_blank"class="links">{{instructor[0]["second_lecture_time"]}}</a></p>
+                                    {% else %}
+                                        <p>{{instructor[0]["second_lecture_time"]}}</p>
+                                    {% endif %}
+                                {% else %}
+                                    <p>Professor has yet to set</p>
+                                {% endif %}
+                            </div>
+                            <div class="cardSection">
+                                <p>Office Hours:</p>
+                                {% if instructor[0]["office_hours"] %}
+                                    {% if instructor[0]["office_hours_link"] %}
+                                        <p><a href="{{instructor[0]["office_hours_link"]}}" target="_blank" class="links">{{instructor[0]["office_hours"]}}</a></p>
+                                    {% else %}
+                                        <p>{{instructor[0]["office_hours"]}}</p>
+                                    {% endif %}
+                                {% else %}
+                                    <p>Unknown for now</p>
+                                {% endif %} 
+                            </div>
                         </div>
                     </div>
                 </div>
-                <!-- Timetable Card -->
-                <div class="card">
-                    <a name="timetable" href="{{url_for('.home')}}#timetable" class="links">
-                    <h1 class="cardTitle">
-                    Timetable
-                    </h1>
-                    </a>
-                    <div class="cardContent">
-                        <div class="cardSection">
-                            <p>Lecture Times:</p>
-                            <p>Wednesdays: <a href="https://utoronto.zoom.us/j/89553548645" target="_blank" class="links">3:00pm - 4:00pm</a></p>
-                            <p>Thursdays: <a href="https://utoronto.zoom.us/j/83378932991" target="_blank"class="links">9:00am - 11:00am</a></p>
-                        </div>
-                        <div class="cardSection">
-                            <p>Office Hours:</p>
-                            <p>Usually Monday 11:00am - 12:30pm</p>
-                            <p>Friday 10:40am - 11:30am</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            {% endif %}
             <!-- Course Team Card -->
             <div class="card">
                 <a name="courseTeam" href="{{url_for('.home')}}#courseTeam" class="links">
@@ -94,46 +132,38 @@
                     </h1>
                 </a>
                 <div class="cardContent" id="teamGrid">
-                    <div class="cardPicture">
-                        <img src="https://via.placeholder.com/150" alt="Picture of TA">
-                        <b><p>Filler TA name</p></b>
-                        <p>TA</p>
-                        <p>OH: Monday 11 - 12:30am</p>
-                        <p>Tutorial: <a href="" class="links"> Tuesday 7 - 8pm</a></p>
-                        <p>Email: <a href="" class="links">filler@mail.utoronto.ca</a></p>
-                    </div>
-                    <div class="cardPicture">
-                        <img src="https://via.placeholder.com/150" alt="Picture of TA">
-                        <b><p>Filler TA name</p></b>
-                        <p>TA</p>
-                        <p>OH: Monday 11 - 12:30am</p>
-                        <p>Tutorial: <a href="" class="links"> Wednesdays 7 - 8pm</a></p>
-                        <p>Email: <a href="" class="links">filler@mail.utoronto.ca</a></p>
-                    </div>
-                    <div class="cardPicture">
-                        <img src="https://via.placeholder.com/150" alt="Picture of TA">
-                        <b><p>Filler TA name</p></b>
-                        <p>TA</p>
-                        <p>OH: Monday 11 - 12:30am</p>
-                        <p>Tutorial: <a href="" class="links"> Thursdays 5 - 6pm</a></p>
-                        <p>Email: <a href="" class="links">filler@mail.utoronto.ca</a></p>
-                    </div>
-                    <div class="cardPicture">
-                        <img src="https://via.placeholder.com/150" alt="Picture of TA">
-                        <b><p>Filler TA name</p></b>
-                        <p>TA</p>
-                        <p>OH: Monday 11 - 12:30am</p>
-                        <p>Tutorial: <a href="" class="links"> Friday 12 - 1pm</a></p>
-                        <p>Email: <a href="" class="links">filler@mail.utoronto.ca</a></p>
-                    </div>
-                    <div class="cardPicture">
-                        <img src="https://via.placeholder.com/150" alt="Picture of TA">
-                        <b><p>Filler TA name</p></b>
-                        <p>TA</p>
-                        <p>OH: Monday 11 - 12:30am</p>
-                        <p>Tutorial: <a href="" class="links"> Friday 12 - 1pm</a></p>
-                        <p>Email: <a href="" class="links">filler@mail.utoronto.ca</a></p>
-                    </div>
+                    {% for ta in tas %}
+                        {% if ta["first_name"] != "null" %}
+                            <div class="cardPicture">
+                                {% if ta["ta_picture"] %}
+                                    <img src="data:image/png;base64,{{ta["ta_picture"]}}" alt="Picture of TA" id="taPicture">
+                                {% else %}
+                                    <img src="https://via.placeholder.com/150" alt="Picture of TA">
+                                {% endif %}
+                                <b><p>{{ta["first_name"]}} {{ta["last_name"]}}</p></b>
+                                <p>TA</p>
+                                {% if ta["office_hours"]%}
+                                    {% if ta["office_hours_link"] %}
+                                        <p>OH: <a href="{{ta["office_hours_link"]}}" class="links">{{ta["office_hours"]}}</a></p>
+                                    {% else %}
+                                        <p>OH: {{ta["office_hours"]}} </p>
+                                    {% endif %}
+                                {% else %}
+                                    <p>OH: None</p>
+                                {% endif %} 
+                                {% if ta["tutorial_hours"]%}
+                                    {% if ta["tutorial_link"] %}
+                                        <p>Tutorial: <a href="{{ta["tutorial_link"]}}" class="links"> {{ta["tutorial_hours"]}}</a></p>
+                                    {% else %}
+                                        <p>Tutorial: {{ta["tutorial_hours"]}}</p>
+                                    {% endif %}
+                                {% else %}
+                                    <p>Tutorials: None</p>
+                                {% endif %}
+                                <p>Email: <a href="mailto:{{ta["email"]}}" class="links">{{ta["email"]}}</a></p>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
                 </div>
             </div>
             <!-- Calendar Card -->
@@ -158,6 +188,5 @@
             </div>
         </div>
         {% endblock %}
-        
     </body>
 </html>

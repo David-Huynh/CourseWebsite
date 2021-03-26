@@ -18,9 +18,9 @@
 
 /* Multicard Layout */
 .multiCard{
-    display: grid;
-    grid-template-columns:  1fr 1fr;
-    column-gap: 50px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
     width: 100%;
 }
 /*Card Title Links*/
@@ -39,9 +39,10 @@
 }
 /*Course Team Card Layout*/
 .cardContent#teamGrid{
-    display: grid;
-    grid-template-rows: auto;
-    gap: 10px 10px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
 }
 
 /* Small Mobile Screen*/
@@ -53,16 +54,7 @@
     .cardTitle{
         font-size: 40px;
     }
-    .multiCard{
-        display: grid;
-        grid-template-columns:  auto;
-        grid-template-rows: 1fr 1fr;
-        column-gap: 50px;
-        width: 100%;
-    }
-    .cardContent#teamGrid { 
-        grid-template-columns: repeat(2, 1fr); 
-    }
+
 }
 /* Tablet Screen and Bigger */
 @media (min-width: 900px) {
@@ -78,11 +70,5 @@
         padding-right: 50px;
         padding-bottom: 30px;
     }
-    .multiCard{
-        grid-template-columns:  1fr 1fr;
-        grid-template-rows: auto;
-    }
-    .cardContent#teamGrid { 
-        grid-template-columns: repeat(5, 1fr); 
-    }
+
 }

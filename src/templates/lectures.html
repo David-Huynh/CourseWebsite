@@ -5,10 +5,10 @@
         <title>Lectures and Tutorials</title>
         <link rel="stylesheet" href="{{url_for('static', filename ='css/lectures.css')}}">
         <link rel="stylesheet" href="{{url_for('static', filename ='css/card.css')}}">
-        
+        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
     </head>
     <body>
-        <!-- TODO:::: ADD LECTURES FROM DATABASE AND USE JAVASCRIPT TO REPEATEDLY GENERATE THE LECTURE CARDS -->
+        <!-- TODO:::: ADD LECTURES FROM DATABASE AND USE JINJA2 TO REPEATEDLY GENERATE THE LECTURE CARDS -->
         <!-- TODO:::: MAKE A SEPERATE TUTORIALS PAGE WHERE TAs CAN POST THEIR NOTES AND RECORDINGS -->
         {% extends "template.html" %}
         {% block content %}

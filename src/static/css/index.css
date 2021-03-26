@@ -6,6 +6,9 @@ h1{
 p {
     color: black;
 }
+.cardPicture{
+    margin-right: 20px;
+}
 
 /* Small Mobile Screen*/
 @media (min-width: 320px) {
@@ -19,10 +22,17 @@ p {
         width:100%;
         height:600px; 
     }
+    #multi-left{
+        width: 100%;
+        margin-right: 0;
+    }
+    #multi{
+        width:100%;
+    }
 }
 
 /* Desktop Screen */
-@media (min-width: 900px) {
+@media (min-width: 1400px) {
     #desktopCalendar{
         width:100%;
         height:600px; 
@@ -32,6 +42,13 @@ p {
     #mobileCalendar{
         visibility: collapse;
         display: none;
+    }
+    #multi-left{
+        width: 47%;
+        margin-right: 3%;
+    }
+    #multi{
+        width:50%
     }
 }
 

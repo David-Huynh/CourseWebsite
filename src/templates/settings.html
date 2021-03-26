@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Profile</title>
+        <link rel="stylesheet" href="{{url_for('static', filename ='css/index.css')}}">
+        <link rel="stylesheet" href="{{url_for('static', filename ='css/card.css')}}">
+        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    </head>
+    <body>
+
+        {% extends "template.html" %}
+        {% block content %}
+        <!-- Page Content -->
+        <div class="content">
+        </div>
+        {% endblock %}
+    </body>
+</html>
