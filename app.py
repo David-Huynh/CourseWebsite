@@ -71,7 +71,6 @@ def home():
             instructor = query_db("SELECT * FROM instructor WHERE instructor_code=?",[student[0]["instructor_code"]])
             if instructor[0]["instructor_picture"] != None:
                 instructor[0]["instructor_picture"] = base64.encodebytes(instructor[0]["instructor_picture"])
-            print(instructor)
         for ta in tas:
             if ta["ta_picture"] != None:
                 ta["ta_picture"]= base64.encodebytes(ta["ta_picture"])
