@@ -45,12 +45,18 @@ def close_connection(exception):
 def get_pdf(id=None):
     if 'username' in session and 'password' in session:
         if id is not None:
-            binary_pdf = get_binary_pdf_data_from_database(id=id)
-            response = make_response(binary_pdf)
-            response.headers['Content-Type'] = 'application/pdf'
-            response.headers['Content-Disposition'] = \
-                'attachment; filename=%s.pdf' % 'random'
-            return response
+            pdf = query_db("SELECT pdf_name, pdf_data, username FROM pdf WHERE pdf_id=?",[id])
+            if pdf:
+                if pdf[0]["username"] == session["username"] or pdf[0]["username"] == None:
+                    response = make_response(pdf[0]["pdf_data"])
+                    response.headers['Content-Type'] = 'application/pdf'
+                    response.headers['Content-Disposition'] = \
+                        'attachment; filename=%s.pdf' % pdf[0]["pdf_name"]
+                    return response
+                else:
+                    return "ERROR: you do not have permission to view this file"
+            else:
+                return "ERROR: no such file exists"
     return redirect(url_for('login'))
 ##WEB APP ROUTES
 @app.route('/')
@@ -74,7 +80,7 @@ def home():
         for ta in tas:
             if ta["ta_picture"] != None:
                 ta["ta_picture"]= base64.encodebytes(ta["ta_picture"])
-        return render_template("index.html", name=name[0]["first_name"].lower().capitalize(), tas=tas, instructor=instructor)
+        return render_template("index.html", name=name[0]["first_name"].lower().capitalize(), tas=tas, instructor=instructor, pdf=instructor[0]["syllabus_id"])
     return redirect(url_for('login'))
 
 @app.route('/lectures')

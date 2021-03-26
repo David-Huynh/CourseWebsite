@@ -41,7 +41,11 @@
                     </div>
                     <div class="cardSection">
                         <p><b>Resources</b></p>
-                        <p><a href="/lectures" class="syllabus" target="_blank">Syllabus</a></p>
+                        {% if pdf %}
+                            <p><a href="/docs/{{pdf}}" class="syllabus" target="_blank">Syllabus</a></p>
+                        {% else %}
+                            <p>Syllabus(None Yet)</p>
+                        {% endif %}
                         <p>Latex: <a href="http://latex-project.org/ftp.html" class="links" target="_blank">Installation links</a></p>
                         <p>Latex Guide: <a href="http://tobi.oetiker.ch/lshort/lshort.pdf" class="links" target="_blank">Download</a></p>
                         <p>Latex Template: <a href="https://mathlab.utsc.utoronto.ca/bretscher/b63/lectures/template.tex" class="links" target="_blank">template.tex</a></p>
