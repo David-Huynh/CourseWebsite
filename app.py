@@ -41,7 +41,7 @@ def close_connection(exception):
     if db is not None:
         db.close()
 ## PDF DOWNLOADER
-@app.route('/docs/<id>')
+@app.route('/pdfs/<id>')
 def get_pdf(id=None):
     if 'username' in session and 'password' in session:
         if id is not None:
