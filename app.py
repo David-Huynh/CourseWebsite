@@ -80,7 +80,10 @@ def home():
         for ta in tas:
             if ta["ta_picture"] != None:
                 ta["ta_picture"]= base64.encodebytes(ta["ta_picture"])
-        return render_template("index.html", name=name[0]["first_name"].lower().capitalize(), tas=tas, instructor=instructor, pdf=instructor[0]["syllabus_id"])
+        if instructor:
+            return render_template("index.html", name=name[0]["first_name"].lower().capitalize(), tas=tas, instructor=instructor, pdf=instructor[0]["syllabus_id"])
+        else:
+            return render_template("index.html", name=name[0]["first_name"].lower().capitalize(), tas=tas, instructor=instructor, pdf=None)
     return redirect(url_for('login'))
 
 @app.route('/lectures')
