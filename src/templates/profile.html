@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8">
+        <title>My Profile</title>
+        <link rel="stylesheet" href="{{url_for('static', filename ='css/profile.css')}}">
+        <link rel="stylesheet" href="{{url_for('static', filename ='css/courseWork.css')}}">
+        <link rel="stylesheet" href="{{url_for('static', filename ='css/card.css')}}">
+        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    </head>
+    <body>
+        <!-- TODO:::: CREATE A COURSE FEEDBACK PAGE WHERE STUDENTS CAN GIVE FEEDBACK TO PROFS AND TA's AND TA's/Prof's CAN READ FEEDBACK FOR THEM-->
+        {% extends "template.html" %}
+        {% block content %}
+        <!-- Page Content -->
+        <div class="content">
+            <h1 class="title" id="assignmentPageTitle">My Profile</h1>
+            <!-- Tests Card -->
+            <div class="card">
+                <a name="resources" href="{{url_for('.links')}}#resources" class="links">
+                    <h1 class="cardTitle">
+                        {{name}} 
+                    </h1>
+                </a>
+                <div class="cardContent">
+                    <input type="button" value="Edit Profile" class="editButton">
+                    <div class="cardPicture">
+                        {% if instructor %}
+                            <img src="data:image/png;base64,{{instructor["instructor_picture"]}}" alt="Picture of Instructor"> 
+                        {% else %}
+                            <img src="https://via.placeholder.com/150" alt="Picture of Instructor">
+                        {% endif %}
+                    </div>
+                    <div class="cardSection">
+                        <p>
+                            <span class="subtitle">Syllabus:</span> 
+                            {% if syllabus %}
+                                <a href="https://piazza.com/class/kk052lckppx73x" class="links" target="_blank">[Link]</a> 
+                            {% else %}
+                                <p>Coming Soon</p>
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="cardSection">
+                        <p>
+                            <span class="subtitle">Office Hours:</span> 
+                            {% if oHours %}
+                                <a href="https://piazza.com/class/kk052lckppx73x" class="links" target="_blank">[Link]</a> 
+                            {% else %}
+                                <p>Coming Soon</p>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endblock %}
+        <script src="{{url_for('static', filename='javascript/profile.js')}}"></script>
+    </body>
+</html>
