@@ -4,9 +4,10 @@
         <meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8">
         <title>My Profile</title>
         <link rel="stylesheet" href="{{url_for('static', filename ='css/profile.css')}}">
-        <link rel="stylesheet" href="{{url_for('static', filename ='css/courseWork.css')}}">
+        <link rel="stylesheet" href="{{url_for('static', filename ='css/.css')}}">
         <link rel="stylesheet" href="{{url_for('static', filename ='css/card.css')}}">
         <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+        <script src="{{url_for('static', filename='javascript/profile.js')}}"></script>
     </head>
     <body>
         <!-- TODO:::: CREATE A COURSE FEEDBACK PAGE WHERE STUDENTS CAN GIVE FEEDBACK TO PROFS AND TA's AND TA's/Prof's CAN READ FEEDBACK FOR THEM-->
@@ -17,13 +18,19 @@
             <h1 class="title" id="assignmentPageTitle">My Profile</h1>
             <!-- Tests Card -->
             <div class="card">
-                <a name="resources" href="{{url_for('.links')}}#resources" class="links">
-                    <h1 class="cardTitle">
-                        {{name}} 
-                    </h1>
-                </a>
+                <h1 class="cardTitle"> {{name}} </h1>
                 <div class="cardContent">
-                    <input type="button" value="Edit Profile" class="editButton">
+                    <button id="editB" class="editButton">Edit Profile</button>
+                    <!-- The Modal -->
+                    <div id="myModal" class="modal">
+
+                        <!-- Modal content -->
+                        <div class="modal-content">
+                        <span class="close">&times;</span>
+                        <p class="cardTitle">Editing Profile...</p>
+                        </div>
+                    
+                    </div>
                     <div class="cardPicture">
                         {% if instructor %}
                             <img src="data:image/png;base64,{{instructor["instructor_picture"]}}" alt="Picture of Instructor"> 
@@ -55,6 +62,5 @@
             </div>
         </div>
         {% endblock %}
-        <script src="{{url_for('static', filename='javascript/profile.js')}}"></script>
     </body>
 </html>
