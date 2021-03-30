@@ -75,9 +75,13 @@ def home():
             instructor = None
         else:
             instructor = query_db("SELECT * FROM instructor WHERE instructor_code=?",[student[0]["instructor_code"]])
+            instructor[0]["first_name"] = instructor[0]["first_name"].lower().capitalize()
+            instructor[0]["last_name"] = instructor[0]["last_name"].lower().capitalize()
             if instructor[0]["instructor_picture"] != None:
                 instructor[0]["instructor_picture"] = base64.encodebytes(instructor[0]["instructor_picture"])
         for ta in tas:
+            ta["first_name"] =  ta["first_name"].lower().capitalize()
+            ta["last_name"] =  ta["last_name"].lower().capitalize()
             if ta["ta_picture"] != None:
                 ta["ta_picture"]= base64.encodebytes(ta["ta_picture"])
         if instructor:

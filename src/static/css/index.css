@@ -9,7 +9,10 @@ p {
 .cardPicture{
     margin-right: 20px;
 }
-
+.picture{
+    width: 150px;
+    height: 150px;
+}
 /* Small Mobile Screen*/
 @media (min-width: 320px) {
     #desktopCalendar{

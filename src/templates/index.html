@@ -64,7 +64,7 @@
                         <div class="cardContent" id="instructorGrid">
                             <div class="cardPicture">
                                 {% if instructor[0]["instructor_picture"] %}
-                                    <img src="data:image/png;base64,{{instructor[0]["instructor_picture"]}}" alt="Picture of Instructor">
+                                    <img src="data:image/png;base64,{{instructor[0]["instructor_picture"]}}" alt="Picture of Instructor" class="pictures">
                                 {% else %}
                                     <img src="https://via.placeholder.com/150" alt="Picture of Instructor">
                                 {% endif %}
@@ -136,7 +136,7 @@
                         {% if ta["first_name"] != "null" %}
                             <div class="cardPicture">
                                 {% if ta["ta_picture"] %}
-                                    <img src="data:image/png;base64,{{ta["ta_picture"]}}" alt="Picture of TA" id="taPicture">
+                                    <img src="data:image/png;base64,{{ta["ta_picture"]}}" alt="Picture of TA" class="pictures">
                                 {% else %}
                                     <img src="https://via.placeholder.com/150" alt="Picture of TA">
                                 {% endif %}
