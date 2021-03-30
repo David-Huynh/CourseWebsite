@@ -45,23 +45,22 @@ CREATE TABLE instr_feedback (
 CREATE TABLE instr_notes (
 	week INTEGER NOT NULL,
 	instructor_code TEXT NOT NULL,
-	pdf_no INTEGER NOT NULL,
 	pdf_id INT NOT NULL,
-	PRIMARY KEY(week, instructor_code, pdf_no),
+	PRIMARY KEY(week, instructor_code, pdf_id),
 	FOREIGN KEY(instructor_code) REFERENCES instructor(instructor_code),
 	FOREIGN KEY (pdf_id) REFERENCES pdf(pdf_id)
 );
 
 CREATE TABLE lec_pdfs (
 	week INTEGER NOT NULL,
-	pdf_no INTEGER NOT NULL,
 	pdf_id INT NOT NULL,
-	PRIMARY KEY (week, pdf_no),
+	PRIMARY KEY (week, pdf_id),
 	FOREIGN KEY (pdf_id) REFERENCES pdf(pdf_id)
 );
 
 CREATE TABLE lectures(
 	week INTEGER NOT NULL,
+	lecture_title TEXT NOT NULL,
 	instructor_code TEXT NOT NULL,
 	tues_recording TEXT,
 	thurs_recording TEXT,
@@ -74,6 +73,7 @@ CREATE TABLE ta(
 	last_name TEXT NOT NULL,
 	email TEXT NOT NULL,
 	password TEXT NOT NULL,
+	
 	office_hours TEXT,
 	tutorial_hours TEXT,
 	office_hours_link TEXT,
@@ -125,6 +125,7 @@ CREATE TABLE student (
 	last_name TEXT NOT NULL,
 	email TEXT NOT NULL,
 	password TEXT NOT NULL,
+	
 	ta_code TEXT,
 	instructor_code TEXT NOT NULL,
 	PRIMARY KEY (student_no),

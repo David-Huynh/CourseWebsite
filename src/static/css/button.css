@@ -1,0 +1,15 @@
+.customButton {
+    color: #002A5C;
+    font-weight: bold;
+    background: #ffffff;
+    padding: 10px;
+    border: 3px solid #002A5C;
+    transition: all 0.4s ease 0s;
+}
+    
+.customButton:hover {
+    color: #ffffff;
+    background: #002A5C;
+    border-color: #002A5C;
+    transition: all 0.4s ease 0s;
+}

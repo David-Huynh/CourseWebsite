@@ -62,7 +62,7 @@ def get_pdf(id=None):
 @app.route('/')
 def home():
     if 'username' in session and 'password' in session:
-        name = query_db("SELECT first_name FROM (SELECT instructor_code as username,first_name FROM instructor UNION SELECT ta_code as username,first_name FROM ta UNION SELECT student_no as username,first_name FROM student) WHERE username=\"{}\"".format(session['username']))
+        name = query_db("SELECT first_name FROM (SELECT instructor_code as username,first_name FROM instructor UNION SELECT ta_code as username,first_name FROM ta UNION SELECT student_no as username,first_name FROM student) WHERE username=?",[session['username']])
         tas = query_db("SELECT * FROM ta")
         student = query_db("SELECT * FROM student WHERE student_no=?",[session['username']])
         ##Queries whether there is a username match in instructors table
@@ -93,6 +93,36 @@ def home():
 @app.route('/lectures')
 def lectures():
     if 'username' in session and 'password' in session:
+        student=None
+        error=None
+        ##Queries whether there is a username match in instructors table
+        qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=?)) AS \"col\"",[session['username']])
+        ##Queries whether there is a username match in ta table
+        qt = query_db("SELECT EXISTS(SELECT ta_code,password FROM ta WHERE (ta_code=?)) AS \"col\"",[session['username']])
+        
+        if qi[0]["col"] == 1:
+            if request.method == 'POST':
+                
+                print("POST")
+            return render_template("lectures.html", error=error,qi=qi)
+        elif qt[0]["col"] == 1:
+            first_instructor_code = query_db("SELECT instructor_code FROM instructor")[0]
+            instructor_lecture_material = query_db("SELECT * FROM lectures WHERE instructor_code=?", [first_instructor_code["instructor_code"]])
+            general_lecture_material = query_db("SELECT * FROM lec_pdfs")
+            instructor_pdfs = instructor_lecture_material = query_db("SELECT * FROM instr_notes WHERE instructor_code=?", [first_instructor_code["instructor_code"]])
+            return render_template("lectures.html",
+                instructor_lecture_material=instructor_lecture_material,  
+                general_lecture_material=general_lecture_material, 
+                instructor_pdfs=instructor_pdfs)
+        else:
+            student = query_db("SELECT * FROM student WHERE student_no=?",[session['username']])
+            instructor_lecture_material = query_db("SELECT * FROM lectures WHERE instructor_code=?", [student[0]["instructor_code"]])
+            general_lecture_material = query_db("SELECT * FROM lec_pdfs")
+            instructor_pdfs = instructor_lecture_material = query_db("SELECT * FROM instr_notes WHERE instructor_code=?", [student[0]["instructor_code"]])
+            return render_template("lectures.html", 
+                instructor_lecture_material=instructor_lecture_material,  
+                general_lecture_material=general_lecture_material, 
+                instructor_pdfs=instructor_pdfs)
         return render_template("lectures.html")
     return redirect(url_for('login'))
 
@@ -110,9 +140,11 @@ def links():
 @app.route('/profile')
 def profile():
     if 'username' in session and 'password' in session:
-        fname = query_db("SELECT first_name FROM instructor WHERE instructor_code=\"{}\"".format(session['username']))
-        lname = query_db("SELECT last_name FROM instructor WHERE instructor_code=\"{}\"".format(session['username']))
-        return render_template("profile.html", name=fname[0]["first_name"].lower().capitalize()+' '+lname[0]["last_name"].lower().capitalize(), instructor=None)
+        fname = query_db("SELECT first_name FROM instructor WHERE instructor_code=?",[session['username']])
+        lname = query_db("SELECT last_name FROM instructor WHERE instructor_code=?",[session['username']])
+        if fname and lname:
+            return render_template("profile.html", name=fname[0]["first_name"].lower().capitalize()+' '+lname[0]["last_name"].lower().capitalize(), instructor=None)
+        return render_template("profile.html", instructor=None)
     return redirect(url_for('login'))
 ##LOGIN/SIGNUP REQUESTS
 @app.route('/login', methods=['GET', 'POST'])

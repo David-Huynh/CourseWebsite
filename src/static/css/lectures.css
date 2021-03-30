@@ -6,3 +6,8 @@ h1{
 p{
     color: black;
 }
+
+#alignRight{
+    align-self: flex-end;
+    margin-bottom: 20px;
+}
