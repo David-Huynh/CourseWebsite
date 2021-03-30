@@ -1,42 +1,50 @@
-$(document).ready(function(){
-    $("#dropmenu").change(function () {
-        var option = $("#dropmenu option:selected").val();
-        console.log(option);
-        if(option=="Signin")
-        {
-            $("#signinButton").show();
-            $("#registerForm").hide();
-            $("#studentForm").hide();
-            $("#regtypemenu").hide();
-            $("#studentForm input").removeAttr('required');
-            $("#registerForm input").removeAttr('required');
-            
-
+window.onload = function() {
+    var dropmenu = document.getElementById("dropmenu");
+    dropmenu.addEventListener("change", () => {
+        var option = dropmenu.value;
+        if(option=="Signin"){
+            document.getElementById("signinButton").style.display="block";
+            document.getElementById("registerForm").style.display="none";
+            document.getElementById("studentForm").style.display="none";
+            document.getElementById("regtypemenu").style.display="none";
+            document.getElementById("registerForm").removeAttribute("required");
+            document.getElementById("studentForm").removeAttribute("required");
         }else if (option=="Register"){
-            $("#signinButton").hide();
-            $("#regtypemenu").show();
-            $("#registerForm").show();
-            $("#registerForm input").attr('required', '');
-            //Checks whether student is selected or instructor is selected to show the correct form
-            if ($("#regtypemenu option:selected").val()=="Student"){
-                $("#studentForm").show();
-                $("#studentForm input").attr('required', '');
-            }else if ($("#regtypemenu option:selected").val()=="Instructor"){
-                $("#studentForm").hide();
-                $("#studentForm input").removeAttr('required');
+            document.getElementById("registerForm").style.display="block";
+            document.getElementById("regtypemenu").style.display="block";
+            document.getElementById("signinButton").style.display="none";
+            document.querySelectorAll("#registerForm input").forEach(element => {
+                element.setAttribute("required","");
+            });
+            var regOption = document.getElementById("regtypemenu").value;
+            console.log(regOption)
+            if (regOption=="Student"){
+                document.getElementById("studentForm").style.display="block";
+                document.querySelectorAll("#studentForm input").forEach(element => {
+                    element.setAttribute("required","");
+                });
+            }else if (regOption=="Instructor"){
+                document.getElementById("studentForm").style.display="none";
+                document.querySelectorAll("#studentForm input").forEach(element => {
+                    element.removeAttribute("required");
+                });
             }
         }
-    });
-    $("#regtypemenu").change(function () {
-        var option = $("#regtypemenu option:selected").val();
+    })
+    var regMenu = document.getElementById("regtypemenu");
+    regMenu.addEventListener("change", () => {
+        var option = regMenu.value;
         console.log(option);
-        if(option=="Student")
-        {   
-            $("#studentForm").show();
-            $("#studentForm input").attr('required', '');
+        if(option=="Student"){   
+            document.getElementById("studentForm").style.display="block";
+            document.querySelectorAll("#studentForm input").forEach(element => {
+                element.setAttribute("required","");
+            });
         }else if (option=="Instructor"){
-            $("#studentForm").hide();
-            $("#studentForm input").removeAttr('required');
+            document.getElementById("studentForm").style.display="none";
+            document.querySelectorAll("#studentForm input").forEach(element => {
+                element.removeAttribute("required");
+            });
         }
-    });
-});
+    }) ;
+}
