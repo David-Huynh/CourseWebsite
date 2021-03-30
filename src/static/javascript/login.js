@@ -7,8 +7,12 @@ window.onload = function() {
             document.getElementById("registerForm").style.display="none";
             document.getElementById("studentForm").style.display="none";
             document.getElementById("regtypemenu").style.display="none";
-            document.getElementById("registerForm").removeAttribute("required");
-            document.getElementById("studentForm").removeAttribute("required");
+            document.querySelectorAll("#registerForm input").forEach(element=>{
+                element.removeAttribute("required");
+            })
+            document.querySelectorAll("#studentForm input").forEach(element=>{
+                element.removeAttribute("required");
+            })
         }else if (option=="Register"){
             document.getElementById("registerForm").style.display="block";
             document.getElementById("regtypemenu").style.display="block";
