@@ -1,5 +1,4 @@
-.editButton {
-    float: right;
+.customButton {
     color: #002A5C;
     font-weight: bold;
     background: #ffffff;
@@ -8,7 +7,7 @@
     transition: all 0.4s ease 0s;
 }
   
-.editButton:hover {
+.customButton:hover {
     color: #ffffff;
     background: #002A5C;
     border-color: #002A5C;

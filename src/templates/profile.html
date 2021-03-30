@@ -20,14 +20,28 @@
             <div class="card">
                 <h1 class="cardTitle"> {{name}} </h1>
                 <div class="cardContent">
-                    <button id="editB" class="editButton">Edit Profile</button>
+                    <button id="editB" class="customButton" style="float:right">Edit Profile</button>
                     <!-- The Modal -->
                     <div id="myModal" class="modal">
-
                         <!-- Modal content -->
                         <div class="modal-content">
                         <span class="close">&times;</span>
                         <p class="cardTitle">Editing Profile...</p>
+                        <div class="cardContent">
+                            <p>
+                                <span class="subtitle">Syllabus:</span> 
+                                <!-- Button to upload file -->
+                                <input type="file" id="real-file" hidden="hidden" />
+                                <button type="button" class="customButton" id="upload-button">Upload File</button>
+                                <span id="upload-text">No file chosen, yet.</span>
+                            </p>
+                        </div>
+                        <div class="cardContent">
+                            <p>
+                                <span class="subtitle">Office Hours:</span> 
+                                <!-- Input textbox-->
+                            </p>
+                        </div>
                         </div>
                     
                     </div>

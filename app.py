@@ -108,7 +108,7 @@ def profile():
     if 'username' in session and 'password' in session:
         fname = query_db("SELECT first_name FROM instructor WHERE instructor_code=\"{}\"".format(session['username']))
         lname = query_db("SELECT last_name FROM instructor WHERE instructor_code=\"{}\"".format(session['username']))
-        return render_template("profile.html", name=fname[0]["first_name"].lower().capitalize()+' '+lname[0]["last_name"].lower().capitalize())
+        return render_template("profile.html", name=fname[0]["first_name"].lower().capitalize()+' '+lname[0]["last_name"].lower().capitalize(), instructor=None)
     return redirect(url_for('login'))
 ##LOGIN/SIGNUP REQUESTS
 @app.route('/login', methods=['GET', 'POST'])
