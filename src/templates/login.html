@@ -56,6 +56,9 @@
                     </div>
 
                     <input type=submit value="Sign in" id="signinButton">
+                    {% if error %}
+                        <p id="error">{{error}}</p>
+                    {% endif %}
                 </form>
             </div>
         </div>

@@ -142,7 +142,7 @@ def login():
                 error='User already exists'
             elif t == 0:
                 ##USER DOES NOT EXIST SO DETERMINE THE USER LEVEL AND CREATE THE RESPECTIVE USER ENTRY
-                if request.form['creationcode'] == '0':
+                if request.form['creationcode'] == '0' and request.form['InstructorsCode']:
                     qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=?)) AS \"col\"",[request.form['InstructorsCode']])
                     if (qi[0]["col"] == 1):
                         insert_db("INSERT INTO student (student_no ,first_name ,last_name ,email ,password,instructor_code) VALUES (?,?,?,?,?,?)",
@@ -152,13 +152,13 @@ def login():
                         return redirect(url_for('home'))
                     else:
                         error="Invalid instructor code"
-                elif request.form['creationcode'] =='1':
+                elif request.form['creationcode'] =='1' and not request.form['InstructorsCode']:
                     insert_db("INSERT INTO instructor (instructor_code, first_name, last_name, email, password) VALUES (?,?,?,?,?)",
                         [request.form['username'],request.form['firstname'],request.form['lastname'],request.form['email'],request.form['password']])
                     session['username'] = request.form['username']
                     session['password'] = request.form['password']
                     return redirect(url_for('home'))
-                elif request.form['creationcode'] == '2':
+                elif request.form['creationcode'] == '2' and not request.form['InstructorsCode']:
                     insert_db("INSERT INTO ta (ta_code,first_name ,last_name ,email ,password) VALUES (?,?,?,?,?)",
                         [request.form['username'],request.form['firstname'],request.form['lastname'],request.form['email'],request.form['password']])
                     session['username'] = request.form['username']
