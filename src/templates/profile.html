@@ -29,17 +29,27 @@
                         <p class="cardTitle">Editing Profile...</p>
                         <div class="cardContent">
                             <p>
-                                <span class="subtitle">Syllabus:</span> 
+                                <span class="subtitle">Update Profile Picture:</span> 
                                 <!-- Button to upload file -->
                                 <input type="file" id="real-file" hidden="hidden" />
-                                <button type="button" class="customButton" id="upload-button">Upload File</button>
+                                <button type="button" class="customButton" id="upload-button" style="margin-left: 20px;">Upload File</button>
                                 <span id="upload-text">No file chosen, yet.</span>
                             </p>
                         </div>
                         <div class="cardContent">
                             <p>
-                                <span class="subtitle">Office Hours:</span> 
+                                <span class="subtitle">Update Syllabus:</span> 
+                                <!-- Button to upload file -->
+                                <input type="file" id="real-file2" hidden="hidden" />
+                                <button type="button" class="customButton" id="upload-button2" style="margin-left: 20px;">Upload File</button>
+                                <span id="upload-text2">No file chosen, yet.</span>
+                            </p>
+                        </div>
+                        <div class="cardContent">
+                            <p>
+                                <span class="subtitle">Update Office Hours:</span> 
                                 <!-- Input textbox-->
+                                <input type="text" name="search" placeholder="Entering Office Hours...">
                             </p>
                         </div>
                         </div>
@@ -56,6 +66,16 @@
                         <p>
                             <span class="subtitle">Syllabus:</span> 
                             {% if syllabus %}
+                                <a href="https://piazza.com/class/kk052lckppx73x" class="links" target="_blank">[Link]</a> 
+                            {% else %}
+                                <p>Coming Soon</p>
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="cardSection">
+                        <p>
+                            <span class="subtitle">Lecture Times:</span> 
+                            {% if lec %}
                                 <a href="https://piazza.com/class/kk052lckppx73x" class="links" target="_blank">[Link]</a> 
                             {% else %}
                                 <p>Coming Soon</p>
