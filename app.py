@@ -167,7 +167,11 @@ def lectures():
                 instructor_pdfs=instructor_pdfs)
         return render_template("lectures.html")
     return redirect(url_for('login'))
-
+@app.route('/tutorials', methods=['GET', 'POST'])
+def tutorials():
+    if 'username' in session and 'password' in session:
+        return render_template("tutorials.html")
+    return redirect(url_for('login'))
 @app.route('/coursework')
 def coursework():
     if 'username' in session and 'password' in session:
