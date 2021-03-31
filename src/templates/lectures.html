@@ -63,7 +63,7 @@
             <!-- Lecture Cards -->
             {% for lecture in instructor_lecture_material%}
                 <div class="card">
-                    <a name="{{lecture["week"]}}" href="{{url_for('.lectures')}}#{{lecture["week"]}}" class="links">
+                    <a name="{{lecture["week"]}}" href="{{url_for('.lectures',id=id)}}#{{lecture["week"]}}" class="links">
                         <h1 class="cardTitle">Week {{lecture["week"]}} - {{lecture["lecture_title"]}}</h1>
                     </a>
                     <div class="cardContent">

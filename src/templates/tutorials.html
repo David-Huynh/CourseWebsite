@@ -17,82 +17,83 @@
         {% block content %}
         <!-- Page Content -->
         <div class="content">
-            <h1 class="title" id="lecturePageTitle">Lectures</h1>
-            {% if qi %}<!-- CHANGE TO QT !!!!!!!-->
+            <h1 class="title" id="lecturePageTitle">Tutorials</h1>
+            {% if ta %}
                 <div id="alignRight">
-                    <button id="coursePdfButton" class="customButton">Add Course Wide PDF</button>
-                    <button id="lecture" class="customButton">Add Lecture</button>
+                    <button id="coursePdfButton" class="customButton">Add Course Wide Tutorial PDF</button>
+                    <button id="tutorial" class="customButton">Add/Update Tutorial</button>
                 </div>
                 <!-- Course PDF -->
-                <div id="coursePdf" class="modal">
+                <div id="courseTutPdf" class="modal">
                     <div class="modal-content">
                         <span class="close">&times;</span>
-                        <p class="cardTitle">Adding Course Wide PDF...</p>
+                        <p class="cardTitle">Adding Course Wide Tutorial PDF...</p>
                         <div class="cardContent">
                             <form method="post" enctype="multipart/form-data">
                                 <label class="requiredInput" for="week">Week #(Only 1 week)</label>
                                 <input type="text" name="week" placeholder="ie:1,2,3,4..." required>
-                                <label for"instructor_pdf" class="requiredInput">Course Wide File (1 PDF)</label>
-                                <input type="file" class="fileInput" name="courseWidePdf" accept=".pdf" required>
+                                <label for"courseWideTutPdf" class="requiredInput">Course Wide File (1 PDF)</label>
+                                <input type="file" class="fileInput" name="courseWideTutPdf" accept=".pdf" required>
                                 <input type=submit value="Upload Files" id="createButton">
                             </form>
                         </div>
                     </div>
                 </div>
-                <!-- Lecture Modal -->
-                <div id="lectureModal" class="modal">
+                <!-- Tutorial Modal -->
+                <div id="tutorialModal" class="modal">
                     <div class="modal-content">
                         <span class="close">&times;</span>
-                        <p class="cardTitle">Adding Lecture Card...</p>
+                        <p class="cardTitle">Adding Tutorial Card...</p>
                         <div class="cardContent">
                             <form method="post" enctype="multipart/form-data">
-                                <label class="requiredInput" for="lecture_title">Lecture Title</label>
-                                <input type="text" name="lecture_title" placeholder="Lecture Title..." required>
-                                <label for"instructor_pdf">Instructor Notes (PDF)</label>
-                                <input type="file" class="fileInput" name="instructor_pdf" accept=".pdf" multiple>
-                                <label for="tues_recording">Tues Recording</label>
-                                <input type="text" name="tues_recording" placeholder="Tues Recording Link...">
-                                <label for="thurs_recording">Thurs Recording</label>
-                                <input type="text" name="thurs_recording" placeholder="Thurs Recording Link...">
-                                <input type=submit value="Create Lecture" id="createButton">
+                                <label for"ta_pdf">Tutorial Notes (PDF)</label>
+                                <input type="file" class="fileInput" name="ta_pdf" accept=".pdf" multiple>
+                                <label for="recording_link">Recording link</label>
+                                <input type="text" name="recording_link" placeholder="Recording Link...">
+                                <input type=submit value="Create Tutorial" id="createButton">
                             </form>
                         </div>
                     </div>
                 </div>
             {% endif %}
-            <!-- Lecture Cards -->
-            <div class="card">
-                <a name="weekOne" href="{{url_for('.lectures')}}#weekOne" class="links">
-                    <h1 class="cardTitle">Week 1 - Intro, Worst Case Complexity</h1>
-                </a>
-                <div class="cardContent">
-                    <div class="cardSection">
-                        <p>
-                            <span class="subtitle">Wed Pre-Lecture Reading/Exercise:</span> <a href="../pdfs/fillerPDF.pdf" class="links" target="_blank">PDF</a>
-                        </p>
-                        <p>
-                            <span class="subtitle">Thursday Pre-Lecture Reading/Exercise:</span> <a href="../pdfs/fillerPDF.pdf" class="links" target="_blank">PDF</a>
-                        </p>
-                    </div>
-                    <div class="cardSection">
-                        <p>
-                            <span class="subtitle">Wed Slides/Recording:</span> <a href="../pdfs/fillerPDF.pdf" class="links" target="_blank">Worksheet</a>, 
-                            <a href="../pdfs/fillerPDF.pdf" class="links" target="_blank">Recording</a>
-                        </p>
-                        <p>
-                            <span class="subtitle">Thursday Slides/Recording:</span> <a href="../pdfs/fillerPDF.pdf" class="links" target="_blank">Worksheet</a>, 
-                            <a href="../pdfs/fillerPDF.pdf" class="links" target="_blank">Recording</a>
-                        </p>
-                    </div>
-                    <div class="cardSection">
-                        <p>
-                            <span class="subtitle">Tutorial:</span> None
-                        </p>
+            <!-- Tutorial Cards -->
+            {% for tutorial in ta_tutorial_material%}
+                <div class="card">
+                    <a name="{{tutorial["week"]}}" href="{{url_for('.tutorials',id=id)}}#{{tutorial["week"]}}" class="links">
+                        <h1 class="cardTitle">Week {{tutorial["week"]}}</h1>
+                    </a>
+                    <div class="cardContent">
+                        <div class="cardSection">
+                            <span class="subtitle">Course Tutorial PDFs:</span>
+                            {% for pdf in general_tutorial_material%}
+                                {% if pdf["week"] == tutorial["week"]%}
+                                    <p><a href="/pdfs/{{pdf["pdf_id"]}}" class="links" target="_blank">{{pdf["pdf_name"]}}</a></p>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <div class="cardSection">
+                            <span class="subtitle">Instructor PDFs:</span>
+                            {% for pdf in ta_pdfs%}
+                                {% if pdf["week"] == tutorial["week"]%}
+                                    <p><a href="/pdfs/{{pdf["pdf_id"]}}" class="links" target="_blank">{{pdf["pdf_name"]}}</a></p>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <div class="cardSection">
+                            <p>
+                                <span class="subtitle">Recording:</span>
+                                {% if tutorial["recording_link"]%}
+                                    <a href="{{tutorial["recording_link"]}}" class="links" target="_blank">Recording</a>
+                                {% else %}
+                                    <a class="links" target="_blank">None</a>
+                                {% endif%}
+                            </p>
+                        </div>
                     </div>
                 </div>
-            </div>
+            {% endfor %}
         </div>
-        <script src="{{url_for('static', filename='javascript/lectures.js')}}"></script>
+        <script src="{{url_for('static', filename='javascript/tutorials.js')}}"></script>
         {% endblock %}
     </body>
 </html>

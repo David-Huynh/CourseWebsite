@@ -34,6 +34,30 @@ def insert_db(query, args=()):
 @app.before_request
 def before_request():
     session.permanent = True
+##Injects instructor and ta information into context of every template
+@app.context_processor
+def inject_ta_instructor():
+    if 'username' in session and 'password' in session:
+        ##Queries whether there is a username match in instructors table
+        qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=?)) AS \"col\"",[session['username']])
+        ##Queries whether there is a username match in ta table
+        qt = query_db("SELECT EXISTS(SELECT ta_code,password FROM ta WHERE (ta_code=?)) AS \"col\"",[session['username']])
+        first_instructor = query_db("SELECT instructor_code FROM instructor",one=True)
+        first_ta = query_db("SELECT ta_code FROM ta",one=True)
+        if qi[0]["col"] == 1:
+            return dict(ta_id=first_ta["ta_code"],instructor_id=session['username'])
+        elif qt[0]["col"] == 1:
+            return dict(ta_id=session['username'],instructor_id=first_instructor["instructor_code"])
+        else:
+            student = query_db("SELECT * FROM student WHERE (student_no=?)",[session['username']])
+            if student[0]["ta_code"] and student[0]["instructor_code"]:
+                return dict(ta_id=student[0]["ta_code"],instructor_id=student[0]["instructor_code"])
+            elif student[0]["ta_code"] and not student[0]["instructor_code"]:
+                return dict(ta_id=student[0]["ta_code"], instructor_id=first_instructor["instructor_code"])
+            elif student[0]["instructor_code"] and not student[0]["ta_code"]:
+                return dict(ta_id=first_ta["ta_code"], instructor_id=student[0]["instructor_code"])
+            return dict(ta_id=first_ta["ta_code"], instructor_id=first_instructor["instructor_code"])
+    return dict()
 ## ON APPLICATION CLOSE
 @app.teardown_appcontext
 def close_connection(exception):
@@ -90,87 +114,170 @@ def home():
             return render_template("index.html", name=name[0]["first_name"].lower().capitalize(), tas=tas, instructor=instructor, pdf=None)
     return redirect(url_for('login'))
 
-@app.route('/lectures', methods=['GET', 'POST'])
-def lectures():
+@app.route('/lectures/<id>', methods=['GET', 'POST'])
+def lectures(id=None):
     if 'username' in session and 'password' in session:
-        student=None
-        error=None
-        ##Queries whether there is a username match in instructors table
-        qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=?)) AS \"col\"",[session['username']])
-        ##Queries whether there is a username match in ta table
-        qt = query_db("SELECT EXISTS(SELECT ta_code,password FROM ta WHERE (ta_code=?)) AS \"col\"",[session['username']])
-        ##Instructor User Page
-        if qi[0]["col"] == 1:
-            instructor_lecture_material = query_db("SELECT * FROM lectures WHERE instructor_code=? ORDER BY week ASC", [session["username"]])
-            general_lecture_material = query_db("SELECT * FROM lec_pdfs INNER JOIN pdf ON lec_pdfs.pdf_id = pdf.pdf_id")
-            instructor_pdfs = query_db("SELECT * FROM instr_notes INNER JOIN pdf ON instr_notes.pdf_id = pdf.pdf_id WHERE instructor_code=?", [session["username"]])
-            if request.method == 'POST':
-                ## Course Wide PDF Upload
-                if request.files.get("courseWidePdf"):
-                    if request.files["courseWidePdf"]:
-                        #Inserts pdfs
-                        insert_db("INSERT INTO pdf (pdf_name,pdf_data,username) VALUES (?,?,?)",[request.files["courseWidePdf"].filename, request.files["courseWidePdf"].read(), session['username']])
-                        insert_db("INSERT INTO lec_pdfs (week, pdf_id) VALUES (?,(SELECT last_insert_rowid()))",[request.form["week"]])
-                ## else: Lecture Upload
-                else:
-                    ##Checks whether selected week lecture exists
-                    lectureExists = query_db("SELECT EXISTS(SELECT * FROM lectures WHERE (week=? AND instructor_code=?)) AS \"col\"",[request.form["week"],session['username']])
-                    if lectureExists[0]["col"] !=1:
-                        ## Insert if lecture does not exist
-                        insert_db("INSERT INTO lectures (week, lecture_title,instructor_code) VALUES (?,?,?)",[request.form["week"],request.form["lecture_title"], session['username']])
-                    else:
-                        ## Update if lecture does not exist
-                        insert_db("UPDATE lectures SET lecture_title=? WHERE week=? AND instructor_code=?",[request.form["lecture_title"], request.form["week"],session['username']])
-                    if request.form["tues_recording"]:
-                        ## Updates tues_recording
-                        insert_db("UPDATE lectures SET tues_recording=? WHERE week=? AND instructor_code=?",[request.form["tues_recording"],request.form["week"], session['username']])
-                    if request.form["thurs_recording"]:
-                        ## Updates thurs_recording
-                        insert_db("UPDATE lectures SET thurs_recording=? WHERE week=? AND instructor_code=?",[request.form["thurs_recording"],request.form["week"], session['username']])
-                    ##INSERT FILES INTO DATABASE
-                    if request.files["instructor_pdf"]:
-                        ##INSERTS PDFS INTO DATABASE AND REMOVES OLD PDFS IF APPLICABLE
-                        instructor_Notes = query_db("SELECT pdf_id FROM instr_notes WHERE (week=? AND instructor_code=?)",[request.form["week"],session['username']])
-                        for note in instructor_Notes:
-                            ##removes all old pdfs
-                            insert_db("DELETE FROM pdf WHERE pdf_id=?",[note["pdf_id"]])
-                        if len(instructor_Notes) >=1:
-                            ##Deletes all refernces
-                            insert_db("DELETE FROM instr_notes WHERE week=? AND instructor_code=?",[request.form["week"], session['username']])
-                        for pdf in request.files.getlist("instructor_pdf"):
-                            insert_db("INSERT INTO pdf (pdf_name,pdf_data,username) VALUES (?,?,?)",[pdf.filename, pdf.read(), session['username']])
-                            insert_db("INSERT INTO instr_notes (week, instructor_code, pdf_id) VALUES (?,?,(SELECT last_insert_rowid()))",[request.form["week"],session['username']])
-            return render_template("lectures.html", 
-                instructor_lecture_material=instructor_lecture_material,  
-                general_lecture_material=general_lecture_material, 
-                instructor_pdfs=instructor_pdfs,
-                instructor=qi)
-        ##TA User Page
-        elif qt[0]["col"] == 1:
-            first_instructor_code = query_db("SELECT instructor_code FROM instructor")[0]
-            instructor_lecture_material = query_db("SELECT * FROM lectures WHERE instructor_code=? ORDER BY week ASC", [first_instructor_code["instructor_code"]])
-            general_lecture_material = query_db("SELECT * FROM lec_pdfs INNER JOIN pdf ON lec_pdfs.pdf_id = pdf.pdf_id")
-            instructor_pdfs = query_db("SELECT * FROM instr_notes INNER JOIN pdf ON instr_notes.pdf_id = pdf.pdf_id WHERE instructor_code=?", [first_instructor_code["instructor_code"]])
-            return render_template("lectures.html",
-                instructor_lecture_material=instructor_lecture_material,  
-                general_lecture_material=general_lecture_material, 
-                instructor_pdfs=instructor_pdfs)
-        ##Student User Page
-        else:
-            student = query_db("SELECT * FROM student WHERE student_no=?",[session['username']])
-            instructor_lecture_material = query_db("SELECT * FROM lectures WHERE instructor_code=? ORDER BY week ASC", [student[0]["instructor_code"]])
-            general_lecture_material = query_db("SELECT * FROM lec_pdfs INNER JOIN pdf ON lec_pdfs.pdf_id = pdf.pdf_id")
-            instructor_pdfs = query_db("SELECT * FROM instr_notes INNER JOIN pdf ON instr_notes.pdf_id = pdf.pdf_id WHERE instructor_code=?", [student[0]["instructor_code"]])
-            return render_template("lectures.html", 
-                instructor_lecture_material=instructor_lecture_material,  
-                general_lecture_material=general_lecture_material, 
-                instructor_pdfs=instructor_pdfs)
-        return render_template("lectures.html")
+        if id is not None:
+            ##Queries whether there is a username match in instructors table
+            qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=?)) AS \"col\"",[session['username']])
+            ##Queries whether there is a username match in ta table
+            qt = query_db("SELECT EXISTS(SELECT ta_code,password FROM ta WHERE (ta_code=?)) AS \"col\"",[session['username']])
+            ##Instructor User Page
+            if qi[0]["col"] == 1:
+                instructor_lecture_material = query_db("SELECT * FROM lectures WHERE instructor_code=? ORDER BY week ASC", [id])
+                general_lecture_material = query_db("SELECT * FROM lec_pdfs INNER JOIN pdf ON lec_pdfs.pdf_id = pdf.pdf_id")
+                instructor_pdfs = query_db("SELECT * FROM instr_notes INNER JOIN pdf ON instr_notes.pdf_id = pdf.pdf_id WHERE instructor_code=?", [id])
+                if session["username"] == id:
+                    if request.method == 'POST':
+                        ## Course Wide PDF Upload
+                        if request.files.get("courseWidePdf"):
+                            if request.files["courseWidePdf"]:
+                                #Inserts pdfs
+                                insert_db("INSERT INTO pdf (pdf_name,pdf_data,username) VALUES (?,?,?)",[request.files["courseWidePdf"].filename, request.files["courseWidePdf"].read(), session['username']])
+                                insert_db("INSERT INTO lec_pdfs (week, pdf_id) VALUES (?,(SELECT last_insert_rowid()))",[request.form["week"]])
+                        ## else: Lecture Upload
+                        else:
+                            ##Checks whether selected week lecture exists
+                            lectureExists = query_db("SELECT EXISTS(SELECT * FROM lectures WHERE (week=? AND instructor_code=?)) AS \"col\"",[request.form["week"],session['username']])
+                            if lectureExists[0]["col"] !=1:
+                                ## Insert if lecture does not exist
+                                insert_db("INSERT INTO lectures (week, lecture_title,instructor_code) VALUES (?,?,?)",[request.form["week"],request.form["lecture_title"], session['username']])
+                            else:
+                                ## Update if lecture does not exist
+                                insert_db("UPDATE lectures SET lecture_title=? WHERE week=? AND instructor_code=?",[request.form["lecture_title"], request.form["week"],session['username']])
+                            if request.form["tues_recording"]:
+                                ## Updates tues_recording
+                                insert_db("UPDATE lectures SET tues_recording=? WHERE week=? AND instructor_code=?",[request.form["tues_recording"],request.form["week"], session['username']])
+                            if request.form["thurs_recording"]:
+                                ## Updates thurs_recording
+                                insert_db("UPDATE lectures SET thurs_recording=? WHERE week=? AND instructor_code=?",[request.form["thurs_recording"],request.form["week"], session['username']])
+                            ##INSERT FILES INTO DATABASE
+                            if request.files["instructor_pdf"]:
+                                ##INSERTS PDFS INTO DATABASE AND REMOVES OLD PDFS IF APPLICABLE
+                                instructor_Notes = query_db("SELECT pdf_id FROM instr_notes WHERE (week=? AND instructor_code=?)",[request.form["week"],session['username']])
+                                for note in instructor_Notes:
+                                    ##removes all old pdfs
+                                    insert_db("DELETE FROM pdf WHERE pdf_id=?",[note["pdf_id"]])
+                                if len(instructor_Notes) >=1:
+                                    ##Deletes all refernces
+                                    insert_db("DELETE FROM instr_notes WHERE week=? AND instructor_code=?",[request.form["week"], session['username']])
+                                for pdf in request.files.getlist("instructor_pdf"):
+                                    insert_db("INSERT INTO pdf (pdf_name,pdf_data,username) VALUES (?,?,?)",[pdf.filename, pdf.read(), session['username']])
+                                    insert_db("INSERT INTO instr_notes (week, instructor_code, pdf_id) VALUES (?,?,(SELECT last_insert_rowid()))",[request.form["week"],session['username']])
+                    return render_template("lectures.html", 
+                        instructor_lecture_material=instructor_lecture_material,  
+                        general_lecture_material=general_lecture_material, 
+                        instructor_pdfs=instructor_pdfs,
+                        instructor=qi,
+                        id=id)
+                return render_template("lectures.html", 
+                        instructor_lecture_material=instructor_lecture_material,  
+                        general_lecture_material=general_lecture_material, 
+                        instructor_pdfs=instructor_pdfs,
+                        id=id)
+            ##TA User Page
+            elif qt[0]["col"] == 1:
+                instructor_lecture_material = query_db("SELECT * FROM lectures WHERE instructor_code=? ORDER BY week ASC", [id])
+                general_lecture_material = query_db("SELECT * FROM lec_pdfs INNER JOIN pdf ON lec_pdfs.pdf_id = pdf.pdf_id")
+                instructor_pdfs = query_db("SELECT * FROM instr_notes INNER JOIN pdf ON instr_notes.pdf_id = pdf.pdf_id WHERE instructor_code=?", [id])
+                return render_template("lectures.html",
+                    instructor_lecture_material=instructor_lecture_material,  
+                    general_lecture_material=general_lecture_material, 
+                    instructor_pdfs=instructor_pdfs,
+                    id=id)
+            ##Student User Page
+            else:
+                instructor_lecture_material = query_db("SELECT * FROM lectures WHERE instructor_code=? ORDER BY week ASC", [id])
+                general_lecture_material = query_db("SELECT * FROM lec_pdfs INNER JOIN pdf ON lec_pdfs.pdf_id = pdf.pdf_id")
+                instructor_pdfs = query_db("SELECT * FROM instr_notes INNER JOIN pdf ON instr_notes.pdf_id = pdf.pdf_id WHERE instructor_code=?", [id])
+                return render_template("lectures.html", 
+                    instructor_lecture_material=instructor_lecture_material,  
+                    general_lecture_material=general_lecture_material, 
+                    instructor_pdfs=instructor_pdfs,
+                    id=id)
+            return render_template("lectures.html")
     return redirect(url_for('login'))
-@app.route('/tutorials', methods=['GET', 'POST'])
-def tutorials():
+@app.route('/tutorials/<id>', methods=['GET', 'POST'])
+def tutorials(id=None):
     if 'username' in session and 'password' in session:
-        return render_template("tutorials.html")
+        if id is not None:
+            ##Queries whether there is a username match in instructors table
+            qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=?)) AS \"col\"",[session['username']])
+            ##Queries whether there is a username match in ta table
+            qt = query_db("SELECT EXISTS(SELECT ta_code,password FROM ta WHERE (ta_code=?)) AS \"col\"",[session['username']])
+            ##Instructor User Page
+            if qi[0]["col"] == 1:
+                ta_tutorial_material = query_db("SELECT * FROM tutorials WHERE ta_code=? ORDER BY week ASC", [id])
+                general_tutorial_material = query_db("SELECT * FROM tut_pdfs INNER JOIN pdf ON tut_pdfs.pdf_id = pdf.pdf_id")
+                ta_pdfs = query_db("SELECT * FROM ta_notes INNER JOIN pdf ON ta_notes.pdf_id = pdf.pdf_id WHERE ta_code=?", [id])
+                if request.method == 'POST':
+                    if request.files.get("courseWideTutPdf"):
+                        #Inserts pdfs
+                        insert_db("INSERT INTO pdf (pdf_name,pdf_data,username) VALUES (?,?,?)",[request.files["courseWideTutPdf"].filename, request.files["courseWideTutPdf"].read(), session['username']])
+                        insert_db("INSERT INTO tut_pdfs (week, pdf_id) VALUES (?,(SELECT last_insert_rowid()))",[request.form["week"]])
+                return render_template("tutorials.html", 
+                    ta_tutorial_material=ta_tutorial_material,  
+                    general_tutorial_material=general_tutorial_material, 
+                    ta_pdfs=ta_pdfs,
+                    id=id)
+            ##TA User Page
+            elif qt[0]["col"] == 1:
+                ta_tutorial_material = query_db("SELECT * FROM tutorials WHERE ta_code=? ORDER BY week ASC", [session['username']])
+                general_tutorial_material = query_db("SELECT * FROM tut_pdfs INNER JOIN pdf ON tut_pdfs.pdf_id = pdf.pdf_id")
+                ta_pdfs = query_db("SELECT * FROM ta_notes INNER JOIN pdf ON ta_notes.pdf_id = pdf.pdf_id WHERE ta_code=?", [session['username']])
+                if session["username"] == id:
+                    if request.method == 'POST':
+                        if request.files.get("courseWideTutPdf"):
+                            #Inserts pdfs
+                            insert_db("INSERT INTO pdf (pdf_name,pdf_data,username) VALUES (?,?,?)",[request.files["courseWideTutPdf"].filename, request.files["courseWideTutPdf"].read(), session['username']])
+                            insert_db("INSERT INTO tut_pdfs (week, pdf_id) VALUES (?,(SELECT last_insert_rowid()))",[request.form["week"]])
+                        else:
+                            ##Checks whether selected week tutorial exists
+                            tutorialExists = query_db("SELECT EXISTS(SELECT * FROM tutorials WHERE (week=? AND instructor_code=?)) AS \"col\"",[request.form["week"],session['username']])
+                            if tutorialExists[0]["col"] !=1:
+                                ## Insert if lecture does not exist
+                                insert_db("INSERT INTO tutorials (week,ta_code) VALUES (?,?)",[request.form["week"], session['username']])
+                            else:
+                                ## Update if lecture exists
+                                print("else")
+                            if request.form["recording_link"]:
+                                ## Updates recording link
+                                insert_db("UPDATE tutorials SET recording_link=? WHERE week=? AND ta_code=?",[request.form["recording_link"],request.form["week"], session['username']])
+                            ##INSERT FILES INTO DATABASE
+                            if request.files["ta_pdf"]:
+                                ##INSERTS PDFS INTO DATABASE AND REMOVES OLD PDFS IF APPLICABLE
+                                ta_Notes = query_db("SELECT pdf_id FROM ta_notes WHERE (week=? AND ta_code=?)",[request.form["week"],session['username']])
+                                for note in ta_Notes:
+                                    ##removes all old pdfs
+                                    insert_db("DELETE FROM pdf WHERE pdf_id=?",[note["pdf_id"]])
+                                if len(ta_Notes) >=1:
+                                    ##Deletes all refernces
+                                    insert_db("DELETE FROM ta_notes WHERE week=? AND ta_code=?",[request.form["week"], session['username']])
+                                for pdf in request.files.getlist("ta_pdf"):
+                                    insert_db("INSERT INTO pdf (pdf_name,pdf_data,username) VALUES (?,?,?)",[pdf.filename, pdf.read(), session['username']])
+                                    insert_db("INSERT INTO instr_notes (week, instructor_code, pdf_id) VALUES (?,?,(SELECT last_insert_rowid()))",[request.form["week"],session['username']])
+                    return render_template("tutorials.html",
+                        ta_tutorial_material=ta_tutorial_material,  
+                        general_tutorial_material=general_tutorial_material, 
+                        ta_pdfs=ta_pdfs, 
+                        ta=qt,
+                        id=id)
+                return render_template("tutorials.html",
+                        ta_tutorial_material=ta_tutorial_material,  
+                        general_tutorial_material=general_tutorial_material, 
+                        ta_pdfs=ta_pdfs,
+                        id=id)
+            ##Student User Page
+            else:
+                ta_tutorial_material = query_db("SELECT * FROM tutorials WHERE ta_code=? ORDER BY week ASC", [id])
+                general_tutorial_material = query_db("SELECT * FROM tut_pdfs INNER JOIN pdf ON tut_pdfs.pdf_id = pdf.pdf_id")
+                ta_pdfs = query_db("SELECT * FROM ta_notes INNER JOIN pdf ON ta_notes.pdf_id = pdf.pdf_id WHERE ta_code=?", [id])
+                return render_template("tutorials.html", 
+                    ta_tutorial_material=ta_tutorial_material,  
+                    general_tutorial_material=general_tutorial_material, 
+                    ta_pdfs=ta_pdfs,
+                    id=id)
+            return render_template("tutorials.html")
     return redirect(url_for('login'))
 @app.route('/coursework')
 def coursework():
@@ -254,7 +361,6 @@ def login():
                     return redirect(url_for('home'))
                 else:
                     error='invalid user type'
-    print(error)
     return render_template('login.html', error=error)
 
 ##LOGOUT REQUESTS
