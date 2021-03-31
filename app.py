@@ -183,6 +183,11 @@ def links():
     if 'username' in session and 'password' in session:
         return render_template("links.html")
     return redirect(url_for('login'))
+@app.route('/feedback')
+def feedback():
+    if 'username' in session and 'password' in session:
+        return render_template("feedback.html")
+    return redirect(url_for('login'))
 @app.route('/profile')
 def profile():
     if 'username' in session and 'password' in session:
