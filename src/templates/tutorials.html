@@ -46,6 +46,8 @@
                         <p class="cardTitle">Adding Tutorial Card...</p>
                         <div class="cardContent">
                             <form method="post" enctype="multipart/form-data">
+                                <label class="requiredInput" for="week">Week #(Only 1 week)</label>
+                                <input type="text" name="week" placeholder="ie:1,2,3,4..." required>
                                 <label for"ta_pdf">Tutorial Notes (PDF)</label>
                                 <input type="file" class="fileInput" name="ta_pdf" accept=".pdf" multiple>
                                 <label for="recording_link">Recording link</label>
@@ -72,7 +74,7 @@
                             {% endfor %}
                         </div>
                         <div class="cardSection">
-                            <span class="subtitle">Instructor PDFs:</span>
+                            <span class="subtitle">TA PDFs:</span>
                             {% for pdf in ta_pdfs%}
                                 {% if pdf["week"] == tutorial["week"]%}
                                     <p><a href="/pdfs/{{pdf["pdf_id"]}}" class="links" target="_blank">{{pdf["pdf_name"]}}</a></p>

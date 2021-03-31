@@ -233,7 +233,7 @@ def tutorials(id=None):
                             insert_db("INSERT INTO tut_pdfs (week, pdf_id) VALUES (?,(SELECT last_insert_rowid()))",[request.form["week"]])
                         else:
                             ##Checks whether selected week tutorial exists
-                            tutorialExists = query_db("SELECT EXISTS(SELECT * FROM tutorials WHERE (week=? AND instructor_code=?)) AS \"col\"",[request.form["week"],session['username']])
+                            tutorialExists = query_db("SELECT EXISTS(SELECT * FROM tutorials WHERE (week=? AND ta_code=?)) AS \"col\"",[request.form["week"],session['username']])
                             if tutorialExists[0]["col"] !=1:
                                 ## Insert if lecture does not exist
                                 insert_db("INSERT INTO tutorials (week,ta_code) VALUES (?,?)",[request.form["week"], session['username']])
@@ -255,7 +255,7 @@ def tutorials(id=None):
                                     insert_db("DELETE FROM ta_notes WHERE week=? AND ta_code=?",[request.form["week"], session['username']])
                                 for pdf in request.files.getlist("ta_pdf"):
                                     insert_db("INSERT INTO pdf (pdf_name,pdf_data,username) VALUES (?,?,?)",[pdf.filename, pdf.read(), session['username']])
-                                    insert_db("INSERT INTO instr_notes (week, instructor_code, pdf_id) VALUES (?,?,(SELECT last_insert_rowid()))",[request.form["week"],session['username']])
+                                    insert_db("INSERT INTO ta_notes (week, ta_code, pdf_id) VALUES (?,?,(SELECT last_insert_rowid()))",[request.form["week"],session['username']])
                     return render_template("tutorials.html",
                         ta_tutorial_material=ta_tutorial_material,  
                         general_tutorial_material=general_tutorial_material, 
