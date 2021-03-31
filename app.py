@@ -135,6 +135,7 @@ def lectures(id=None):
                                 #Inserts pdfs
                                 insert_db("INSERT INTO pdf (pdf_name,pdf_data,username) VALUES (?,?,?)",[request.files["courseWidePdf"].filename, request.files["courseWidePdf"].read(), session['username']])
                                 insert_db("INSERT INTO lec_pdfs (week, pdf_id) VALUES (?,(SELECT last_insert_rowid()))",[request.form["week"]])
+                                return redirect(url_for(".lectures",id=id))
                         ## else: Lecture Upload
                         else:
                             ##Checks whether selected week lecture exists
@@ -164,6 +165,7 @@ def lectures(id=None):
                                 for pdf in request.files.getlist("instructor_pdf"):
                                     insert_db("INSERT INTO pdf (pdf_name,pdf_data,username) VALUES (?,?,?)",[pdf.filename, pdf.read(), session['username']])
                                     insert_db("INSERT INTO instr_notes (week, instructor_code, pdf_id) VALUES (?,?,(SELECT last_insert_rowid()))",[request.form["week"],session['username']])
+                            return redirect(url_for(".lectures",id=id))
                     return render_template("lectures.html", 
                         instructor_lecture_material=instructor_lecture_material,  
                         general_lecture_material=general_lecture_material, 
@@ -215,6 +217,7 @@ def tutorials(id=None):
                         #Inserts pdfs
                         insert_db("INSERT INTO pdf (pdf_name,pdf_data,username) VALUES (?,?,?)",[request.files["courseWideTutPdf"].filename, request.files["courseWideTutPdf"].read(), session['username']])
                         insert_db("INSERT INTO tut_pdfs (week, pdf_id) VALUES (?,(SELECT last_insert_rowid()))",[request.form["week"]])
+                        return redirect(url_for(".tutorials",id=id))
                 return render_template("tutorials.html", 
                     ta_tutorial_material=ta_tutorial_material,  
                     general_tutorial_material=general_tutorial_material, 
@@ -256,6 +259,7 @@ def tutorials(id=None):
                                 for pdf in request.files.getlist("ta_pdf"):
                                     insert_db("INSERT INTO pdf (pdf_name,pdf_data,username) VALUES (?,?,?)",[pdf.filename, pdf.read(), session['username']])
                                     insert_db("INSERT INTO ta_notes (week, ta_code, pdf_id) VALUES (?,?,(SELECT last_insert_rowid()))",[request.form["week"],session['username']])
+                        return redirect(url_for(".tutorials",id=id))
                     return render_template("tutorials.html",
                         ta_tutorial_material=ta_tutorial_material,  
                         general_tutorial_material=general_tutorial_material, 
