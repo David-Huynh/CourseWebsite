@@ -96,18 +96,16 @@ CREATE TABLE ta_feedback (
 CREATE TABLE ta_notes (
 	week INTEGER NOT NULL,
 	ta_code TEXT NOT NULL,
-	pdf_no INTEGER NOT NULL,
 	pdf_id INTEGER NOT NULL,
-	PRIMARY KEY(week, ta_code, pdf_no),
+	PRIMARY KEY(week, ta_code, pdf_id),
 	FOREIGN KEY(ta_code) REFERENCES ta(ta_code),
 	FOREIGN KEY (pdf_id) REFERENCES pdf(pdf_id)
 );
 
 CREATE TABLE tut_pdfs (
 	week INTEGER NOT NULL,
-	pdf_no INTEGER NOT NULL,
 	pdf_id INTEGER NOT NULL,
-	PRIMARY KEY (week, pdf_no),
+	PRIMARY KEY (week, pdf_id),
 	FOREIGN KEY (pdf_id) REFERENCES pdf(pdf_id)
 );
 
@@ -146,7 +144,7 @@ CREATE TABLE submissions (
 	pdf_id INTEGER NOT NULL,
 	grade REAL,
 	marked INTEGER NOT NULL,
-	regrade_requested INTEGER NOT NULL,
+	regrade_requested INTEGER,
 	PRIMARY KEY (assignment_no, student_no),
 	FOREIGN KEY (assignment_no) REFERENCES assignments(assignment_no),
 	FOREIGN KEY (student_no) REFERENCES student(student_no),

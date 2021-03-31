@@ -2,7 +2,7 @@
 <html lang="en" dir="ltr">
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8">
-        <title>Lectures</title>
+        <title>Tutorials</title>
         <link rel="stylesheet" href="{{url_for('static', filename ='css/lectures.css')}}">
         <link rel="stylesheet" href="{{url_for('static', filename ='css/card.css')}}">
         <link rel="stylesheet" href="{{url_for('static', filename ='css/form.css')}}">
@@ -11,15 +11,16 @@
         <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
     </head>
     <body>
+        <!-- TODO:::: ADD Tutorials FROM DATABASE AND USE JINJA2 TO REPEATEDLY GENERATE THE LECTURE CARDS -->
         {% extends "template.html" %}
         {% block content %}
         <!-- Page Content -->
         <div class="content">
             <h1 class="title" id="lecturePageTitle">Lectures</h1>
-            {% if instructor %}
+            {% if qi %}
                 <div id="alignRight">
                     <button id="coursePdfButton" class="customButton">Add Course Wide PDF</button>
-                    <button id="lecture" class="customButton">Add/Update Lecture</button>
+                    <button id="lecture" class="customButton">Add Lecture</button>
                 </div>
                 <!-- Course PDF -->
                 <div id="coursePdf" class="modal">
@@ -30,7 +31,7 @@
                             <form method="post" enctype="multipart/form-data">
                                 <label class="requiredInput" for="week">Week #(Only 1 week)</label>
                                 <input type="text" name="week" placeholder="ie:1,2,3,4..." required>
-                                <label for"courseWidePdf" class="requiredInput">Course Wide File (1 PDF)</label>
+                                <label for"instructor_pdf" class="requiredInput">Course Wide File (1 PDF)</label>
                                 <input type="file" class="fileInput" name="courseWidePdf" accept=".pdf" required>
                                 <input type=submit value="Upload Files" id="createButton">
                             </form>
@@ -44,8 +45,6 @@
                         <p class="cardTitle">Adding Lecture Card...</p>
                         <div class="cardContent">
                             <form method="post" enctype="multipart/form-data">
-                                <label class="requiredInput" for="week">Week #(Only 1 week)</label>
-                                <input type="text" name="week" placeholder="ie:1,2,3,4..." required>
                                 <label class="requiredInput" for="lecture_title">Lecture Title</label>
                                 <input type="text" name="lecture_title" placeholder="Lecture Title..." required>
                                 <label for"instructor_pdf">Instructor Notes (PDF)</label>
@@ -61,49 +60,36 @@
                 </div>
             {% endif %}
             <!-- Lecture Cards -->
-            {% for lecture in instructor_lecture_material%}
-                <div class="card">
-                    <a name="{{lecture["week"]}}" href="{{url_for('.lectures')}}#{{lecture["week"]}}" class="links">
-                        <h1 class="cardTitle">Week {{lecture["week"]}} - {{lecture["lecture_title"]}}</h1>
-                    </a>
-                    <div class="cardContent">
-                        <div class="cardSection">
-                            <span class="subtitle">Course PDFs:</span>
-                            {% for pdf in general_lecture_material%}
-                                {% if pdf["week"] == lecture["week"]%}
-                                    <p><a href="/pdfs/{{pdf["pdf_id"]}}" class="links" target="_blank">{{pdf["pdf_name"]}}</a></p>
-                                {% endif %}
-                            {% endfor %}
-                        </div>
-                        <div class="cardSection">
-                            <span class="subtitle">Instructor PDFs:</span>
-                            {% for pdf in instructor_pdfs%}
-                                {% if pdf["week"] == lecture["week"]%}
-                                    <p><a href="/pdfs/{{pdf["pdf_id"]}}" class="links" target="_blank">{{pdf["pdf_name"]}}</a></p>
-                                {% endif %}
-                            {% endfor %}
-                        </div>
-                        <div class="cardSection">
-                            <p>
-                                <span class="subtitle">First Recording:</span>
-                                {% if lecture["tues_recording"] %}
-                                    <a href="{{lecture["tues_recording"]}}" class="links" target="_blank">Recording</a>
-                                {% else %}
-                                    <a class="links" target="_blank">None</a>
-                                {% endif %}
-                            </p>
-                            <p>
-                                <span class="subtitle">Second Recording:</span>
-                                {% if lecture["thurs_recording"]%}
-                                    <a href="{{lecture["thurs_recording"]}}" class="links" target="_blank">Recording</a>
-                                {% else %}
-                                    <a class="links" target="_blank">None</a>
-                                {% endif%}
-                            </p>
-                        </div>
+            <div class="card">
+                <a name="weekOne" href="{{url_for('.lectures')}}#weekOne" class="links">
+                    <h1 class="cardTitle">Week 1 - Intro, Worst Case Complexity</h1>
+                </a>
+                <div class="cardContent">
+                    <div class="cardSection">
+                        <p>
+                            <span class="subtitle">Wed Pre-Lecture Reading/Exercise:</span> <a href="../pdfs/fillerPDF.pdf" class="links" target="_blank">PDF</a>
+                        </p>
+                        <p>
+                            <span class="subtitle">Thursday Pre-Lecture Reading/Exercise:</span> <a href="../pdfs/fillerPDF.pdf" class="links" target="_blank">PDF</a>
+                        </p>
+                    </div>
+                    <div class="cardSection">
+                        <p>
+                            <span class="subtitle">Wed Slides/Recording:</span> <a href="../pdfs/fillerPDF.pdf" class="links" target="_blank">Worksheet</a>, 
+                            <a href="../pdfs/fillerPDF.pdf" class="links" target="_blank">Recording</a>
+                        </p>
+                        <p>
+                            <span class="subtitle">Thursday Slides/Recording:</span> <a href="../pdfs/fillerPDF.pdf" class="links" target="_blank">Worksheet</a>, 
+                            <a href="../pdfs/fillerPDF.pdf" class="links" target="_blank">Recording</a>
+                        </p>
+                    </div>
+                    <div class="cardSection">
+                        <p>
+                            <span class="subtitle">Tutorial:</span> None
+                        </p>
                     </div>
                 </div>
-            {% endfor %}
+            </div>
         </div>
         <script src="{{url_for('static', filename='javascript/lectures.js')}}"></script>
         {% endblock %}
