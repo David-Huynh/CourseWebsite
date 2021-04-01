@@ -225,9 +225,9 @@ def tutorials(id=None):
                     id=id)
             ##TA User Page
             elif qt[0]["col"] == 1:
-                ta_tutorial_material = query_db("SELECT * FROM tutorials WHERE ta_code=? ORDER BY week ASC", [session['username']])
+                ta_tutorial_material = query_db("SELECT * FROM tutorials WHERE ta_code=? ORDER BY week ASC", [id])
                 general_tutorial_material = query_db("SELECT * FROM tut_pdfs INNER JOIN pdf ON tut_pdfs.pdf_id = pdf.pdf_id")
-                ta_pdfs = query_db("SELECT * FROM ta_notes INNER JOIN pdf ON ta_notes.pdf_id = pdf.pdf_id WHERE ta_code=?", [session['username']])
+                ta_pdfs = query_db("SELECT * FROM ta_notes INNER JOIN pdf ON ta_notes.pdf_id = pdf.pdf_id WHERE ta_code=?", [id])
                 if session["username"] == id:
                     if request.method == 'POST':
                         if request.files.get("courseWideTutPdf"):
