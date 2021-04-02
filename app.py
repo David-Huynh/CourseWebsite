@@ -35,7 +35,7 @@ def insert_db(query, args=()):
 def before_request():
     session.permanent = True
 
-##Injects instructor and ta information into context of every template
+##Injects instructor and ta information into context of every template (Defaults to first ta and instructor in database if none set)
 @app.context_processor
 def inject_ta_instructor():
     if 'username' in session and 'password' in session:
@@ -67,14 +67,17 @@ def close_connection(exception):
     if db is not None:
         db.close()
 
-## PDF DOWNLOADER
+## PDF Display Route
 @app.route('/pdfs/<id>')
 def get_pdf(id=None):
     if 'username' in session and 'password' in session:
         if id is not None:
             pdf = query_db("SELECT pdf_name, pdf_data, username FROM pdf WHERE pdf_id=?",[id])
+            qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=?)) AS \"col\"",[session['username']])
+            student = query_db("SELECT EXISTS(SELECT * FROM student WHERE student_no=?) AS \"col\"",[pdf[0]["username"]])
+            qt = query_db("SELECT EXISTS(SELECT ta_code,password FROM ta WHERE (ta_code=?)) AS \"col\"",[session['username']])
             if pdf:
-                if pdf[0]["username"] == session["username"] or pdf[0]["username"] == None:
+                if pdf[0]["username"] == session["username"] or pdf[0]["username"] == "all" or qi[0]["col"] == 1 or (student[0]["col"] == 1 and qt[0]["col"]):
                     response = make_response(pdf[0]["pdf_data"])
                     response.headers['Content-Type'] = 'application/pdf'
                     response.headers['Content-Disposition'] = \
@@ -137,7 +140,7 @@ def lectures(id=None):
                         if request.files.get("courseWidePdf"):
                             if request.files["courseWidePdf"]:
                                 #Inserts pdfs
-                                insert_db("INSERT INTO pdf (pdf_name,pdf_data,username) VALUES (?,?,?)",[request.files["courseWidePdf"].filename, request.files["courseWidePdf"].read(), session['username']])
+                                insert_db("INSERT INTO pdf (pdf_name,pdf_data,username) VALUES (?,?,?)",[request.files["courseWidePdf"].filename, request.files["courseWidePdf"].read(), "all"])
                                 insert_db("INSERT INTO lec_pdfs (week, pdf_id) VALUES (?,(SELECT last_insert_rowid()))",[request.form["week"]])
                                 return redirect(url_for(".lectures",id=id))
                         ## else: Lecture Upload
@@ -167,8 +170,8 @@ def lectures(id=None):
                                     ##Deletes all refernces
                                     insert_db("DELETE FROM instr_notes WHERE week=? AND instructor_code=?",[request.form["week"], session['username']])
                                 for pdf in request.files.getlist("instructor_pdf"):
-                                    insert_db("INSERT INTO pdf (pdf_name,pdf_data,username) VALUES (?,?,?)",[pdf.filename, pdf.read(), session['username']])
-                                    insert_db("INSERT INTO instr_notes (week, instructor_code, pdf_id) VALUES (?,?,(SELECT last_insert_rowid()))",[request.form["week"],session['username']])
+                                    insert_db("INSERT INTO pdf (pdf_name,pdf_data,username) VALUES (?,?,?)",[pdf.filename, pdf.read(), "all"])
+                                    insert_db("INSERT INTO instr_notes (week, instructor_code, pdf_id) VALUES (?,?,(SELECT last_insert_rowid()))",[request.form["week"],"all"])
                             return redirect(url_for(".lectures",id=id))
                     return render_template("lectures.html", 
                         instructor_lecture_material=instructor_lecture_material,  
@@ -220,7 +223,7 @@ def tutorials(id=None):
                 if request.method == 'POST':
                     if request.files.get("courseWideTutPdf"):
                         #Inserts pdfs
-                        insert_db("INSERT INTO pdf (pdf_name,pdf_data,username) VALUES (?,?,?)",[request.files["courseWideTutPdf"].filename, request.files["courseWideTutPdf"].read(), session['username']])
+                        insert_db("INSERT INTO pdf (pdf_name,pdf_data,username) VALUES (?,?,?)",[request.files["courseWideTutPdf"].filename, request.files["courseWideTutPdf"].read(), "all"])
                         insert_db("INSERT INTO tut_pdfs (week, pdf_id) VALUES (?,(SELECT last_insert_rowid()))",[request.form["week"]])
                         return redirect(url_for(".tutorials",id=id))
                 return render_template("tutorials.html", 
@@ -238,17 +241,14 @@ def tutorials(id=None):
                     if request.method == 'POST':
                         if request.files.get("courseWideTutPdf"):
                             #Inserts pdfs
-                            insert_db("INSERT INTO pdf (pdf_name,pdf_data,username) VALUES (?,?,?)",[request.files["courseWideTutPdf"].filename, request.files["courseWideTutPdf"].read(), session['username']])
+                            insert_db("INSERT INTO pdf (pdf_name,pdf_data,username) VALUES (?,?,?)",[request.files["courseWideTutPdf"].filename, request.files["courseWideTutPdf"].read(), "all"])
                             insert_db("INSERT INTO tut_pdfs (week, pdf_id) VALUES (?,(SELECT last_insert_rowid()))",[request.form["week"]])
                         else:
                             ##Checks whether selected week tutorial exists
                             tutorialExists = query_db("SELECT EXISTS(SELECT * FROM tutorials WHERE (week=? AND ta_code=?)) AS \"col\"",[request.form["week"],session['username']])
                             if tutorialExists[0]["col"] !=1:
-                                ## Insert if lecture does not exist
+                                ## Insert if tutorial does not exist
                                 insert_db("INSERT INTO tutorials (week,ta_code) VALUES (?,?)",[request.form["week"], session['username']])
-                            else:
-                                ## Update if lecture exists
-                                print("else")
                             if request.form["recording_link"]:
                                 ## Updates recording link
                                 insert_db("UPDATE tutorials SET recording_link=? WHERE week=? AND ta_code=?",[request.form["recording_link"],request.form["week"], session['username']])
@@ -263,8 +263,8 @@ def tutorials(id=None):
                                     ##Deletes all refernces
                                     insert_db("DELETE FROM ta_notes WHERE week=? AND ta_code=?",[request.form["week"], session['username']])
                                 for pdf in request.files.getlist("ta_pdf"):
-                                    insert_db("INSERT INTO pdf (pdf_name,pdf_data,username) VALUES (?,?,?)",[pdf.filename, pdf.read(), session['username']])
-                                    insert_db("INSERT INTO ta_notes (week, ta_code, pdf_id) VALUES (?,?,(SELECT last_insert_rowid()))",[request.form["week"],session['username']])
+                                    insert_db("INSERT INTO pdf (pdf_name,pdf_data,username) VALUES (?,?,?)",[pdf.filename, pdf.read(), "all"])
+                                    insert_db("INSERT INTO ta_notes (week, ta_code, pdf_id) VALUES (?,?,(SELECT last_insert_rowid()))",[request.form["week"],"all"])
                         return redirect(url_for(".tutorials",id=id))
                     return render_template("tutorials.html",
                         ta_tutorial_material=ta_tutorial_material,  
