@@ -78,9 +78,10 @@ def get_pdf(id=None):
             qt = query_db("SELECT EXISTS(SELECT ta_code,password FROM ta WHERE (ta_code=?)) AS \"col\"",[session['username']])
             if pdf:
                 if pdf[0]["username"] == session["username"] or pdf[0]["username"] == "all" or qi[0]["col"] == 1 or (student[0]["col"] == 1 and qt[0]["col"]):
+                    print(type(pdf[0]["pdf_data"]))
                     response = make_response(bytes(pdf[0]["pdf_data"]))
-                    response.headers['Content-Type'] = 'application/pdf'
-                    response.headers['Content-Disposition'] = 'inline; filename={}.pdf'.format(pdf[0]["pdf_name"])
+                    response.headers['Content-Type'] = "application/pdf"
+                    response.headers['Content-Disposition'] = "inline; filename={}.pdf".format(pdf[0]["pdf_name"])
                     return response
                 else:
                     return "ERROR: you do not have permission to view this file"
