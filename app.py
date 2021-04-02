@@ -317,8 +317,10 @@ def profile():
             qt = query_db("SELECT EXISTS(SELECT ta_code,password FROM ta WHERE (ta_code=?)) AS \"col\"",[session['username']])
             # Load Instructor page
             if qi[0]["col"] == 1:
-                instructor_info = query_db("SELECT * FROM instructor WHERE instructor_code=?",[session['username']])
-                syllabus = query_db("SELECT pdf.pdf_data FROM instructor, pdf WHERE instructor_code=? AND pdf.pdf_id=instructor.syllabus_id;",[session['username']])
+                instructor_info = query_db("SELECT * FROM pdf INNER JOIN instructor  ON instructor.syllabus_id = pdf.pdf_id AND instructor.instructor_code=?", [session['username']])
+                """instructor_info = query_db("SELECT * FROM instructor WHERE instructor_code=?",[session['username']])
+                syllabus_id = query_db("SELECT pdf.id FROM instructor, pdf WHERE instructor_code=? AND pdf.pdf_id=instructor.syllabus_id;",[session['username']])
+                syllabus_name = query_db("SELECT pdf.pdf_name FROM instructor, pdf WHERE instructor_code=? AND pdf.pdf_id=instructor.syllabus_id;",[session['username']])"""
                 if request.method == 'POST':
                     #update form info case
                     return "updating info for instructor"
@@ -326,7 +328,8 @@ def profile():
                     user_type=0,
                     name=instructor_info[0]["first_name"].lower().capitalize()+' '+instructor_info[0]["last_name"].lower().capitalize(),  
                     pic=instructor_info[0]["instructor_picture"], 
-                    syllabus=syllabus[0]["pdf_data"],
+                    syllabus_name=instructor_info[0]["pdf_name"],
+                    syllabus_id=instructor_info[0]["pdf_id"],
                     office=instructor_info[0]["office"],
                     office_hours=instructor_info[0]["office_hours"],
                     office_hours_link=instructor_info[0]["office_hours_link"])

@@ -62,8 +62,8 @@
                     <div class="cardSection">
                         <p>
                             <span class="subtitle">Syllabus:</span> 
-                            {% if syllabus %}
-                                <a href="https://piazza.com/class/kk052lckppx73x" class="links" target="_blank">[Link]</a> 
+                            {% if pdf_id != None %}
+                                <span class="data"><a href="/pdfs/{{syllabus_id}}" class="links" target="_blank">{{syllabus_name}}</a></p>
                             {% else %}
                                 <span class="data">Coming Soon</span>
                             {% endif %}
@@ -73,7 +73,7 @@
                         <p>
                             <span class="subtitle">Office:</span> 
                             {% if office %}
-                                <span> {{office}} </span>
+                                <span class="data"> {{office}} </span>
                             {% else %}
                                 <span class="data">Coming Soon</span>
                             {% endif %}
