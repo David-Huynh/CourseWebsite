@@ -80,8 +80,7 @@ def get_pdf(id=None):
                 if pdf[0]["username"] == session["username"] or pdf[0]["username"] == "all" or qi[0]["col"] == 1 or (student[0]["col"] == 1 and qt[0]["col"]):
                     response = make_response(pdf[0]["pdf_data"])
                     response.headers['Content-Type'] = 'application/pdf'
-                    response.headers['Content-Disposition'] = \
-                        'inline; filename=%s.pdf' % pdf[0]["pdf_name"]
+                    response.headers['Content-Disposition'] = 'inline; filename={}.pdf'.format(pdf[0]["pdf_name"])
                     return response
                 else:
                     return "ERROR: you do not have permission to view this file"
