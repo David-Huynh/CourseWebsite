@@ -34,6 +34,7 @@ def insert_db(query, args=()):
 @app.before_request
 def before_request():
     session.permanent = True
+
 ##Injects instructor and ta information into context of every template
 @app.context_processor
 def inject_ta_instructor():
@@ -58,12 +59,14 @@ def inject_ta_instructor():
                 return dict(ta_id=first_ta["ta_code"], instructor_id=student[0]["instructor_code"])
             return dict(ta_id=first_ta["ta_code"], instructor_id=first_instructor["instructor_code"])
     return dict()
+
 ## ON APPLICATION CLOSE
 @app.teardown_appcontext
 def close_connection(exception):
     db = getattr(g, '_database', None)
     if db is not None:
         db.close()
+
 ## PDF DOWNLOADER
 @app.route('/pdfs/<id>')
 def get_pdf(id=None):
@@ -82,6 +85,7 @@ def get_pdf(id=None):
             else:
                 return "ERROR: no such file exists"
     return redirect(url_for('login'))
+
 ##WEB APP ROUTES
 @app.route('/')
 def home():
@@ -199,6 +203,7 @@ def lectures(id=None):
                     id=id)
             return render_template("lectures.html")
     return redirect(url_for('login'))
+
 @app.route('/tutorials/<id>', methods=['GET', 'POST'])
 def tutorials(id=None):
     if 'username' in session and 'password' in session:
@@ -283,6 +288,7 @@ def tutorials(id=None):
                     id=id)
             return render_template("tutorials.html")
     return redirect(url_for('login'))
+
 @app.route('/coursework')
 def coursework():
     if 'username' in session and 'password' in session:
@@ -294,22 +300,78 @@ def links():
     if 'username' in session and 'password' in session:
         return render_template("links.html")
     return redirect(url_for('login'))
+
 @app.route('/feedback')
 def feedback():
     if 'username' in session and 'password' in session:
         return render_template("feedback.html")
     return redirect(url_for('login'))
+
 @app.route('/profile', methods=['GET','POST'])
 def profile():
-    if request.method == 'POST':
-        return 'submitting data'
     if 'username' in session and 'password' in session:
-        fname = query_db("SELECT first_name FROM instructor WHERE instructor_code=?",[session['username']])
-        lname = query_db("SELECT last_name FROM instructor WHERE instructor_code=?",[session['username']])
-        if fname and lname:
-            return render_template("profile.html", name=fname[0]["first_name"].lower().capitalize()+' '+lname[0]["last_name"].lower().capitalize(), instructor=None)
-        return render_template("profile.html", instructor=None)
+        if id is not None:
+            ##Queries whether there is a username match in instructors table
+            qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=?)) AS \"col\"",[session['username']])
+            ##Queries whether there is a username match in ta table
+            qt = query_db("SELECT EXISTS(SELECT ta_code,password FROM ta WHERE (ta_code=?)) AS \"col\"",[session['username']])
+            # Load Instructor page
+            if qi[0]["col"] == 1:
+                fname = query_db("SELECT first_name FROM instructor WHERE instructor_code=?",[session['username']])
+                lname = query_db("SELECT last_name FROM instructor WHERE instructor_code=?",[session['username']])
+                prof_pic = query_db("SELECT instructor_picture FROM instructor WHERE instructor_code=?",[session['username']])
+                if prof_pic != None:
+                    prof_pic = base64.decodebytes(prof_pic)
+                syllabus = query_db("SELECT pdf.pdf_data FROM instructor, pdf WHERE instructor_code=? AND pdf.pdf_id=instructor.syllabus_id;",[session['username']])
+                if syllabus != None:
+                    syllabus = base64.decodebytes(syllabus)
+                office = query_db("SELECT office FROM instructor, pdf WHERE instructor_code=?",[session['username']])
+                office_hours = query_db("SELECT office_hours FROM instructor WHERE instructor_code=?",[session['username']])
+                office_hours_link = query_db("SELECT office_hours_link FROM instructor WHERE instructor_code=?",[session['username']])
+                if request.method == 'POST':
+                    #update form info case
+                    return "updating info for instructor"
+                return render_template("profile.html", 
+                    name=fname[0]["first_name"].lower().capitalize()+' '+lname[0]["last_name"].lower().capitalize(),  
+                    pic=prof_pic, 
+                    syllabus=syllabus,
+                    office=office,
+                    office_hours=office_hours,
+                    office_hours_link=office_hours_link)
+            # Load TA page
+            elif qt[0]["col"] == 1:
+                fname = query_db("SELECT first_name FROM ta WHERE ta_code=?",[session['username']])
+                lname = query_db("SELECT last_name FROM ta WHERE ta_code=?",[session['username']])
+                ta_pic = query_db("SELECT ta_picture FROM ta WHERE ta_code=?",[session['username']])
+                if ta_pic != None:
+                    ta_pic = base64.encodebytes(ta_pic)
+                    ta_pic = ta_pic.base64.decode("utf-8")
+                office_hours = query_db("SELECT office_hours FROM ta WHERE ta_code=?",[session['username']])
+                office_hours_link = query_db("SELECT office_hours_link FROM ta WHERE ta_code=?",[session['username']])
+                if request.method == 'POST':
+                    #update form info case
+                    return "updating info for TA"
+                return render_template("profile.html", 
+                    name=fname[0]["first_name"].lower().capitalize()+' '+lname[0]["last_name"].lower().capitalize(),  
+                    pic=ta_pic, 
+                    office_hours=office_hours,
+                    office_hours_link=office_hours_link)
+            # Load Student page
+            else:
+                fname = query_db("SELECT first_name FROM student WHERE student_no=?",[session['username']])
+                lname = query_db("SELECT last_name FROM student WHERE student_no=?",[session['username']])
+                email = query_db("SELECT email FROM student WHERE student_no=?",[session['username']])
+                ta_code = query_db("SELECT ta_code FROM student WHERE ta_code=?",[session['username']])
+                instructor_code = query_db("SELECT instructor_code FROM student WHERE ta_code=?",[session['username']])
+                if request.method == 'POST':
+                    return 'updating data for student'
+                return render_template("profile.html",
+                    name=fname[0]["first_name"].lower().capitalize()+' '+lname[0]["last_name"].lower().capitalize(),  
+                    email=email,
+                    ta_code=ta_code,
+                    instructor_code=instructor_code)    
     return redirect(url_for('login'))
+
 ##LOGIN/SIGNUP REQUESTS
 @app.route('/login', methods=['GET', 'POST'])
 def login():
