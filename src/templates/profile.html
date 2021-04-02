@@ -3,8 +3,9 @@
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8">
         <title>My Profile</title>
-        <link rel="stylesheet" href="{{url_for('static', filename ='css/profile.css')}}">
-        <link rel="stylesheet" href="{{url_for('static', filename ='css/.css')}}">
+        <link rel="stylesheet" href="{{url_for('static', filename ='css/button.css')}}">
+        <link rel="stylesheet" href="{{url_for('static', filename ='css/form.css')}}">
+        <link rel="stylesheet" href="{{url_for('static', filename ='css/modal.css')}}">
         <link rel="stylesheet" href="{{url_for('static', filename ='css/card.css')}}">
         <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
         <script src="{{url_for('static', filename='javascript/profile.js')}}"></script>
@@ -23,37 +24,28 @@
                     <button id="editB" class="customButton" style="float:right">Edit Profile</button>
                     <!-- The Modal -->
                     <div id="myModal" class="modal">
-                        <!-- Modal content -->
+                        <!-- Instructor Modal content -->
                         <div class="modal-content">
-                        <span class="close">&times;</span>
-                        <p class="cardTitle">Editing Profile...</p>
-                        <div class="cardContent">
-                            <p>
-                                <span class="subtitle">Update Profile Picture:</span> 
-                                <!-- Button to upload file -->
-                                <input type="file" id="real-file" hidden="hidden" />
-                                <button type="button" class="customButton" id="upload-button" style="margin-left: 20px;">Upload File</button>
-                                <span id="upload-text">No file chosen, yet.</span>
-                            </p>
+                            <span class="close">&times;</span>
+                            <p class="cardTitle">Editing Profile...</p>
+                            <div class="cardContent">
+                                <p>
+                                    <form method="post" enctype="multipart/form-data">
+                                        <label class="subtitle">Update Profile Picture</label>
+                                        <input type="file" class="fileInput" name="courseWidePdf" accept="image/*">
+                                        <label for="courseWidePdf" class="subtitle">Update Syllabus</label>
+                                        <input type="file" class="fileInput" name="courseWidePdf" accept=".pdf">
+                                        <label class="subtitle" for="week">Update Office</label>
+                                        <input type="text" name="week" placeholder="Enter Office Location">
+                                        <label class="subtitle" for="week">Update Office Hours</label>
+                                        <input type="text" name="week" placeholder="Enter Office Hours Schedule">
+                                        <label class="subtitle" for="week">Update Office Hours Link</label>
+                                        <input type="text" name="week" placeholder="Enter Office Hours Meeting Link">
+                                        <input type="submit" value="Update" id="createButton">
+                                    </form>
+                                </p>
+                            </div>
                         </div>
-                        <div class="cardContent">
-                            <p>
-                                <span class="subtitle">Update Syllabus:</span> 
-                                <!-- Button to upload file -->
-                                <input type="file" id="real-file2" hidden="hidden" />
-                                <button type="button" class="customButton" id="upload-button2" style="margin-left: 20px;">Upload File</button>
-                                <span id="upload-text2">No file chosen, yet.</span>
-                            </p>
-                        </div>
-                        <div class="cardContent">
-                            <p>
-                                <span class="subtitle">Update Office Hours:</span> 
-                                <!-- Input textbox-->
-                                <input type="text" name="search" placeholder="Entering Office Hours...">
-                            </p>
-                        </div>
-                        </div>
-                    
                     </div>
                     <div class="cardPicture">
                         {% if instructor %}

@@ -299,8 +299,10 @@ def feedback():
     if 'username' in session and 'password' in session:
         return render_template("feedback.html")
     return redirect(url_for('login'))
-@app.route('/profile')
+@app.route('/profile', methods=['GET','POST'])
 def profile():
+    if request.method == 'POST':
+        return 'submitting data'
     if 'username' in session and 'password' in session:
         fname = query_db("SELECT first_name FROM instructor WHERE instructor_code=?",[session['username']])
         lname = query_db("SELECT last_name FROM instructor WHERE instructor_code=?",[session['username']])
