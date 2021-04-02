@@ -5,6 +5,9 @@
         <title>My Profile</title>
         <link rel="stylesheet" href="{{url_for('static', filename ='css/button.css')}}">
         <link rel="stylesheet" href="{{url_for('static', filename ='css/form.css')}}">
+        <link rel="stylesheet" href="{{url_for('static', filename ='css/profile.css')}}">
+        <link rel="stylesheet" href="{{url_for('static', filename ='css/index.css')}}">
+
         <link rel="stylesheet" href="{{url_for('static', filename ='css/modal.css')}}">
         <link rel="stylesheet" href="{{url_for('static', filename ='css/card.css')}}">
         <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
@@ -47,43 +50,57 @@
                             </div>
                         </div>
                     </div>
+                    {% if user_type != 2 %}
                     <div class="cardPicture">
-                        {% if instructor %}
-                            <img src="data:image/png;base64,{{instructor["instructor_picture"]}}" alt="Picture of Instructor"> 
+                        {% if pic != None %}
+                            <img src="data:image/png;base64,{{pic}}" alt="Picture of Instructor"> 
                         {% else %}
-                            <img src="https://via.placeholder.com/150" alt="Picture of Instructor">
+                            <img src="../static/placeholder.png" class="picture" alt="Picture of Instructor">
                         {% endif %}
                     </div>
+                    {% if user_type == 0 %}
                     <div class="cardSection">
                         <p>
                             <span class="subtitle">Syllabus:</span> 
                             {% if syllabus %}
                                 <a href="https://piazza.com/class/kk052lckppx73x" class="links" target="_blank">[Link]</a> 
                             {% else %}
-                                <p>Coming Soon</p>
+                                <span class="data">Coming Soon</span>
                             {% endif %}
                         </p>
                     </div>
                     <div class="cardSection">
                         <p>
-                            <span class="subtitle">Lecture Times:</span> 
-                            {% if lec %}
-                                <a href="https://piazza.com/class/kk052lckppx73x" class="links" target="_blank">[Link]</a> 
+                            <span class="subtitle">Office:</span> 
+                            {% if office %}
+                                <span> {{office}} </span>
                             {% else %}
-                                <p>Coming Soon</p>
+                                <span class="data">Coming Soon</span>
                             {% endif %}
                         </p>
                     </div>
+                    {% endif %}
                     <div class="cardSection">
                         <p>
                             <span class="subtitle">Office Hours:</span> 
-                            {% if oHours %}
-                                <a href="https://piazza.com/class/kk052lckppx73x" class="links" target="_blank">[Link]</a> 
+                            {% if office_hours %}
+                                <p> {{office_hours}} </p>
                             {% else %}
-                                <p>Coming Soon</p>
+                                <span class="data">Coming Soon</span>
                             {% endif %}
                         </p>
                     </div>
+                    <div class="cardSection">
+                        <p>
+                            <span class="subtitle">Office Hours Link:</span> 
+                            {% if office_hours_link %}
+                                <a href="https://piazza.com/class/kk052lckppx73x" class="links" target="_blank">[Link]</a> 
+                            {% else %}
+                                <span class="data">Coming Soon</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
