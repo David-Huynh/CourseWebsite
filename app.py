@@ -35,7 +35,7 @@ def insert_db(query, args=()):
 def before_request():
     session.permanent = True
 
-##Injects instructor and ta information into context of every template
+##Injects instructor and ta information into context of every template (Defaults to first ta and instructor in database if none set)
 @app.context_processor
 def inject_ta_instructor():
     if 'username' in session and 'password' in session:
@@ -67,14 +67,17 @@ def close_connection(exception):
     if db is not None:
         db.close()
 
-## PDF DOWNLOADER
+## PDF Display Route
 @app.route('/pdfs/<id>')
 def get_pdf(id=None):
     if 'username' in session and 'password' in session:
         if id is not None:
             pdf = query_db("SELECT pdf_name, pdf_data, username FROM pdf WHERE pdf_id=?",[id])
+            qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=?)) AS \"col\"",[session['username']])
+            student = query_db("SELECT EXISTS(SELECT * FROM student WHERE student_no=?) AS \"col\"",[pdf[0]["username"]])
+            qt = query_db("SELECT EXISTS(SELECT ta_code,password FROM ta WHERE (ta_code=?)) AS \"col\"",[session['username']])
             if pdf:
-                if pdf[0]["username"] == session["username"] or pdf[0]["username"] == None:
+                if pdf[0]["username"] == session["username"] or pdf[0]["username"] == "all" or qi[0]["col"] == 1 or (student[0]["col"] == 1 and qt[0]["col"]):
                     response = make_response(pdf[0]["pdf_data"])
                     response.headers['Content-Type'] = 'application/pdf'
                     response.headers['Content-Disposition'] = \
