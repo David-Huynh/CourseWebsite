@@ -227,6 +227,7 @@ def tutorials(id=None):
                     ta_tutorial_material=ta_tutorial_material,  
                     general_tutorial_material=general_tutorial_material, 
                     ta_pdfs=ta_pdfs,
+                    qi=qi,
                     id=id)
             ##TA User Page
             elif qt[0]["col"] == 1:
