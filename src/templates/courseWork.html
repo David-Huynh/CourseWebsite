@@ -5,82 +5,188 @@
         <title>Course Work</title>
         <link rel="stylesheet" href="{{url_for('static', filename ='css/courseWork.css')}}">
         <link rel="stylesheet" href="{{url_for('static', filename ='css/card.css')}}">
+        <link rel="stylesheet" href="{{url_for('static', filename ='css/form.css')}}">
+        <link rel="stylesheet" href="{{url_for('static', filename ='css/modal.css')}}">
+        <link rel="stylesheet" href="{{url_for('static', filename ='css/button.css')}}">
         <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
         
     </head>
     <body>
-        <!-- TODO:::: UPDATE ASSIGNMENTS SO THEY ARE INDIVIDUAL CARDS AND RETRIEVE ASSIGNMENTS FROM DATABASE AND GRADES etc.-->
-        <!-- TODO:::: ADD UPLOAD FUNCTIONALITY TO ASSIGNMENT CARDS -->
-        <!-- TODO:::: ADD TESTS TABLE TO DATABASE SCHEMA [REPEAT TODO FOR ASSIGNMENTS FOR **TESTS** ASWELL] -->
+        <!-- TODO:::: ADD REGRADE REQUESTS -->
         {% extends "template.html" %}
         {% block content %}
         <!-- Page Content -->
         <div class="content">
-            <h1 class="title" id="assignmentPageTitle">Course Work</h1>
-            <!-- Tests Card -->
-            <div class="card">
-                <a name="assignments" href="{{url_for('.coursework')}}#assignments" class="links">
-                    <h1 class="cardTitle">
-                        
-                        Assignments
-                        
-                    </h1>
-                </a>
-                <div class="cardContent">
-                    <div class="cardSection">
-                        <p>
-                            <span class="subtitle">Assignment #1:</span> <a href="../pdfs/assignments/fillerPDF.pdf" class="links" target="_blank">Handout</a> 
-                            | <a href="../pdfs/assignments/fillerPDF.pdf" class="links" target="_blank">Solutions</a>
-                        </p>
-                    </div>
-                    <div class="cardSection">
-                        <p>
-                            <span class="subtitle">Assignment #2:</span> <a href="../pdfs/assignments/fillerPDF.pdf" class="links" target="_blank">Handout</a> 
-                            | <a href="../pdfs/assignments/fillerPDF.pdf" class="links" target="_blank">Solutions</a>
-                        </p>
-                    </div>
-                    <div class="cardSection">
-                        <p>
-                            <span class="subtitle">Assignment #3:</span> <a href="../pdfs/fillerPDF.pdf" class="links" target="_blank">Handout</a> 
-                            | <span class="text">Solutions (Coming Soon)</span>
-                        </p>
-                    </div>
-                    <div class="cardSection">
-                        <p>
-                            <span class="subtitle">Assignment #4:</span> Handout (Coming Soon) | Solutions (Coming Soon)
-                        </p>
+            <h1 class="title" id="assignmentPageTitle">Assignments</h1>
+            {% if qi %}
+                <div id="alignRight">
+                    {%if error%}
+                        {{error}}
+                    {%endif%}
+                    <button id="testButton" class="customButton">Add/Update Test</button>
+                    <button id="assignmentButton" class="customButton">Add/Update Assignment</button>
+                </div>
+                <!-- Test Modal -->
+                <div id="testModal" class="modal">
+                    <div class="modal-content">
+                        <span class="close">&times;</span>
+                        <p class="cardTitle">Adding Test...</p>
+                        <div class="cardContent">
+                            <form method="post" enctype="multipart/form-data">
+                                <label class="requiredInput" for="test_no">Test #(Only 1 test)</label>
+                                <input type="text" name="test_no" placeholder="ie:1,2,3,4..." required>
+                                <label for="test_pdf">Test PDF</label>
+                                <input type="file" class="fileInput" name="test_pdf" accept=".pdf">
+                                <label for="solution_pdf">Solution PDF</label>
+                                <input type="file" class="fileInput" name="solution_pdf" accept=".pdf">
+                                <label for="due_date">Due Date</label>
+                                <input type="date" class="fileInput" name="due_date" >
+                                <label for="due_time">Due Time</label>
+                                <input type="time" class="fileInput" name="due_time" >
+                                <input type=submit value="Create Test" id="createButton">
+                            </form>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <!-- Assignments Card -->
-            <div class="card">
-                <a name="tests" href="{{url_for('.coursework')}}#tests" class="links">
-                    <h1 class="cardTitle">
-                        
-                        Tests
-                        
-                    </h1>
-                </a>
-                <div class="cardContent">
-                    <div class="cardSection">
-                        <p>
-                            <span class="subtitle">Term Test #1:</span> <a href="../pdfs/assignments/fillerPDF.pdf" class="links" target="_blank">Questions</a> 
-                            | <a href="../pdfs/assignments/fillerPDF.pdf" class="links" target="_blank">Solutions</a>
-                        </p>
-                    </div>
-                    <div class="cardSection">
-                        <p>
-                            <span class="subtitle">Term Test #2:</span> Questions (Coming Soon) | Solutions (Coming Soon)
-                        </p>
-                    </div>
-                    <div class="cardSection">
-                        <p>
-                            <span class="subtitle">Term Test #3:</span> Questions (Coming Soon) | Solutions (Coming Soon)
-                        </p>
+                <!-- Assignment Modal -->
+                <div id="assignmentModal" class="modal">
+                    <div class="modal-content">
+                        <span class="close">&times;</span>
+                        <p class="cardTitle">Adding Assignment...</p>
+                        <div class="cardContent">
+                            <form method="post" enctype="multipart/form-data">
+                                <label class="requiredInput" for="assignment_no">Assignment #(Only 1 assignment)</label>
+                                <input type="text" name="assignment_no" placeholder="ie:1,2,3,4..." required>
+                                <label for="assignment_pdf">Assignment PDF</label>
+                                <input type="file" class="fileInput" name="assignment_pdf" accept=".pdf">
+                                <label for="solution_pdf">Solution PDF</label>
+                                <input type="file" class="fileInput" name="solution_pdf" accept=".pdf">
+                                <label for="due_date">Due Date</label>
+                                <input type="date" class="fileInput" name="due_date">
+                                <label for="due_time">Due Time</label>
+                                <input type="time" class="fileInput" name="due_time">
+                                <input type=submit value="Create Assignment" id="createButton">
+                            </form>
+                        </div>
                     </div>
                 </div>
-            </div>
+            {% endif %}
+            {% if student %}
+                <div id="alignRight">
+                    <button id="testButton" class="customButton">Submit Test</button>
+                    <button id="assignmentButton" class="customButton">Submit Assignment</button>
+                </div>
+                <!-- Test Modal -->
+                <div id="testModal" class="modal">
+                    <div class="modal-content">
+                        <span class="close">&times;</span>
+                        <p class="cardTitle">Submitting Test...</p>
+                        <div class="cardContent">
+                            <form method="post" enctype="multipart/form-data">
+                                <label class="requiredInput" for="test_no">Test #(Only 1 test)</label>
+                                <input type="text" name="test_no" placeholder="ie:1,2,3,4..." required>
+                                <label class="requiredInput" for="test_pdf">Your Test Solution PDF</label>
+                                <input type="file" class="fileInput" name="test_pdf" accept=".pdf" required>
+                                <input type=submit value="Submit Test" id="createButton">
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <!-- Assignment Modal -->
+                <div id="assignmentModal" class="modal">
+                    <div class="modal-content">
+                        <span class="close">&times;</span>
+                        <p class="cardTitle">Submitting Assignment...</p>
+                        <div class="cardContent">
+                            <form method="post" enctype="multipart/form-data">
+                                <label class="requiredInput" for="assignment_no">Assignment #(Only 1 assignment)</label>
+                                <input type="text" name="assignment_no" placeholder="ie:1,2,3,4..." required>
+                                <label class="requiredInput" for="assignment_pdf">Your Assignment Solution PDF</label>
+                                <input type="file" class="fileInput" name="assignment_pdf" accept=".pdf">
+                                <input type=submit value="Submit Assignment" id="createButton">
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            <!-- Assignments Cards-->
+            {% for assignment in assignments%}
+                <div class="card">
+                    <a name="assignments" href="{{url_for('.coursework')}}#assignments" class="links">
+                        <h1 class="cardTitle">
+                            
+                            Assignment {{assignment["assignment_no"]}}
+                            
+                        </h1>
+                    </a>
+                    <div class="cardContent">
+                        <div class="cardSection">
+                            <p>
+                                
+                                <span class="subtitle">Assignment {{assignment["assignment_no"]}}:</span>
+                                {%if assignment["pdf_id"]%}
+                                <a href="/pdfs/{{assignment["pdf_id"]}}" class="links" target="_blank">Handout</a> 
+                                {%endif%}
+                                {%if assignment["solution_id"]%}
+                                | <a href="../pdfs/{{assignment["solution_id"]}}" class="links" target="_blank">Solutions</a>
+                                {%endif%}
+                            </p>
+                            {%if assignment["due_date"]%}
+                                <span class="subtitle">Due Date: </span>{{assignment["due_date"]}}
+                            {%endif%}
+                            <p>
+                                {% for submission in assignment_submissions%}
+                                    {%if submission["assignment_no"] == assignment["assignment_no"]%}
+                                        <a href="../pdfs/{{submission["pdf_id"]}}" class="links" target="_blank">Submission</a>
+                                        {% if submission["late"] == 1%}
+                                            Late
+                                        {%endif%}
+                                    {%endif%}
+                                {% endfor%}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            <!-- Tests Cards -->
+            <h1 class="title" id="assignmentPageTitle">Tests</h1>
+            {% for test in tests%}
+                <div class="card">
+                    <a name="tests" href="{{url_for('.coursework')}}#tests" class="links">
+                        <h1 class="cardTitle"> 
+                            Test {{test["test_no"]}}
+                        </h1>
+                    </a>
+                    <div class="cardContent">
+                        <div class="cardSection">
+                            <p>
+                                <span class="subtitle">Term Test {{test["test_no"]}}:</span> 
+                                {%if test["pdf_id"]%}
+                                <a href="/pdfs/{{test["pdf_id"]}}" class="links" target="_blank">Questions</a> 
+                                {%endif%}
+                                {%if test["solution_id"]%}
+                                | <a href="../pdfs/{{test["solution_id"]}}" class="links" target="_blank">Solutions</a>
+                                {%endif%}
+                            </p>
+                            {%if test["due_date"]%}
+                                <span class="subtitle">Due Date: </span>{{test["due_date"]}}
+                            {%endif%}
+                            <p>
+                                {% for submission in test_submissions %}
+                                    {%if submission["test_no"] == test["test_no"]%}
+                                        <a href="../pdfs/{{submission["pdf_id"]}}" class="links" target="_blank">Submission </a>
+                                        {% if submission["late"] == 1%}
+                                            Late
+                                        {%endif%}
+                                    {%endif%}
+                                {% endfor %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
         </div>
+        <script src="{{url_for('static', filename='javascript/coursework.js')}}"></script>
         {% endblock %}
     </body>
 </html>
