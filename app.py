@@ -528,9 +528,12 @@ def profile():
                 syllabus = query_db("SELECT * FROM pdf INNER JOIN instructor ON instructor.syllabus_id = pdf.pdf_id AND instructor.instructor_code=?", [session['username']])
                 if request.method == 'POST':
                     #update form info case
-                    insert_db("INSERT INTO pdf (pdf_name,pdf_data,username) VALUES (?,?,?)",[request.files["courseWideTutPdf"].filename, request.files["courseWideTutPdf"].read(), "all"])
-                    insert_db("INSERT INTO tut_pdfs (week, pdf_id) VALUES (?,(SELECT last_insert_rowid()))",[request.form["week"]])
-                    return redirect(url_for(".tutorials",id=id))
+                    if request.form["picture"]:
+                        insert_db()
+                    if request.form["office"]:
+                        insert_db()
+                        
+                    return redirect(url_for(".profile",id=id))
                 return render_template("profile.html", 
                     user_type=0,
                     user_info=instructor_info,
