@@ -355,16 +355,15 @@ def coursework():
         elif qt[0]["col"] == 1:
             return render_template("courseWork.html",
                 assignments=assignments,
-                tests=tests,)
+                tests=tests)
         ##Student Page
         else:
-            error=None
             assignment_submissions= query_db("SELECT * FROM assignment_submissions WHERE student_no=?",[session["username"]])
             test_submissions =query_db("SELECT * FROM test_submissions WHERE student_no=?",[session["username"]])
             if request.method == "POST":
                 now = datetime.now()
                 ##Checks whether selected assignment exists
-                if "assignment_no" in request.form:
+                if "assignment_no" in request.form and "dropmenu" not in request.form:
                     assignment = query_db("SELECT * FROM assignments WHERE (assignment_no=?)",[request.form["assignment_no"]],one=True)
                     if assignment:
                         assignmentExists = query_db("SELECT * FROM assignment_submissions WHERE assignment_no=? AND student_no=?",[request.form["assignment_no"],session["username"]],one=True)
@@ -387,7 +386,7 @@ def coursework():
                             else:
                                 insert_db("UPDATE assignment_submissions SET date_submitted=?,late=0 WHERE assignment_no=? AND student_no=?",[now.isoformat(),request.form["assignment_no"],session["username"]])
                     else:
-                        error= "No such assignment"
+                        flash("No such assignment")
                 elif "test_no" in request.form:
                     test = query_db("SELECT * FROM tests WHERE test_no=?",[request.form["test_no"]],one=True)
                     if test:
@@ -410,15 +409,35 @@ def coursework():
                             else:
                                 insert_db("UPDATE test_submissions SET date_submitted=?,late=0 WHERE test_no=? AND student_no=?",[now.isoformat(),request.form["test_no"],session["username"]])
                     else:
-                        error="Error: no such test"
+                        flash("Error: no such test")
+                elif "dropmenu" in request.form:
+                    if request.form["dropmenu"] == "assignment":
+                        assignmentExists = query_db("SELECT * FROM assignment_submissions WHERE assignment_no=? AND student_no=?",[request.form["evaluation_no"],session["username"]],one=True)
+                        if assignmentExists:
+                            if assignmentExists["marked"]:
+                                insert_db("UPDATE assignment_submissions SET regrade_requested=1 WHERE assignment_no=? AND student_no=?",[request.form["evaluation_no"],session["username"]])
+                            else:
+                                flash("This assignment has yet to be marked")
+                        else:
+                            flash("No submission detected")
+                    elif request.form["dropmenu"] == "test":
+                        testExists = query_db("SELECT * FROM test_submissions WHERE student_no=? AND test_no=?",[session["username"], request.form["evaluation_no"]],one=True)
+                        if testExists:
+                            if testExists["marked"]:
+                                insert_db("UPDATE test_submissions SET regrade_requested=1 WHERE test_no=? AND student_no=?",[request.form["evaluation_no"],session["username"]])
+                            else:
+                                flash("This test has yet to be marked")
+                        else:
+                            flash("No submission detected")
+                else:
+                    flash("No such post request supported")
                 return redirect(url_for('coursework'))
             return render_template("courseWork.html",
                 assignments=assignments,
                 assignment_submissions=assignment_submissions,
                 test_submissions=test_submissions,
                 tests=tests,
-                student="student",
-                error=error)
+                student="student")
     return redirect(url_for('login'))
 
 @app.route('/links')

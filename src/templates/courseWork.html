@@ -73,6 +73,7 @@
             {% endif %}
             {% if student %}
                 <div id="alignRight">
+                    <button id="regradeButton" class="customButton">Submit Regrade</button>
                     <button id="testButton" class="customButton">Submit Test</button>
                     <button id="assignmentButton" class="customButton">Submit Assignment</button>
                 </div>
@@ -108,21 +109,54 @@
                         </div>
                     </div>
                 </div>
+                <div id="regradeModal" class="modal">
+                    <div class="modal-content">
+                        <span class="close">&times;</span>
+                        <p class="cardTitle">Submitting Regrade Request...</p>
+                        <div class="cardContent">
+                            <form method="post" enctype="multipart/form-data">
+                                <select name="dropmenu" id="dropmenu">
+                                    <option value="assignment">Assignment</option>
+                                    <option value="test">Test</option>
+                                </select>
+                                <label class="requiredInput" for="evaluation_no">#(Only 1)</label>
+                                <input type="text" name="evaluation_no" placeholder="ie:1,2,3,4..." required>
+                                <input type=submit value="Submit Regrade Request" id="createButton">
+                            </form>
+                        </div>
+                    </div>
+                </div>
             {% endif %}
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="error">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
             <!-- Assignments Cards-->
             {% for assignment in assignments%}
                 <div class="card">
                     <a name="assignments" href="{{url_for('.coursework')}}#assignments" class="links">
-                        <h1 class="cardTitle">
-                            
-                            Assignment {{assignment["assignment_no"]}}
-                            
-                        </h1>
+                        <div class="marks">
+                            <h1 class="cardTitle">Assignment {{assignment["assignment_no"]}}</h1>
+                            <div>
+                                {% for submission in assignment_submissions%}
+                                    {%if submission["assignment_no"] == assignment["assignment_no"]%}
+                                        {% if submission["regrade_requested"] == 1%}
+                                            <h5 class="cardTitle">Regrading</h5>
+                                        {%endif%}
+                                        {% if submission["grade"] and submission["regrade_requested"] != 1%}
+                                            <h5 class="cardTitle">Grade: {{assignment["grade"]}}</h5>
+                                        {%endif%}
+                                    {%endif%}
+                                {% endfor%}
+                            </div>
+                        </div>
                     </a>
                     <div class="cardContent">
                         <div class="cardSection">
                             <p>
-                                
                                 <span class="subtitle">Assignment {{assignment["assignment_no"]}}:</span>
                                 {%if assignment["pdf_id"]%}
                                 <a href="/pdfs/{{assignment["pdf_id"]}}" class="links" target="_blank">Handout</a> 
@@ -153,9 +187,16 @@
             {% for test in tests%}
                 <div class="card">
                     <a name="tests" href="{{url_for('.coursework')}}#tests" class="links">
-                        <h1 class="cardTitle"> 
-                            Test {{test["test_no"]}}
-                        </h1>
+                        <div class="marks">
+                            <h1 class="cardTitle"> 
+                                Test {{test["test_no"]}}
+                            </h1>
+                            {% if test["grade"]%}
+                                <h1 class="cardTitle">
+                                    Grade: {{test["grade"]}}
+                                </h1>
+                            {%endif%}
+                        </div>
                     </a>
                     <div class="cardContent">
                         <div class="cardSection">
