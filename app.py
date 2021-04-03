@@ -222,10 +222,9 @@ def tutorials(id=None):
                 general_tutorial_material = query_db("SELECT * FROM tut_pdfs INNER JOIN pdf ON tut_pdfs.pdf_id = pdf.pdf_id")
                 ta_pdfs = query_db("SELECT * FROM ta_notes INNER JOIN pdf ON ta_notes.pdf_id = pdf.pdf_id WHERE ta_code=?", [id])
                 if request.method == 'POST':
-                    if request.files.get("courseWideTutPdf"):
+                    if request.form.get("courseWideTutPdf"):
                         #Inserts pdfs
-                        insert_db("INSERT INTO pdf (pdf_name,pdf_data,username) VALUES (?,?,?)",[request.files["courseWideTutPdf"].filename, request.files["courseWideTutPdf"].read(), "all"])
-                        insert_db("INSERT INTO tut_pdfs (week, pdf_id) VALUES (?,(SELECT last_insert_rowid()))",[request.form["week"]])
+                        
                         return redirect(url_for(".tutorials",id=id))
                 return render_template("tutorials.html", 
                     ta_tutorial_material=ta_tutorial_material,  
