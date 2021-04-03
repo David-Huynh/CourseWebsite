@@ -443,22 +443,17 @@ def profile():
             qt = query_db("SELECT EXISTS(SELECT ta_code,password FROM ta WHERE (ta_code=?)) AS \"col\"",[session['username']])
             # Load Instructor page
             if qi[0]["col"] == 1:
-                instructor_info = query_db("SELECT * FROM pdf INNER JOIN instructor  ON instructor.syllabus_id = pdf.pdf_id AND instructor.instructor_code=?", [session['username']])
-                """instructor_info = query_db("SELECT * FROM instructor WHERE instructor_code=?",[session['username']])
-                syllabus_id = query_db("SELECT pdf.id FROM instructor, pdf WHERE instructor_code=? AND pdf.pdf_id=instructor.syllabus_id;",[session['username']])
-                syllabus_name = query_db("SELECT pdf.pdf_name FROM instructor, pdf WHERE instructor_code=? AND pdf.pdf_id=instructor.syllabus_id;",[session['username']])"""
+                instructor_info = query_db("SELECT * FROM instructor WHERE instructor_code=?",[session['username']])
+                syllabus = query_db("SELECT * FROM pdf INNER JOIN instructor ON instructor.syllabus_id = pdf.pdf_id AND instructor.instructor_code=?", [session['username']])
                 if request.method == 'POST':
                     #update form info case
-                    return "updating info for instructor"
+                    insert_db("INSERT INTO pdf (pdf_name,pdf_data,username) VALUES (?,?,?)",[request.files["courseWideTutPdf"].filename, request.files["courseWideTutPdf"].read(), "all"])
+                    insert_db("INSERT INTO tut_pdfs (week, pdf_id) VALUES (?,(SELECT last_insert_rowid()))",[request.form["week"]])
+                    return redirect(url_for(".tutorials",id=id))
                 return render_template("profile.html", 
                     user_type=0,
-                    name=instructor_info[0]["first_name"].lower().capitalize()+' '+instructor_info[0]["last_name"].lower().capitalize(),  
-                    pic=instructor_info[0]["instructor_picture"], 
-                    syllabus_name=instructor_info[0]["pdf_name"],
-                    syllabus_id=instructor_info[0]["pdf_id"],
-                    office=instructor_info[0]["office"],
-                    office_hours=instructor_info[0]["office_hours"],
-                    office_hours_link=instructor_info[0]["office_hours_link"])
+                    user_info=instructor_info,
+                    syllabus=syllabus)
             # Load TA page
             elif qt[0]["col"] == 1:
                 ta_info = query_db("SELECT * FROM ta WHERE ta_code=?",[session['username']])
@@ -467,21 +462,19 @@ def profile():
                     return "updating info for TA"
                 return render_template("profile.html", 
                     user_type=1,
-                    name=ta_info[0]["first_name"].lower().capitalize()+' '+ta_info[0]["last_name"].lower().capitalize(),  
-                    pic=ta_info[0]["ta_picture"], 
-                    office_hours=ta_info[0]["office_hours"],
-                    office_hours_link=ta_info[0]["office_hours_link"])
+                    user_info=ta_info)
             # Load Student page
             else:
+                prof_list = query_db("SELECT instructor_code, first_name, last_name FROM instructor")
+                ta_list = query_db("SELECT ta_code, first_name, last_name FROM ta")
                 stud_info = query_db("SELECT * FROM student WHERE student_no=?",[session['username']])
                 if request.method == 'POST':
                     return 'updating data for student'
                 return render_template("profile.html",
                     user_type=2,
-                    name=stud_info[0]["first_name"].lower().capitalize()+' '+stud_info[0]["last_name"].lower().capitalize(),  
-                    email=stud_info[0]["email"],
-                    ta_code=stud_info[0]["ta_code"],
-                    instructor_code=stud_info[0]["instructor_code"])    
+                    user_info=stud_info, 
+                    prof_list=prof_list,
+                    ta_list=ta_list)    
     return redirect(url_for('login'))
 
 ##LOGIN/SIGNUP REQUESTS

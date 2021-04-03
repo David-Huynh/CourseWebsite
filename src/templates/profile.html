@@ -23,7 +23,7 @@
             <button id="editB" class="customButton" style="align-self: flex-end;margin-bottom: 20px;">Edit Profile</button>
             <!-- Tests Card -->
             <div class="card">
-                <h1 class="cardTitle"> {{name}} </h1>
+                <h1 class="cardTitle"> {{user_info[0]["first_name"].lower().capitalize()+' '+user_info[0]["last_name"].lower().capitalize()}} </h1>
                 <div class="cardContent">
                     <!-- The Modal -->
                     <div id="myModal" class="modal">
@@ -34,16 +34,51 @@
                             <div class="cardContent">
                                 <p>
                                     <form method="post" enctype="multipart/form-data">
-                                        <label class="subtitle">Update Profile Picture</label>
-                                        <input type="file" class="fileInput" name="courseWidePdf" accept="image/*">
-                                        <label for="courseWidePdf" class="subtitle">Update Syllabus</label>
-                                        <input type="file" class="fileInput" name="courseWidePdf" accept=".pdf">
-                                        <label class="subtitle" for="week">Update Office</label>
-                                        <input type="text" name="week" placeholder="Enter Office Location">
-                                        <label class="subtitle" for="week">Update Office Hours</label>
-                                        <input type="text" name="week" placeholder="Enter Office Hours Schedule">
-                                        <label class="subtitle" for="week">Update Office Hours Link</label>
-                                        <input type="text" name="week" placeholder="Enter Office Hours Meeting Link">
+                                        {% if user_type != 2 %}
+                                            <label class="subtitle">Update Profile Picture</label>
+                                            <input type="file" class="fileInput" name="courseWidePdf" accept="image/*">
+                                            {% if user_type == 0 %}
+                                                <label for="courseWidePdf" class="subtitle">Update Syllabus</label>
+                                                <input type="file" class="fileInput" name="syllabus" accept=".pdf">
+                                                <label class="subtitle" for="week">Update Office</label>                                            
+                                                <input type="text" name="office" placeholder="Enter Office Location">
+                                            {% endif %}
+                                            <label class="subtitle" for="week">Update Office Hours</label>
+                                            <input type="text" name="office_hours" placeholder="Enter Office Hours Schedule">
+                                            <label class="subtitle" for="week">Update Office Hours Link</label>
+                                            <input type="text" name="office_hours_link" placeholder="Enter Office Hours Meeting Link">
+                                        {% else %}
+                                            <label class="subtitle">Change Instructor</label>
+                                            <select name="prof" id="prof">
+                                                {% if user_info[0]["instructor_code"] %}
+                                                    <option value="NULL">None selected</option>
+                                                {% else %}
+                                                    <option value="NULL" selected>None selected</option>
+                                                {% endif %}
+                                                {% for prof in prof_list %}
+                                                    {% if prof["instructor_code"] == user_info[0]["instructor_code"] %}
+                                                        <option value="{{prof["instructor_code"]}}" selected>{{prof["first_name"]}} {{prof["last_name"]}}</option>
+                                                    {% else %}
+                                                        <option value="{{prof["instructor_code"]}}">{{prof["first_name"]}} {{prof["last_name"]}}</option>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </select>
+                                            <label class="subtitle">Change TA</label>
+                                            <select name="ta" id="ta">
+                                                {% if user_info[0]["ta_code"] %}
+                                                    <option value="NULL">None selected</option>
+                                                {% else %}
+                                                    <option value="NULL" selected>None selected</option>
+                                                {% endif %}
+                                                {% for ta in ta_list %}
+                                                    {% if ta["ta_code"] == user_info[0]["ta_code"] %}
+                                                        <option value="{{ta["ta_code"]}}" selected>{{ta["first_name"]}} {{ta["last_name"]}}</option>
+                                                    {% else %}
+                                                        <option value="{{ta["ta_code"]}}">{{ta["first_name"]}} {{ta["last_name"]}}</option>
+                                                    {% endif %}
+                                                {% endfor %}
+                                              </select>
+                                        {% endif %}
                                         <input type="submit" value="Update" id="createButton">
                                     </form>
                                 </p>
@@ -51,55 +86,97 @@
                         </div>
                     </div>
                     {% if user_type != 2 %}
-                    <div class="cardPicture">
-                        {% if pic != None %}
-                            <img src="data:image/png;base64,{{pic}}" alt="Picture of Instructor"> 
-                        {% else %}
-                            <img src="../static/placeholder.png" class="picture" alt="Picture of Instructor">
+                        <div class="cardPicture">
+                            {% if user_type == 1 and user_info[0]["ta_picture"] %}
+                                <img src="data:image/png;base64,{{user_info[0]["ta_picture"]}}" alt="Picture of Instructor"> 
+                            {% elif user_type == 0 and user_info[0]["instructor_picture"] %}
+                                <img src="data:image/png;base64,{{user_info[0]["instructor_picture"]}}" alt="Picture of Instructor"> 
+                            {% else %}
+                                <img src="../static/placeholder.png" class="picture" alt="Picture of Instructor">
+                            {% endif %}
+                        </div>
+                        {% if user_type == 0 %}
+                            <div class="cardSection">
+                                <p>
+                                    <span class="subtitle">Syllabus:</span> 
+                                    {% if syllabus["pdf_id"] %}
+                                        <span class="data"><a href="/pdfs/{{syllabus["pdf_id"]}}" class="links" target="_blank">{{syllabus["pdf_name"]}}</a></p>
+                                    {% else %}
+                                        <span class="data">Coming Soon</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                            <div class="cardSection">
+                                <p>
+                                    <span class="subtitle">Office:</span> 
+                                    {% if user_info[0]["office"] %}
+                                        <span class="data"> {{user_info[0]["office"]}} </span>
+                                    {% else %}
+                                        <span class="data">Coming Soon</span>
+                                    {% endif %}
+                                </p>
+                            </div>
                         {% endif %}
-                    </div>
-                    {% if user_type == 0 %}
-                    <div class="cardSection">
-                        <p>
-                            <span class="subtitle">Syllabus:</span> 
-                            {% if pdf_id != None %}
-                                <span class="data"><a href="/pdfs/{{syllabus_id}}" class="links" target="_blank">{{syllabus_name}}</a></p>
-                            {% else %}
-                                <span class="data">Coming Soon</span>
-                            {% endif %}
-                        </p>
-                    </div>
-                    <div class="cardSection">
-                        <p>
-                            <span class="subtitle">Office:</span> 
-                            {% if office %}
-                                <span class="data"> {{office}} </span>
-                            {% else %}
-                                <span class="data">Coming Soon</span>
-                            {% endif %}
-                        </p>
-                    </div>
-                    {% endif %}
-                    <div class="cardSection">
-                        <p>
-                            <span class="subtitle">Office Hours:</span> 
-                            {% if office_hours %}
-                                <p> {{office_hours}} </p>
-                            {% else %}
-                                <span class="data">Coming Soon</span>
-                            {% endif %}
-                        </p>
-                    </div>
-                    <div class="cardSection">
-                        <p>
-                            <span class="subtitle">Office Hours Link:</span> 
-                            {% if office_hours_link %}
-                                <a href="https://piazza.com/class/kk052lckppx73x" class="links" target="_blank">[Link]</a> 
-                            {% else %}
-                                <span class="data">Coming Soon</span>
-                            {% endif %}
-                        </p>
-                    </div>
+                        <div class="cardSection">
+                            <p>
+                                <span class="subtitle">Office Hours:</span> 
+                                {% if user_info[0]["office_hours"] %}
+                                    <p> {{user_info[0]["office_hours"]}} </p>
+                                {% else %}
+                                    <span class="data">Coming Soon</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="cardSection">
+                            <p>
+                                <span class="subtitle">Office Hours Link:</span> 
+                                {% if user_info[0]["office_hours_link"] %}
+                                    <a href="{{user_info[0]["office_hours_link"]}}" class="links" target="_blank">[Link]</a> 
+                                {% else %}
+                                    <span class="data">Coming Soon</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    {% else %}    
+                        <div class="cardSection">
+                            <p>
+                                <span class="subtitle">Email:</span> 
+                                {% if user_info[0]["email"] %}
+                                    <span class="data"> {{user_info[0]["email"]}} </span>
+                                {% else %}
+                                    <span class="data">Coming Soon</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="cardSection">
+                            <p>
+                                <span class="subtitle">Instructor:</span> 
+                                {% if user_info[0]["instructor_code"] %}
+                                    {% for prof in prof_list %}
+                                        {% if prof["instructor_code"] == user_info[0]["instructor_code"] %}
+                                            <span class="data"> {{prof["first_name"]}} {{prof["last_name"]}} </span>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% else %}
+                                    <span class="data">None Selected</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="cardSection">
+                            <p>
+                                <span class="subtitle">TA:</span> 
+                                {% if user_info[0]["ta_code"] %}
+                                    {% for ta in ta_list %}
+                                        {% if ta["ta_code"] == user_info[0]["ta_code"] %}
+                                            <span class="data"> {{ta["first_name"]}} {{ta["last_name"]}} </span>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% else %}
+                                    <span class="data">None Selected</span>
+                                {% endif %}
+                            </p>
+                        </div>
+
                     {% endif %}
                 </div>
             </div>
