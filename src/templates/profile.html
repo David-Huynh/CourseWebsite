@@ -34,16 +34,22 @@
                             <div class="cardContent">
                                 <p>
                                     <form method="post" enctype="multipart/form-data">
-                                        <label class="subtitle">Update Profile Picture</label>
-                                        <input type="file" class="fileInput" name="courseWidePdf" accept="image/*">
-                                        <label for="courseWidePdf" class="subtitle">Update Syllabus</label>
-                                        <input type="file" class="fileInput" name="courseWidePdf" accept=".pdf">
-                                        <label class="subtitle" for="week">Update Office</label>
-                                        <input type="text" name="week" placeholder="Enter Office Location">
-                                        <label class="subtitle" for="week">Update Office Hours</label>
-                                        <input type="text" name="week" placeholder="Enter Office Hours Schedule">
-                                        <label class="subtitle" for="week">Update Office Hours Link</label>
-                                        <input type="text" name="week" placeholder="Enter Office Hours Meeting Link">
+                                        {% if user_type != 2 %}
+                                            <label class="subtitle">Update Profile Picture</label>
+                                            {% if user_type == 0 %}
+                                                <input type="file" class="fileInput" name="courseWidePdf" accept="image/*">
+                                                <label for="courseWidePdf" class="subtitle">Update Syllabus</label>
+                                                <input type="file" class="fileInput" name="courseWidePdf" accept=".pdf">
+                                                <label class="subtitle" for="week">Update Office</label>
+                                            {% endif %}
+                                            <input type="text" name="week" placeholder="Enter Office Location">
+                                            <label class="subtitle" for="week">Update Office Hours</label>
+                                            <input type="text" name="week" placeholder="Enter Office Hours Schedule">
+                                            <label class="subtitle" for="week">Update Office Hours Link</label>
+                                            <input type="text" name="week" placeholder="Enter Office Hours Meeting Link">
+                                        {% else %}
+                                            <!-- add student profile attributes-->
+                                        {% endif %}
                                         <input type="submit" value="Update" id="createButton">
                                     </form>
                                 </p>
@@ -102,6 +108,46 @@
                                 {% endif %}
                             </p>
                         </div>
+                    {% else %}    
+                        <div class="cardSection">
+                            <p>
+                                <span class="subtitle">Email:</span> 
+                                {% if user_info[0]["email"] %}
+                                    <span class="data"> {{user_info[0]["email"]}} </span>
+                                {% else %}
+                                    <span class="data">Coming Soon</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="cardSection">
+                            <p>
+                                <span class="subtitle">Instructor:</span> 
+                                {% if user_info[0]["instructor_code"] %}
+                                    {% for prof in prof_list %}
+                                        {% if prof["instructor_code"] == user_info[0]["instructor_code"] %}
+                                            <span class="data"> {{prof["first_name"]}} {{prof["last_name"]}} </span>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% else %}
+                                    <span class="data">Coming Soon</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="cardSection">
+                            <p>
+                                <span class="subtitle">TA:</span> 
+                                {% if user_info[0]["instructor_code"] %}
+                                    {% for ta in ta_list %}
+                                        {% if ta["ta_code"] == user_info[0]["ta_code"] %}
+                                            <span class="data"> {{ta["first_name"]}} {{ta["last_name"]}} </span>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% else %}
+                                    <span class="data">Coming Soon</span>
+                                {% endif %}
+                            </p>
+                        </div>
+
                     {% endif %}
                 </div>
             </div>

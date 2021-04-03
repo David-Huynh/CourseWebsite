@@ -331,7 +331,6 @@ def profile():
                     user_info=instructor_info,
                     syllabus=syllabus)
             # Load TA page
-            # Change ta and student to the same as instructor
             elif qt[0]["col"] == 1:
                 ta_info = query_db("SELECT * FROM ta WHERE ta_code=?",[session['username']])
                 if request.method == 'POST':
@@ -339,21 +338,19 @@ def profile():
                     return "updating info for TA"
                 return render_template("profile.html", 
                     user_type=1,
-                    name=ta_info[0]["first_name"].lower().capitalize()+' '+ta_info[0]["last_name"].lower().capitalize(),  
-                    pic=ta_info[0]["ta_picture"], 
-                    office_hours=ta_info[0]["office_hours"],
-                    office_hours_link=ta_info[0]["office_hours_link"])
+                    user_info=ta_info)
             # Load Student page
             else:
+                prof_list = query_db("SELECT instructor_code, first_name, last_name FROM instructor")
+                ta_list = query_db("SELECT ta_code, first_name, last_name FROM ta")
                 stud_info = query_db("SELECT * FROM student WHERE student_no=?",[session['username']])
                 if request.method == 'POST':
                     return 'updating data for student'
                 return render_template("profile.html",
                     user_type=2,
-                    name=stud_info[0]["first_name"].lower().capitalize()+' '+stud_info[0]["last_name"].lower().capitalize(),  
-                    email=stud_info[0]["email"],
-                    ta_code=stud_info[0]["ta_code"],
-                    instructor_code=stud_info[0]["instructor_code"])    
+                    user_info=stud_info, 
+                    prof_list=prof_list,
+                    ta_list=ta_list)    
     return redirect(url_for('login'))
 
 ##LOGIN/SIGNUP REQUESTS
