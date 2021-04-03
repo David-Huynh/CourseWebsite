@@ -13,3 +13,8 @@
     border-color: #002A5C;
     transition: all 0.4s ease 0s;
 }
+
+#alignRight{
+    align-self: flex-end;
+    margin-bottom: 20px;
+}

@@ -1,4 +1,5 @@
 import sqlite3
+from datetime import datetime
 from flask import Flask, render_template, session, url_for, redirect, request, flash, g, make_response
 app = Flask(__name__, template_folder='./src/templates', static_folder='./src/static')
 import base64
@@ -289,10 +290,153 @@ def tutorials(id=None):
             return render_template("tutorials.html")
     return redirect(url_for('login'))
 
-@app.route('/coursework')
+@app.route('/coursework', methods=['GET', 'POST'])
 def coursework():
     if 'username' in session and 'password' in session:
-        return render_template("courseWork.html")
+        ##Queries whether there is a username match in instructors table
+        qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=?)) AS \"col\"",[session['username']])
+        ##Queries whether there is a username match in ta table
+        qt = query_db("SELECT EXISTS(SELECT ta_code,password FROM ta WHERE (ta_code=?)) AS \"col\"",[session['username']])
+        assignments = query_db("SELECT * FROM assignments ORDER BY assignment_no ASC")
+        tests = query_db("SELECT * FROM tests ORDER BY test_no ASC")
+        ##Instructor User Page
+        if qi[0]["col"] == 1:
+            if request.method == "POST":
+                if "assignment_no" in request.form:
+                    ##Checks whether selected assignment exists
+                    assignmentExists = query_db("SELECT * FROM assignments WHERE (assignment_no=?)",[request.form["assignment_no"]],one=True)
+                    if not assignmentExists:
+                        insert_db("INSERT INTO assignments (assignment_no) VALUES (?)",[request.form["assignment_no"]])
+                        assignmentExists = query_db("SELECT * FROM assignments WHERE (assignment_no=?)",[request.form["assignment_no"]],one=True)
+                    if request.files.get("assignment_pdf"): 
+                        if not assignmentExists["pdf_id"]:
+                            ## Insert if assignment does not exist
+                            insert_db("INSERT INTO pdf (pdf_name,pdf_data,username) VALUES (?,?,?)",[request.files["assignment_pdf"].filename, request.files["assignment_pdf"].read(), "all"])
+                            insert_db("UPDATE assignments SET pdf_id=(SELECT last_insert_rowid()) WHERE assignment_no=?",[request.form["assignment_no"]])
+                        elif assignmentExists["pdf_id"]:
+                            insert_db("UPDATE pdf SET pdf_name=?,pdf_data=? WHERE pdf_id=?",[request.files["assignment_pdf"].filename, request.files["assignment_pdf"].read(), assignmentExists["pdf_id"]])
+                    if request.files.get("solution_pdf"):
+                        if not assignmentExists["solution_id"]:
+                            ## Insert if assignment solution does not exist
+                            insert_db("INSERT INTO pdf (pdf_name,pdf_data,username) VALUES (?,?,?)",[request.files["solution_pdf"].filename, request.files["solution_pdf"].read(), "all"])
+                            insert_db("UPDATE assignments SET solution_id=(SELECT last_insert_rowid()) WHERE assignment_no=?",[request.form["assignment_no"]])
+                        elif assignmentExists["solution_id"]:
+                            insert_db("UPDATE pdf SET pdf_name=?,pdf_data=? WHERE pdf_id=?",[request.files["solution_pdf"].filename, request.files["solution_pdf"].read(), assignmentExists["solution_id"]])
+                    ## Insert due date
+                    insert_db("UPDATE assignments SET due_date=? WHERE assignment_no=?",[request.values["due_date"]+"T"+request.values["due_time"]+":00.00",request.form["assignment_no"]])
+                elif "test_no" in request.form:
+                    testExists = query_db("SELECT * FROM tests WHERE (test_no=?)",[request.form["test_no"]],one=True)
+                    if not testExists:
+                        insert_db("INSERT INTO tests (test_no) VALUES (?)",[request.form["test_no"]])
+                        testExists = query_db("SELECT * FROM tests WHERE (test_no=?)",[request.form["test_no"]],one=True)
+                    if request.files.get("test_pdf"):
+                        if not testExists["pdf_id"]:
+                            ## Insert if test does not exist
+                            insert_db("INSERT INTO pdf (pdf_name,pdf_data,username) VALUES (?,?,?)",[request.files["test_pdf"].filename, request.files["test_pdf"].read(), "all"])
+                            insert_db("UPDATE tests SET pdf_id=(SELECT last_insert_rowid()) WHERE test_no=?",[request.form["test_no"]])
+                        elif testExists["pdf_id"]:
+                            insert_db("UPDATE pdf SET pdf_name=?,pdf_data=? WHERE pdf_id=?",[request.files["test_pdf"].filename, request.files["test_pdf"].read(), testExists["pdf_id"]])
+                    if request.files.get("solution_pdf"):
+                        if not testExists["solution_id"]:
+                            ## Insert if test solution does not exist
+                            insert_db("INSERT INTO pdf (pdf_name,pdf_data,username) VALUES (?,?,?)",[request.files["solution_pdf"].filename, request.files["solution_pdf"].read(), "all"])
+                            insert_db("UPDATE tests SET solution_id=(SELECT last_insert_rowid()) WHERE test_no=?",[request.form["test_no"]])
+                        elif testExists["solution_id"]:
+                            insert_db("UPDATE pdf SET pdf_name=?,pdf_data=? WHERE pdf_id=?",[request.files["solution_pdf"].filename, request.files["solution_pdf"].read(), testExists["solution_id"]])
+                    ## Insert due date
+                    insert_db("UPDATE tests SET due_date=? WHERE test_no=?",[request.values["due_date"]+"T"+request.values["due_time"]+":00.00",request.form["test_no"]])
+                return redirect(url_for('coursework'))
+            return render_template("courseWork.html", 
+                assignments=assignments,
+                tests=tests,
+                qi=qi)
+        ##TA User Page
+        elif qt[0]["col"] == 1:
+            return render_template("courseWork.html",
+                assignments=assignments,
+                tests=tests)
+        ##Student Page
+        else:
+            assignment_submissions= query_db("SELECT * FROM assignment_submissions WHERE student_no=?",[session["username"]])
+            test_submissions =query_db("SELECT * FROM test_submissions WHERE student_no=?",[session["username"]])
+            if request.method == "POST":
+                now = datetime.now()
+                ##Checks whether selected assignment exists
+                if "assignment_no" in request.form and "dropmenu" not in request.form:
+                    assignment = query_db("SELECT * FROM assignments WHERE (assignment_no=?)",[request.form["assignment_no"]],one=True)
+                    if assignment:
+                        assignmentExists = query_db("SELECT * FROM assignment_submissions WHERE assignment_no=? AND student_no=?",[request.form["assignment_no"],session["username"]],one=True)
+                        if not assignmentExists:
+                            insert_db("INSERT INTO assignment_submissions (assignment_no,student_no,marked) VALUES (?,?,0)",[request.form["assignment_no"],session["username"]])
+                            assignmentExists = query_db("SELECT * FROM assignment_submissions WHERE student_no=? AND assignment_no=?",[session["username"], request.form["assignment_no"]],one=True)
+                        if request.files.get("assignment_pdf"):
+                            if not assignmentExists["pdf_id"]:
+                                ## Insert if assignment does not exist
+                                insert_db("INSERT INTO pdf (pdf_name,pdf_data,username) VALUES (?,?,?)",[request.files["assignment_pdf"].filename, request.files["assignment_pdf"].read(), session["username"]])
+                                insert_db("UPDATE assignment_submissions SET pdf_id=(SELECT last_insert_rowid()) WHERE assignment_no=? AND student_no=?",[request.form["assignment_no"],session["username"]])
+                            elif assignmentExists["pdf_id"]:
+                                insert_db("UPDATE pdf SET pdf_name=?,pdf_data=? WHERE pdf_id=?",[request.files["assignment_pdf"].filename, request.files["assignment_pdf"].read(), assignmentExists["pdf_id"]])
+                            if assignment["due_date"]:
+                                if datetime.strptime(assignment["due_date"], "%Y-%m-%dT%H:%M:%S.%f") <= now:
+                                    print("DAB")
+                                    insert_db("UPDATE assignment_submissions SET date_submitted=?,late=1 WHERE assignment_no=? AND student_no=?",[now.isoformat(),request.form["assignment_no"],session["username"]])
+                                else:
+                                    insert_db("UPDATE assignment_submissions SET date_submitted=?,late=0 WHERE assignment_no=? AND student_no=?",[now.isoformat(),request.form["assignment_no"],session["username"]])
+                            else:
+                                insert_db("UPDATE assignment_submissions SET date_submitted=?,late=0 WHERE assignment_no=? AND student_no=?",[now.isoformat(),request.form["assignment_no"],session["username"]])
+                    else:
+                        flash("No such assignment")
+                elif "test_no" in request.form:
+                    test = query_db("SELECT * FROM tests WHERE test_no=?",[request.form["test_no"]],one=True)
+                    if test:
+                        testExists = query_db("SELECT * FROM test_submissions WHERE student_no=? AND test_no=?",[session["username"], request.form["test_no"]],one=True)
+                        if not testExists:
+                            insert_db("INSERT INTO test_submissions (test_no,student_no,marked) VALUES (?,?,0)",[request.form["test_no"],session["username"]])
+                            testExists = query_db("SELECT * FROM test_submissions WHERE student_no=? AND test_no=?",[session["username"], request.form["test_no"]],one=True)
+                        if request.files.get("test_pdf"):
+                            if not testExists["pdf_id"]:
+                                ## Insert if test does not exist
+                                insert_db("INSERT INTO pdf (pdf_name,pdf_data,username) VALUES (?,?,?)",[request.files["test_pdf"].filename, request.files["test_pdf"].read(), session["username"]])
+                                insert_db("UPDATE test_submissions SET pdf_id=(SELECT last_insert_rowid()) WHERE test_no=? AND student_no=?",[request.form["test_no"],session["username"]])
+                            elif testExists["pdf_id"]:
+                                insert_db("UPDATE pdf SET pdf_name=?,pdf_data=? WHERE pdf_id=?",[request.files["test_pdf"].filename, request.files["test_pdf"].read(), testExists["pdf_id"]])
+                            if test["due_date"]:
+                                if datetime.strptime(test["due_date"], "%Y-%m-%dT%H:%M:%S.%f") <= now:
+                                    insert_db("UPDATE test_submissions SET date_submitted=?,late=1 WHERE test_no=? AND student_no=?",[now.isoformat(),request.form["test_no"],session["username"]])
+                                else:
+                                    insert_db("UPDATE test_submissions SET date_submitted=?,late=0 WHERE test_no=? AND student_no=?",[now.isoformat(),request.form["test_no"],session["username"]])
+                            else:
+                                insert_db("UPDATE test_submissions SET date_submitted=?,late=0 WHERE test_no=? AND student_no=?",[now.isoformat(),request.form["test_no"],session["username"]])
+                    else:
+                        flash("Error: no such test")
+                elif "dropmenu" in request.form:
+                    if request.form["dropmenu"] == "assignment":
+                        assignmentExists = query_db("SELECT * FROM assignment_submissions WHERE assignment_no=? AND student_no=?",[request.form["evaluation_no"],session["username"]],one=True)
+                        if assignmentExists:
+                            if assignmentExists["marked"]:
+                                insert_db("UPDATE assignment_submissions SET regrade_requested=1 WHERE assignment_no=? AND student_no=?",[request.form["evaluation_no"],session["username"]])
+                            else:
+                                flash("This assignment has yet to be marked")
+                        else:
+                            flash("No submission detected")
+                    elif request.form["dropmenu"] == "test":
+                        testExists = query_db("SELECT * FROM test_submissions WHERE student_no=? AND test_no=?",[session["username"], request.form["evaluation_no"]],one=True)
+                        if testExists:
+                            if testExists["marked"]:
+                                insert_db("UPDATE test_submissions SET regrade_requested=1 WHERE test_no=? AND student_no=?",[request.form["evaluation_no"],session["username"]])
+                            else:
+                                flash("This test has yet to be marked")
+                        else:
+                            flash("No submission detected")
+                else:
+                    flash("No such post request supported")
+                return redirect(url_for('coursework'))
+            return render_template("courseWork.html",
+                assignments=assignments,
+                assignment_submissions=assignment_submissions,
+                test_submissions=test_submissions,
+                tests=tests,
+                student="student")
     return redirect(url_for('login'))
 
 @app.route('/links')

@@ -6,3 +6,12 @@ h1{
 p {
     color: black;
 }
+.error{
+    margin-bottom: 10px;
+}
+.marks{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-end;
+}

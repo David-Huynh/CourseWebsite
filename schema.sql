@@ -30,7 +30,6 @@ CREATE TABLE instructor(
 	FOREIGN KEY (syllabus_id) REFERENCES pdf(pdf_id)
 );
 
-
 CREATE TABLE instr_feedback (
 	feedback_no INTEGER NOT NULL,
 	instructor_code TEXT NOT NULL,
@@ -133,20 +132,49 @@ CREATE TABLE student (
 
 CREATE TABLE assignments (
 	assignment_no INTEGER NOT NULL UNIQUE,
-	pdf_id INTEGER NOT NULL,
-	PRIMARY KEY (assignment_no AUTOINCREMENT),
-	FOREIGN KEY (pdf_id) REFERENCES pdf(pdf_id)
+	pdf_id INTEGER,
+	solution_id INTEGER,
+	due_date TEXT,
+	PRIMARY KEY (assignment_no),
+	FOREIGN KEY (pdf_id) REFERENCES pdf(pdf_id),
+	FOREIGN KEY (solution_id) REFERENCES pdf(pdf_id)
 );
 
-CREATE TABLE submissions (
+CREATE TABLE assignment_submissions (
 	assignment_no INTEGER NOT NULL,
 	student_no TEXT NOT NULL,
-	pdf_id INTEGER NOT NULL,
+	pdf_id INTEGER,
 	grade REAL,
+	date_submitted TEXT,
+	late INTEGER,
 	marked INTEGER NOT NULL,
 	regrade_requested INTEGER,
 	PRIMARY KEY (assignment_no, student_no),
 	FOREIGN KEY (assignment_no) REFERENCES assignments(assignment_no),
+	FOREIGN KEY (student_no) REFERENCES student(student_no),
+	FOREIGN KEY (pdf_id) REFERENCES pdf(pdf_id)
+);
+CREATE TABLE tests (
+	test_no INTEGER NOT NULL UNIQUE,
+	pdf_id INTEGER,
+	solution_id INTEGER,
+	due_date TEXT,
+	PRIMARY KEY (test_no),
+	FOREIGN KEY (pdf_id) REFERENCES pdf(pdf_id),
+	FOREIGN KEY (solution_id) REFERENCES pdf(pdf_id)
+);
+
+CREATE TABLE test_submissions (
+	test_no INTEGER NOT NULL,
+	student_no TEXT NOT NULL,
+	pdf_id INTEGER,
+	grade REAL,
+	date_submitted TEXT,
+	late INTEGER,
+	marked INTEGER NOT NULL,
+	regrade_requested INTEGER,
+	PRIMARY KEY (test_no, student_no),
+	FOREIGN KEY (test_no) REFERENCES tests(test_no),
 	FOREIGN KEY (student_no) REFERENCES student(student_no),
 	FOREIGN KEY (pdf_id) REFERENCES pdf(pdf_id)
 );
