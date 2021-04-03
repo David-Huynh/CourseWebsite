@@ -5,16 +5,16 @@ import base64
 import json
 from datetime import datetime
 
-app = Flask(__name__, template_folder='./src/templates', static_folder='./src/static')
+app = Flask(__name__, template_folder="./src/templates", static_folder="./src/static")
 app.secret_key = "b'\x1a\xe3$e=(\xdc$\xf6\x95}\x00z\x1c\xae\xc2\n\x1a\x08\x85\x1f#9M\xff\xef=x\rg\x9c\xc9'"
-DATABASE = './assignment3.db'
+DATABASE = "./assignment3.db"
 
 ##DATABASE CONNECTION AND QUERY
 def make_dicts(cursor, row):
     return dict((cursor.description[idx][0], value)
                 for idx, value in enumerate(row))
 def get_db():
-    db = getattr(g, '_database', None)
+    db = getattr(g, "_database", None)
     if db is None:
         db = g._database = sqlite3.connect(DATABASE)
         db.row_factory = make_dicts
@@ -39,19 +39,19 @@ def before_request():
 ##Injects instructor and ta information into context of every template (Defaults to first ta and instructor in database if none set)
 @app.context_processor
 def inject_ta_instructor():
-    if 'username' in session and 'password' in session:
+    if "username" in session and "password" in session:
         ##Queries whether there is a username match in instructors table
-        qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=?)) AS \"col\"",[session['username']])
+        qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=?)) AS \"col\"",[session["username"]])
         ##Queries whether there is a username match in ta table
-        qt = query_db("SELECT EXISTS(SELECT ta_code,password FROM ta WHERE (ta_code=?)) AS \"col\"",[session['username']])
+        qt = query_db("SELECT EXISTS(SELECT ta_code,password FROM ta WHERE (ta_code=?)) AS \"col\"",[session["username"]])
         first_instructor = query_db("SELECT instructor_code FROM instructor",one=True)
         first_ta = query_db("SELECT ta_code FROM ta",one=True)
         if qi[0]["col"] == 1:
-            return dict(ta_id=first_ta["ta_code"],instructor_id=session['username'],ta_level=True)
+            return dict(ta_id=first_ta["ta_code"],instructor_id=session["username"],ta_level=True)
         elif qt[0]["col"] == 1:
-            return dict(ta_id=session['username'],instructor_id=first_instructor["instructor_code"],ta_level=True)
+            return dict(ta_id=session["username"],instructor_id=first_instructor["instructor_code"],ta_level=True)
         else:
-            student = query_db("SELECT * FROM student WHERE (student_no=?)",[session['username']])
+            student = query_db("SELECT * FROM student WHERE (student_no=?)",[session["username"]])
             if student[0]["ta_code"] and student[0]["instructor_code"]:
                 return dict(ta_id=student[0]["ta_code"],instructor_id=student[0]["instructor_code"])
             elif student[0]["ta_code"] and not student[0]["instructor_code"]:
@@ -64,39 +64,39 @@ def inject_ta_instructor():
 ## ON APPLICATION CLOSE
 @app.teardown_appcontext
 def close_connection(exception):
-    db = getattr(g, '_database', None)
+    db = getattr(g, "_database", None)
     if db is not None:
         db.close()
 
 ## PDF Display Route
-@app.route('/pdfs/<id>')
+@app.route("/pdfs/<id>")
 def get_pdf(id=None):
-    if 'username' in session and 'password' in session:
+    if "username" in session and "password" in session:
         if id is not None:
             pdf = query_db("SELECT pdf_name, pdf_data, username FROM pdf WHERE pdf_id=?",[id])
-            qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=?)) AS \"col\"",[session['username']])
+            qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=?)) AS \"col\"",[session["username"]])
             student = query_db("SELECT EXISTS(SELECT * FROM student WHERE student_no=?) AS \"col\"",[pdf[0]["username"]])
-            qt = query_db("SELECT EXISTS(SELECT ta_code,password FROM ta WHERE (ta_code=?)) AS \"col\"",[session['username']])
+            qt = query_db("SELECT EXISTS(SELECT ta_code,password FROM ta WHERE (ta_code=?)) AS \"col\"",[session["username"]])
             if pdf:
                 if pdf[0]["username"] == session["username"] or pdf[0]["username"] == "all" or qi[0]["col"] == 1 or (student[0]["col"] == 1 and qt[0]["col"]):
                     print(type(pdf[0]["pdf_data"]))
                     response = make_response(bytes(pdf[0]["pdf_data"]))
-                    response.headers['Content-Type'] = "application/pdf"
-                    response.headers['Content-Disposition'] = "inline; filename={}.pdf".format(pdf[0]["pdf_name"])
+                    response.headers["Content-Type"] = "application/pdf"
+                    response.headers["Content-Disposition"] = "inline; filename={}.pdf".format(pdf[0]["pdf_name"])
                     return response
                 else:
                     return "ERROR: you do not have permission to view this file"
             else:
                 return "ERROR: no such file exists"
-    return redirect(url_for('login'))
+    return redirect(url_for("login"))
 ## Route for instructors/tas to submit marks
-@app.route('/submitMarks', methods=['POST'])
+@app.route("/submitMarks", methods=["POST"])
 def submitMarks():
-    if 'username' in session and 'password' in session:
+    if "username" in session and "password" in session:
         ##Queries whether there is a username match in instructors table
-        qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=?)) AS \"col\"",[session['username']])
+        qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=?)) AS \"col\"",[session["username"]])
         ##Queries whether there is a username match in ta table
-        qt = query_db("SELECT EXISTS(SELECT ta_code,password FROM ta WHERE (ta_code=?)) AS \"col\"",[session['username']])
+        qt = query_db("SELECT EXISTS(SELECT ta_code,password FROM ta WHERE (ta_code=?)) AS \"col\"",[session["username"]])
         ## Only allow requests from instructors or tas
         if qi[0]["col"]==1 or qt[0]["col"]==1:
             if request.method == "POST":
@@ -106,20 +106,20 @@ def submitMarks():
                 elif request.json["type"] == "test":
                     insert_db("UPDATE test_submissions SET grade=?, marked=1, regrade_requested=0 WHERE test_no=? AND student_no=?",[request.json["grade"], request.json["assessment_no"], request.json["student_no"]])
                 response = make_response(json.dumps({"nothing":"nothing"}))
-                response.headers['Content-Type'] = "application/json"
+                response.headers["Content-Type"] = "application/json"
                 return response
 
 ##WEB APP ROUTES
-@app.route('/')
+@app.route("/")
 def home():
-    if 'username' in session and 'password' in session:
-        name = query_db("SELECT first_name FROM (SELECT instructor_code as username,first_name FROM instructor UNION SELECT ta_code as username,first_name FROM ta UNION SELECT student_no as username,first_name FROM student) WHERE username=?",[session['username']])
+    if "username" in session and "password" in session:
+        name = query_db("SELECT first_name FROM (SELECT instructor_code as username,first_name FROM instructor UNION SELECT ta_code as username,first_name FROM ta UNION SELECT student_no as username,first_name FROM student) WHERE username=?",[session["username"]])
         tas = query_db("SELECT * FROM ta")
-        student = query_db("SELECT * FROM student WHERE student_no=?",[session['username']])
+        student = query_db("SELECT * FROM student WHERE student_no=?",[session["username"]])
         ##Queries whether there is a username match in instructors table
-        qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=?)) AS \"col\"",[session['username']])
+        qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=?)) AS \"col\"",[session["username"]])
         ##Queries whether there is a username match in ta table
-        qt = query_db("SELECT EXISTS(SELECT ta_code,password FROM ta WHERE (ta_code=?)) AS \"col\"",[session['username']])
+        qt = query_db("SELECT EXISTS(SELECT ta_code,password FROM ta WHERE (ta_code=?)) AS \"col\"",[session["username"]])
         if qi[0]["col"] == 1:
             instructor = None
         elif qt[0]["col"] == 1:
@@ -139,15 +139,15 @@ def home():
             return render_template("index.html", name=name[0]["first_name"].lower().capitalize(), tas=tas, instructor=instructor, pdf=instructor[0]["syllabus_id"])
         else:
             return render_template("index.html", name=name[0]["first_name"].lower().capitalize(), tas=tas, instructor=instructor, pdf=None)
-    return redirect(url_for('login'))
+    return redirect(url_for("login"))
 ##Marks Route
-@app.route('/marking')
+@app.route("/marking")
 def marking():
-    if 'username' in session and 'password' in session:
+    if "username" in session and "password" in session:
         ##Queries whether there is a username match in instructors table
-        qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=?)) AS \"col\"",[session['username']])
+        qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=?)) AS \"col\"",[session["username"]])
         ##Queries whether there is a username match in ta table
-        qt = query_db("SELECT EXISTS(SELECT ta_code,password FROM ta WHERE (ta_code=?)) AS \"col\"",[session['username']])
+        qt = query_db("SELECT EXISTS(SELECT ta_code,password FROM ta WHERE (ta_code=?)) AS \"col\"",[session["username"]])
         ## Only show page to instructors or tas
         if qi[0]["col"]==1 or qt[0]["col"]==1:
             assignments = query_db("SELECT * FROM assignments ORDER BY assignment_no ASC")
@@ -161,17 +161,17 @@ def marking():
                 tests_submissions=tests_submissions)
         else:
             return "ERROR: insufficient permission to view this page"
-    return redirect(url_for('login'))
+    return redirect(url_for("login"))
 
 
-@app.route('/lectures/<id>', methods=['GET', 'POST'])
+@app.route("/lectures/<id>", methods=["GET", "POST"])
 def lectures(id=None):
-    if 'username' in session and 'password' in session:
+    if "username" in session and "password" in session:
         if id is not None:
             ##Queries whether there is a username match in instructors table
-            qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=?)) AS \"col\"",[session['username']])
+            qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=?)) AS \"col\"",[session["username"]])
             ##Queries whether there is a username match in ta table
-            qt = query_db("SELECT EXISTS(SELECT ta_code,password FROM ta WHERE (ta_code=?)) AS \"col\"",[session['username']])
+            qt = query_db("SELECT EXISTS(SELECT ta_code,password FROM ta WHERE (ta_code=?)) AS \"col\"",[session["username"]])
             ##Instructor name
             name = query_db("SELECT first_name FROM instructor WHERE instructor_code=?",[id],one=True)["first_name"].lower().capitalize()
             ##Instructor User Page
@@ -180,7 +180,7 @@ def lectures(id=None):
                 general_lecture_material = query_db("SELECT * FROM lec_pdfs INNER JOIN pdf ON lec_pdfs.pdf_id = pdf.pdf_id")
                 instructor_pdfs = query_db("SELECT * FROM instr_notes INNER JOIN pdf ON instr_notes.pdf_id = pdf.pdf_id WHERE instructor_code=?", [id])
                 if session["username"] == id:
-                    if request.method == 'POST':
+                    if request.method == "POST":
                         ## Course Wide PDF Upload
                         if request.files.get("courseWidePdf"):
                             if request.files["courseWidePdf"]:
@@ -191,29 +191,29 @@ def lectures(id=None):
                         ## else: Lecture Upload
                         else:
                             ##Checks whether selected week lecture exists
-                            lectureExists = query_db("SELECT EXISTS(SELECT * FROM lectures WHERE (week=? AND instructor_code=?)) AS \"col\"",[request.form["week"],session['username']])
+                            lectureExists = query_db("SELECT EXISTS(SELECT * FROM lectures WHERE (week=? AND instructor_code=?)) AS \"col\"",[request.form["week"],session["username"]])
                             if lectureExists[0]["col"] !=1:
                                 ## Insert if lecture does not exist
-                                insert_db("INSERT INTO lectures (week, lecture_title,instructor_code) VALUES (?,?,?)",[request.form["week"],request.form["lecture_title"], session['username']])
+                                insert_db("INSERT INTO lectures (week, lecture_title,instructor_code) VALUES (?,?,?)",[request.form["week"],request.form["lecture_title"], session["username"]])
                             else:
                                 ## Update if lecture does not exist
-                                insert_db("UPDATE lectures SET lecture_title=? WHERE week=? AND instructor_code=?",[request.form["lecture_title"], request.form["week"],session['username']])
+                                insert_db("UPDATE lectures SET lecture_title=? WHERE week=? AND instructor_code=?",[request.form["lecture_title"], request.form["week"],session["username"]])
                             if request.form["tues_recording"]:
                                 ## Updates tues_recording
-                                insert_db("UPDATE lectures SET tues_recording=? WHERE week=? AND instructor_code=?",[request.form["tues_recording"],request.form["week"], session['username']])
+                                insert_db("UPDATE lectures SET tues_recording=? WHERE week=? AND instructor_code=?",[request.form["tues_recording"],request.form["week"], session["username"]])
                             if request.form["thurs_recording"]:
                                 ## Updates thurs_recording
-                                insert_db("UPDATE lectures SET thurs_recording=? WHERE week=? AND instructor_code=?",[request.form["thurs_recording"],request.form["week"], session['username']])
+                                insert_db("UPDATE lectures SET thurs_recording=? WHERE week=? AND instructor_code=?",[request.form["thurs_recording"],request.form["week"], session["username"]])
                             ##INSERT FILES INTO DATABASE
                             if request.files["instructor_pdf"]:
                                 ##INSERTS PDFS INTO DATABASE AND REMOVES OLD PDFS IF APPLICABLE
-                                instructor_Notes = query_db("SELECT pdf_id FROM instr_notes WHERE (week=? AND instructor_code=?)",[request.form["week"],session['username']])
+                                instructor_Notes = query_db("SELECT pdf_id FROM instr_notes WHERE (week=? AND instructor_code=?)",[request.form["week"],session["username"]])
                                 for note in instructor_Notes:
                                     ##removes all old pdfs
                                     insert_db("DELETE FROM pdf WHERE pdf_id=?",[note["pdf_id"]])
                                 if len(instructor_Notes) >=1:
                                     ##Deletes all refernces
-                                    insert_db("DELETE FROM instr_notes WHERE week=? AND instructor_code=?",[request.form["week"], session['username']])
+                                    insert_db("DELETE FROM instr_notes WHERE week=? AND instructor_code=?",[request.form["week"], session["username"]])
                                 for pdf in request.files.getlist("instructor_pdf"):
                                     insert_db("INSERT INTO pdf (pdf_name,pdf_data,username) VALUES (?,?,?)",[pdf.filename, pdf.read(), "all"])
                                     insert_db("INSERT INTO instr_notes (week, instructor_code, pdf_id) VALUES (?,?,(SELECT last_insert_rowid()))",[request.form["week"],session["username"]])
@@ -254,16 +254,16 @@ def lectures(id=None):
                     name=name,
                     id=id)
             return render_template("lectures.html")
-    return redirect(url_for('login'))
+    return redirect(url_for("login"))
 
-@app.route('/tutorials/<id>', methods=['GET', 'POST'])
+@app.route("/tutorials/<id>", methods=["GET", "POST"])
 def tutorials(id=None):
-    if 'username' in session and 'password' in session:
+    if "username" in session and "password" in session:
         if id is not None:
             ##Queries whether there is a username match in instructors table
-            qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=?)) AS \"col\"",[session['username']])
+            qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=?)) AS \"col\"",[session["username"]])
             ##Queries whether there is a username match in ta table
-            qt = query_db("SELECT EXISTS(SELECT ta_code,password FROM ta WHERE (ta_code=?)) AS \"col\"",[session['username']])
+            qt = query_db("SELECT EXISTS(SELECT ta_code,password FROM ta WHERE (ta_code=?)) AS \"col\"",[session["username"]])
             ##Query Ta Name
             name = query_db("SELECT first_name FROM ta WHERE ta_code=?",[id],one=True)["first_name"].lower().capitalize()
             ##Instructor User Page
@@ -271,7 +271,7 @@ def tutorials(id=None):
                 ta_tutorial_material = query_db("SELECT * FROM tutorials WHERE ta_code=? ORDER BY week ASC", [id])
                 general_tutorial_material = query_db("SELECT * FROM tut_pdfs INNER JOIN pdf ON tut_pdfs.pdf_id = pdf.pdf_id")
                 ta_pdfs = query_db("SELECT * FROM ta_notes INNER JOIN pdf ON ta_notes.pdf_id = pdf.pdf_id WHERE ta_code=?", [id])
-                if request.method == 'POST':
+                if request.method == "POST":
                     if request.form.get("courseWideTutPdf"):
                         #Inserts pdfs
                         insert_db("INSERT INTO pdf (pdf_name,pdf_data,username) VALUES (?,?,?)",[request.files["courseWideTutPdf"].filename, request.files["courseWideTutPdf"].read(), "all"])
@@ -292,30 +292,30 @@ def tutorials(id=None):
                 general_tutorial_material = query_db("SELECT * FROM tut_pdfs INNER JOIN pdf ON tut_pdfs.pdf_id = pdf.pdf_id")
                 ta_pdfs = query_db("SELECT * FROM ta_notes INNER JOIN pdf ON ta_notes.pdf_id = pdf.pdf_id WHERE ta_code=?", [id])
                 if session["username"] == id:
-                    if request.method == 'POST':
+                    if request.method == "POST":
                         if request.files.get("courseWideTutPdf"):
                             #Inserts pdfs
                             insert_db("INSERT INTO pdf (pdf_name,pdf_data,username) VALUES (?,?,?)",[request.files["courseWideTutPdf"].filename, request.files["courseWideTutPdf"].read(), "all"])
                             insert_db("INSERT INTO tut_pdfs (week, pdf_id) VALUES (?,(SELECT last_insert_rowid()))",[request.form["week"]])
                         else:
                             ##Checks whether selected week tutorial exists
-                            tutorialExists = query_db("SELECT EXISTS(SELECT * FROM tutorials WHERE (week=? AND ta_code=?)) AS \"col\"",[request.form["week"],session['username']])
+                            tutorialExists = query_db("SELECT EXISTS(SELECT * FROM tutorials WHERE (week=? AND ta_code=?)) AS \"col\"",[request.form["week"],session["username"]])
                             if tutorialExists[0]["col"] !=1:
                                 ## Insert if tutorial does not exist
-                                insert_db("INSERT INTO tutorials (week,ta_code) VALUES (?,?)",[request.form["week"], session['username']])
+                                insert_db("INSERT INTO tutorials (week,ta_code) VALUES (?,?)",[request.form["week"], session["username"]])
                             if request.form["recording_link"]:
                                 ## Updates recording link
-                                insert_db("UPDATE tutorials SET recording_link=? WHERE week=? AND ta_code=?",[request.form["recording_link"],request.form["week"], session['username']])
+                                insert_db("UPDATE tutorials SET recording_link=? WHERE week=? AND ta_code=?",[request.form["recording_link"],request.form["week"], session["username"]])
                             ##INSERT FILES INTO DATABASE
                             if request.files["ta_pdf"]:
                                 ##INSERTS PDFS INTO DATABASE AND REMOVES OLD PDFS IF APPLICABLE
-                                ta_Notes = query_db("SELECT pdf_id FROM ta_notes WHERE (week=? AND ta_code=?)",[request.form["week"],session['username']])
+                                ta_Notes = query_db("SELECT pdf_id FROM ta_notes WHERE (week=? AND ta_code=?)",[request.form["week"],session["username"]])
                                 for note in ta_Notes:
                                     ##removes all old pdfs
                                     insert_db("DELETE FROM pdf WHERE pdf_id=?",[note["pdf_id"]])
                                 if len(ta_Notes) >=1:
                                     ##Deletes all refernces
-                                    insert_db("DELETE FROM ta_notes WHERE week=? AND ta_code=?",[request.form["week"], session['username']])
+                                    insert_db("DELETE FROM ta_notes WHERE week=? AND ta_code=?",[request.form["week"], session["username"]])
                                 for pdf in request.files.getlist("ta_pdf"):
                                     insert_db("INSERT INTO pdf (pdf_name,pdf_data,username) VALUES (?,?,?)",[pdf.filename, pdf.read(), "all"])
                                     insert_db("INSERT INTO ta_notes (week, ta_code, pdf_id) VALUES (?,?,(SELECT last_insert_rowid()))",[request.form["week"],session["username"]])
@@ -345,15 +345,15 @@ def tutorials(id=None):
                     ta_pdfs=ta_pdfs,
                     id=id)
             return render_template("tutorials.html")
-    return redirect(url_for('login'))
+    return redirect(url_for("login"))
 
-@app.route('/coursework', methods=['GET', 'POST'])
+@app.route("/coursework", methods=["GET", "POST"])
 def coursework():
-    if 'username' in session and 'password' in session:
+    if "username" in session and "password" in session:
         ##Queries whether there is a username match in instructors table
-        qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=?)) AS \"col\"",[session['username']])
+        qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=?)) AS \"col\"",[session["username"]])
         ##Queries whether there is a username match in ta table
-        qt = query_db("SELECT EXISTS(SELECT ta_code,password FROM ta WHERE (ta_code=?)) AS \"col\"",[session['username']])
+        qt = query_db("SELECT EXISTS(SELECT ta_code,password FROM ta WHERE (ta_code=?)) AS \"col\"",[session["username"]])
         assignments = query_db("SELECT * FROM assignments ORDER BY assignment_no ASC")
         tests = query_db("SELECT * FROM tests ORDER BY test_no ASC")
         ##Instructor User Page
@@ -402,7 +402,7 @@ def coursework():
                             insert_db("UPDATE pdf SET pdf_name=?,pdf_data=? WHERE pdf_id=?",[request.files["solution_pdf"].filename, request.files["solution_pdf"].read(), testExists["solution_id"]])
                     ## Insert due date
                     insert_db("UPDATE tests SET due_date=? WHERE test_no=?",[request.values["due_date"]+"T"+request.values["due_time"]+":00.00",request.form["test_no"]])
-                return redirect(url_for('coursework'))
+                return redirect(url_for("coursework"))
             return render_template("courseWork.html", 
                 assignments=assignments,
                 tests=tests,
@@ -493,40 +493,40 @@ def coursework():
                             flash("No submission detected")
                 else:
                     flash("No such post request supported")
-                return redirect(url_for('coursework'))
+                return redirect(url_for("coursework"))
             return render_template("courseWork.html",
                 assignments=assignments,
                 assignment_submissions=assignment_submissions,
                 test_submissions=test_submissions,
                 tests=tests,
                 student="student")
-    return redirect(url_for('login'))
+    return redirect(url_for("login"))
 
-@app.route('/links')
+@app.route("/links")
 def links():
-    if 'username' in session and 'password' in session:
+    if "username" in session and "password" in session:
         return render_template("links.html")
-    return redirect(url_for('login'))
+    return redirect(url_for("login"))
 
-@app.route('/feedback')
+@app.route("/feedback")
 def feedback():
-    if 'username' in session and 'password' in session:
+    if "username" in session and "password" in session:
         return render_template("feedback.html")
-    return redirect(url_for('login'))
+    return redirect(url_for("login"))
 
-@app.route('/profile', methods=['GET','POST'])
+@app.route("/profile", methods=["GET","POST"])
 def profile():
-    if 'username' in session and 'password' in session:
+    if "username" in session and "password" in session:
         if id is not None:
             ##Queries whether there is a username match in instructors table
-            qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=?)) AS \"col\"",[session['username']])
+            qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=?)) AS \"col\"",[session["username"]])
             ##Queries whether there is a username match in ta table
-            qt = query_db("SELECT EXISTS(SELECT ta_code,password FROM ta WHERE (ta_code=?)) AS \"col\"",[session['username']])
+            qt = query_db("SELECT EXISTS(SELECT ta_code,password FROM ta WHERE (ta_code=?)) AS \"col\"",[session["username"]])
             # Load Instructor page
             if qi[0]["col"] == 1:
-                instructor_info = query_db("SELECT * FROM instructor WHERE instructor_code=?",[session['username']])
-                syllabus = query_db("SELECT * FROM pdf INNER JOIN instructor ON instructor.syllabus_id = pdf.pdf_id AND instructor.instructor_code=?", [session['username']])
-                if request.method == 'POST':
+                instructor_info = query_db("SELECT * FROM instructor WHERE instructor_code=?",[session["username"]])
+                syllabus = query_db("SELECT * FROM pdf INNER JOIN instructor ON instructor.syllabus_id = pdf.pdf_id AND instructor.instructor_code=?", [session["username"]])
+                if request.method == "POST":
                     #update form info case
                     if request.form["picture"]:
                         insert_db()
@@ -540,8 +540,8 @@ def profile():
                     syllabus=syllabus)
             # Load TA page
             elif qt[0]["col"] == 1:
-                ta_info = query_db("SELECT * FROM ta WHERE ta_code=?",[session['username']])
-                if request.method == 'POST':
+                ta_info = query_db("SELECT * FROM ta WHERE ta_code=?",[session["username"]])
+                if request.method == "POST":
                     #update form info case
                     return "updating info for TA"
                 return render_template("profile.html", 
@@ -551,23 +551,23 @@ def profile():
             else:
                 prof_list = query_db("SELECT instructor_code, first_name, last_name FROM instructor")
                 ta_list = query_db("SELECT ta_code, first_name, last_name FROM ta")
-                stud_info = query_db("SELECT * FROM student WHERE student_no=?",[session['username']])
-                if request.method == 'POST':
-                    return 'updating data for student'
+                stud_info = query_db("SELECT * FROM student WHERE student_no=?",[session["username"]])
+                if request.method == "POST":
+                    return "updating data for student"
                 return render_template("profile.html",
                     user_type=2,
                     user_info=stud_info, 
                     prof_list=prof_list,
                     ta_list=ta_list)    
-    return redirect(url_for('login'))
+    return redirect(url_for("login"))
 
 ##LOGIN/SIGNUP REQUESTS
-@app.route('/login', methods=['GET', 'POST'])
+@app.route("/login", methods=["GET", "POST"])
 def login():
     error = None
-    if request.method == 'POST':
+    if request.method == "POST":
         ## IF REQUEST = LOGIN
-        if request.form['firstname'] == '' and request.form['lastname'] == '':
+        if request.form["firstname"] == "" and request.form["lastname"] == "":
             ##Queries whether there is a username and password match in instructors table
             qi = query_db("SELECT EXISTS(SELECT instructor_code,password FROM instructor WHERE (instructor_code=? AND password=?)) AS \"col\"",[request.form["username"],request.form["password"]])
             ##Queries whether there is a username and password match in ta table
@@ -576,57 +576,57 @@ def login():
             qs = query_db("SELECT EXISTS(SELECT student_no,password FROM student WHERE (student_no=? AND password=?)) AS \"col\"",[request.form["username"],request.form["password"]])
             t = qi[0]["col"] + qt[0]["col"] + qs[0]["col"]
             if t==0:
-                error = 'Invalid credentials'
+                error = "Invalid credentials"
             elif t==1:
-                session['username'] = request.form['username']
-                session['password'] = request.form['password']
-                return redirect(url_for('home'))
+                session["username"] = request.form["username"]
+                session["password"] = request.form["password"]
+                return redirect(url_for("home"))
         ##else: register the user then add the user to session and redirect them to home route and handle duplicate username error/ 
         else:
             ##Queries whether username exists already or not
-            qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=?)) AS \"col\"",[request.form['username']])
-            qt = query_db("SELECT EXISTS(SELECT ta_code FROM ta WHERE (ta_code=?)) AS \"col\"",[request.form['username']])
-            qs = query_db("SELECT EXISTS(SELECT student_no FROM student WHERE (student_no=?)) AS \"col\"",[request.form['username']])
+            qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=?)) AS \"col\"",[request.form["username"]])
+            qt = query_db("SELECT EXISTS(SELECT ta_code FROM ta WHERE (ta_code=?)) AS \"col\"",[request.form["username"]])
+            qs = query_db("SELECT EXISTS(SELECT student_no FROM student WHERE (student_no=?)) AS \"col\"",[request.form["username"]])
             t = 0
             t = qi[0]["col"] + qt[0]["col"] + qs[0]["col"]
             if t >= 1:
                 ##ERROR: user exits 
-                error='User already exists'
+                error="User already exists"
             elif t == 0:
                 ##USER DOES NOT EXIST SO DETERMINE THE USER LEVEL AND CREATE THE RESPECTIVE USER ENTRY
-                if request.form['creationcode'] == '0' and request.form['InstructorsCode']:
-                    qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=?)) AS \"col\"",[request.form['InstructorsCode']])
+                if request.form["creationcode"] == "0" and request.form["InstructorsCode"]:
+                    qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=?)) AS \"col\"",[request.form["InstructorsCode"]])
                     if (qi[0]["col"] == 1):
                         insert_db("INSERT INTO student (student_no ,first_name ,last_name ,email ,password,instructor_code) VALUES (?,?,?,?,?,?)",
-                        [request.form['username'],request.form['firstname'],request.form['lastname'],request.form['email'],request.form['password'],request.form['InstructorsCode']])
-                        session['username'] = request.form['username']
-                        session['password'] = request.form['password']
-                        return redirect(url_for('home'))
+                        [request.form["username"],request.form["firstname"],request.form["lastname"],request.form["email"],request.form["password"],request.form["InstructorsCode"]])
+                        session["username"] = request.form["username"]
+                        session["password"] = request.form["password"]
+                        return redirect(url_for("home"))
                     else:
                         error="Invalid instructor code"
-                elif request.form['creationcode'] =='1' and not request.form['InstructorsCode']:
+                elif request.form["creationcode"] =="1" and not request.form["InstructorsCode"]:
                     insert_db("INSERT INTO instructor (instructor_code, first_name, last_name, email, password) VALUES (?,?,?,?,?)",
-                        [request.form['username'],request.form['firstname'],request.form['lastname'],request.form['email'],request.form['password']])
-                    session['username'] = request.form['username']
-                    session['password'] = request.form['password']
-                    return redirect(url_for('home'))
-                elif request.form['creationcode'] == '2' and not request.form['InstructorsCode']:
+                        [request.form["username"],request.form["firstname"],request.form["lastname"],request.form["email"],request.form["password"]])
+                    session["username"] = request.form["username"]
+                    session["password"] = request.form["password"]
+                    return redirect(url_for("home"))
+                elif request.form["creationcode"] == "2" and not request.form["InstructorsCode"]:
                     insert_db("INSERT INTO ta (ta_code,first_name ,last_name ,email ,password) VALUES (?,?,?,?,?)",
-                        [request.form['username'],request.form['firstname'],request.form['lastname'],request.form['email'],request.form['password']])
-                    session['username'] = request.form['username']
-                    session['password'] = request.form['password']
-                    return redirect(url_for('home'))
+                        [request.form["username"],request.form["firstname"],request.form["lastname"],request.form["email"],request.form["password"]])
+                    session["username"] = request.form["username"]
+                    session["password"] = request.form["password"]
+                    return redirect(url_for("home"))
                 else:
-                    error='invalid user type'
-    return render_template('login.html', error=error)
+                    error="invalid user type"
+    return render_template("login.html", error=error)
 
 ##LOGOUT REQUESTS
-@app.route('/logout')
+@app.route("/logout")
 def logout():
    ## Removes the username and password from the session if it exists
-   session.pop('username', None)
-   session.pop('password', None)
-   return redirect(url_for('login'))
+   session.pop("username", None)
+   session.pop("password", None)
+   return redirect(url_for("login"))
     
 if __name__ == "__main__":
     app.run(debug=True)
