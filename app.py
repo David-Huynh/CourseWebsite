@@ -1,10 +1,11 @@
-import sqlite3
-from datetime import datetime
 from flask import Flask, render_template, session, url_for, redirect, request, flash, g, make_response
-app = Flask(__name__, template_folder='./src/templates', static_folder='./src/static')
+import sqlite3
+
 import base64
 import json
+from datetime import datetime
 
+app = Flask(__name__, template_folder='./src/templates', static_folder='./src/static')
 app.secret_key = "b'\x1a\xe3$e=(\xdc$\xf6\x95}\x00z\x1c\xae\xc2\n\x1a\x08\x85\x1f#9M\xff\xef=x\rg\x9c\xc9'"
 DATABASE = './assignment3.db'
 
