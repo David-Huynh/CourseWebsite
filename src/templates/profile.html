@@ -35,17 +35,17 @@
                                 <p>
                                     <form method="post" enctype="multipart/form-data">
                                         {% if user_type != 2 %}
-                                            <label class="subtitle">Update Profile Picture</label>
-                                            <input type="file" class="fileInput" name="courseWidePdf" accept="image/*">
+                                            <label for="picture" class="subtitle">Update Profile Picture</label>
+                                            <input type="file" class="fileInput" name="picture" accept="image/*">
                                             {% if user_type == 0 %}
-                                                <label for="courseWidePdf" class="subtitle">Update Syllabus</label>
+                                                <label for="syllabus" class="subtitle">Update Syllabus</label>
                                                 <input type="file" class="fileInput" name="syllabus" accept=".pdf">
-                                                <label class="subtitle" for="week">Update Office</label>                                            
+                                                <label class="subtitle" for="office">Update Office</label>                                            
                                                 <input type="text" name="office" placeholder="Enter Office Location">
                                             {% endif %}
-                                            <label class="subtitle" for="week">Update Office Hours</label>
+                                            <label class="subtitle" for="office_hours">Update Office Hours</label>
                                             <input type="text" name="office_hours" placeholder="Enter Office Hours Schedule">
-                                            <label class="subtitle" for="week">Update Office Hours Link</label>
+                                            <label class="subtitle" for="office_hours_link">Update Office Hours Link</label>
                                             <input type="text" name="office_hours_link" placeholder="Enter Office Hours Meeting Link">
                                         {% else %}
                                             <label class="subtitle">Change Instructor</label>
