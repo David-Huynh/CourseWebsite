@@ -3,6 +3,7 @@ from datetime import datetime
 from flask import Flask, render_template, session, url_for, redirect, request, flash, g, make_response
 app = Flask(__name__, template_folder='./src/templates', static_folder='./src/static')
 import base64
+import json
 
 app.secret_key = "b'\x1a\xe3$e=(\xdc$\xf6\x95}\x00z\x1c\xae\xc2\n\x1a\x08\x85\x1f#9M\xff\xef=x\rg\x9c\xc9'"
 DATABASE = './assignment3.db'
@@ -89,7 +90,25 @@ def get_pdf(id=None):
             else:
                 return "ERROR: no such file exists"
     return redirect(url_for('login'))
-
+## Submitting marks route
+@app.route('/submitMarks', methods=['POST'])
+def submitMarks():
+    if 'username' in session and 'password' in session:
+        ##Queries whether there is a username match in instructors table
+        qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=?)) AS \"col\"",[session['username']])
+        ##Queries whether there is a username match in ta table
+        qt = query_db("SELECT EXISTS(SELECT ta_code,password FROM ta WHERE (ta_code=?)) AS \"col\"",[session['username']])
+        ## Only allow requests from instructors or tas
+        if qi[0]["col"]==1 or qt[0]["col"]==1:
+            if request.method == "POST":
+                print(request.json)
+                if request.json["type"] == "assignment":
+                    insert_db("UPDATE assignment_submissions SET grade=?, marked=1, regrade_requested=0 WHERE assignment_no=? AND student_no=?",[request.json["grade"], request.json["assessment_no"], request.json["student_no"]])
+                elif request.json["type"] == "test":
+                    insert_db("UPDATE test_submissions SET grade=?, marked=1, regrade_requested=0 WHERE test_no=? AND student_no=?",[request.json["grade"], request.json["assessment_no"], request.json["student_no"]])
+                response = make_response(json.dumps({"nothing":"nothing"}))
+                response.headers['Content-Type'] = "application/json"
+                return response
 ##WEB APP ROUTES
 @app.route('/')
 def home():
@@ -131,10 +150,19 @@ def marking():
         qt = query_db("SELECT EXISTS(SELECT ta_code,password FROM ta WHERE (ta_code=?)) AS \"col\"",[session['username']])
         ## Only show page to instructors or tas
         if qi[0]["col"]==1 or qt[0]["col"]==1:
-            return render_template("marking.html")
+            assignments = query_db("SELECT * FROM assignments ORDER BY assignment_no ASC")
+            assignments_submissions = query_db("SELECT * FROM assignment_submissions WHERE marked=0 OR regrade_requested=1 ORDER BY assignment_no ASC")
+            tests = query_db("SELECT * FROM tests ORDER BY test_no ASC")
+            tests_submissions = query_db("SELECT * FROM test_submissions WHERE marked=0 OR regrade_requested=1 ORDER BY test_no ASC")
+            return render_template("marking.html", 
+                assignments=assignments,
+                assignments_submissions=assignments_submissions,
+                tests=tests,
+                tests_submissions=tests_submissions)
         else:
             return "ERROR: insufficient permission to view this page"
     return redirect(url_for('login'))
+
 
 @app.route('/lectures/<id>', methods=['GET', 'POST'])
 def lectures(id=None):
@@ -410,7 +438,6 @@ def coursework():
                             ## Checks for late submission and records the time of submission for incremental late penalties if desired
                             if assignment["due_date"]:
                                 if datetime.strptime(assignment["due_date"], "%Y-%m-%dT%H:%M:%S.%f") <= now:
-                                    print("DAB")
                                     insert_db("UPDATE assignment_submissions SET date_submitted=?,late=1 WHERE assignment_no=? AND student_no=?",[now.isoformat(),request.form["assignment_no"],session["username"]])
                                 else:
                                     insert_db("UPDATE assignment_submissions SET date_submitted=?,late=0 WHERE assignment_no=? AND student_no=?",[now.isoformat(),request.form["assignment_no"],session["username"]])

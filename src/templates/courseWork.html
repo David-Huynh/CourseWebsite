@@ -146,7 +146,7 @@
                                             <h5 class="cardTitle">Regrading</h5>
                                         {%endif%}
                                         {% if submission["grade"] and submission["regrade_requested"] != 1%}
-                                            <h5 class="cardTitle">Grade: {{assignment["grade"]}}</h5>
+                                            <h5 class="cardTitle">Grade: {{submission["grade"]}}%</h5>
                                         {%endif%}
                                     {%endif%}
                                 {% endfor%}
@@ -161,7 +161,7 @@
                                 <a href="/pdfs/{{assignment["pdf_id"]}}" class="links" target="_blank">Handout</a> 
                                 {%endif%}
                                 {%if assignment["solution_id"]%}
-                                | <a href="../pdfs/{{assignment["solution_id"]}}" class="links" target="_blank">Solutions</a>
+                                | <a href="/pdfs/{{assignment["solution_id"]}}" class="links" target="_blank">Solutions</a>
                                 {%endif%}
                             </p>
                             {%if assignment["due_date"]%}
@@ -190,11 +190,16 @@
                             <h1 class="cardTitle"> 
                                 Test {{test["test_no"]}}
                             </h1>
-                            {% if test["grade"]%}
-                                <h1 class="cardTitle">
-                                    Grade: {{test["grade"]}}
-                                </h1>
-                            {%endif%}
+                            {% for submission in test_submissions%}
+                                {%if submission["test_no"] == test["test_no"]%}
+                                    {% if submission["regrade_requested"] == 1%}
+                                        <h5 class="cardTitle">Regrading</h5>
+                                    {%endif%}
+                                    {% if submission["grade"] and submission["regrade_requested"] != 1%}
+                                        <h5 class="cardTitle">Grade: {{submission["grade"]}}%</h5>
+                                    {%endif%}
+                                {%endif%}
+                            {% endfor%}
                         </div>
                     </a>
                     <div class="cardContent">

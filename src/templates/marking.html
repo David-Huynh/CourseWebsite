@@ -5,9 +5,8 @@
         <title>Tutorials</title>
         <link rel="stylesheet" href="{{url_for('static', filename ='css/lectures.css')}}">
         <link rel="stylesheet" href="{{url_for('static', filename ='css/card.css')}}">
-        <link rel="stylesheet" href="{{url_for('static', filename ='css/form.css')}}">
-        <link rel="stylesheet" href="{{url_for('static', filename ='css/modal.css')}}">
         <link rel="stylesheet" href="{{url_for('static', filename ='css/button.css')}}">
+        <link rel="stylesheet" href="{{url_for('static', filename ='css/table.css')}}">
         <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
     </head>
     <body>
@@ -16,8 +15,102 @@
         {% block content %}
         <!-- Page Content -->
         <div class="content">
-            
+            <h1 class="title">Unmarked Work | Regrade</h1>
+            <div id="alignRight">
+                <p id="saveText">Auto Saved</p>
+            </div>
+            {% for assignment in assignments %}
+                <div class="card">
+                    {% if assignment["assignment_no"] %}
+                        <a name="{{assignment["assignment_no"]}}" href="{{url_for('.marking')}}#{{assignment["assignment_no"]}}" class="links">
+                            <h1 class="cardTitle">Assignment {{assignment["assignment_no"]}}</h1>
+                        </a>
+                    {% endif %}
+                    <div class="cardContent">
+                        <div class="table" id="courseWork">
+                            <div class="tableCell">Student Number</div>
+                            <div class="tableCell">PDF</div>
+                            <div class="tableCell">Grade</div>
+                            <div class="tableCell">Date Submitted</div>
+                            <div class="tableCell">Late</div>
+                            <div class="tableCell">Regrade</div>
+                            {% for submission in assignments_submissions %}
+                                {% if submission["assignment_no"] == assignment["assignment_no"] %}
+                                    <div class="tableCell"><p>{{submission["student_no"]}}</p></div>
+                                    <div class="tableCell"><a href="/pdfs/{{submission["pdf_id"]}}" target="_blank">Submission</a></div>
+                                    {% if submission["grade"] %}
+                                        <input class="tableCell" type="text" value="{{submission["grade"]}}" id="assignment///{{submission["assignment_no"]}}///{{submission["student_no"]}}">
+                                    {% else %}
+                                        <input class="tableCell" type="text" value="" id="assignment///{{submission["assignment_no"]}}///{{submission["student_no"]}}">
+                                    {%endif%}
+                                    <div class="tableCell"><p>{{submission["date_submitted"]}}</p></div>
+                                    <div class="tableCell">
+                                        {% if submission["late"] == 1 %}
+                                            <p>&check;</p>
+                                        {% else %}
+                                            <p>&#10005;</p>
+                                        {% endif%}
+                                    </div>
+                                    <div class="tableCell">
+                                        {% if submission["regrade_requested"]%}
+                                            <p>&check;</p>
+                                        {% else %}
+                                            <p>&#10005;</p>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            {% for test in tests %}
+                <div class="card">
+                    {% if test["test_no"] %}
+                        <a name="{{test["test_no"]}}" href="{{url_for('.marking')}}#{{test["test_no"]}}" class="links">
+                            <h1 class="cardTitle">Test {{test["test_no"]}}</h1>
+                        </a>
+                    {% endif %}
+                    <div class="cardContent">
+                        <div class="table" id="courseWork">
+                            <div class="tableCell">Student Number</div>
+                            <div class="tableCell">PDF</div>
+                            <div class="tableCell">Grade</div>
+                            <div class="tableCell">Date Submitted</div>
+                            <div class="tableCell">Late</div>
+                            <div class="tableCell">Regrade</div>
+                            {% for submission in tests_submissions %}
+                                {% if submission["test_no"] == test["test_no"] %}
+                                    <div class="tableCell"><p>{{submission["student_no"]}}</p></div>
+                                    <div class="tableCell"><a href="/pdfs/{{submission["pdf_id"]}}" target="_blank">Submission</a></div>
+                                    {% if submission["grade"] %}
+                                        <input class="tableCell" type="text" value="{{submission["grade"]}}" id="test///{{submission["test_no"]}}///{{submission["student_no"]}}">
+                                    {% else %}
+                                        <input class="tableCell" type="text" value="" id="test///{{submission["test_no"]}}///{{submission["student_no"]}}">
+                                    {%endif%}
+                                    <div class="tableCell"><p>{{submission["date_submitted"]}}</p></div>
+                                    <div class="tableCell">
+                                        {% if submission["late"] == 1 %}
+                                            <p>&check;</p>
+                                        {% else %}
+                                            <p>&#10005;</p>
+                                        {% endif%}
+                                    </div>
+                                    <div class="tableCell">
+                                        {% if submission["regrade_requested"]%}
+                                            <p>&check;</p>
+                                        {% else %}
+                                            <p>&#10005;</p>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
         </div>
+        <script src="{{url_for('static', filename='javascript/marking.js')}}"></script>
         {% endblock %}
     </body>
 </html>
