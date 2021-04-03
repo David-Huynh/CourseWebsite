@@ -8,8 +8,6 @@ import json
 app.secret_key = "b'\x1a\xe3$e=(\xdc$\xf6\x95}\x00z\x1c\xae\xc2\n\x1a\x08\x85\x1f#9M\xff\xef=x\rg\x9c\xc9'"
 DATABASE = './assignment3.db'
 
-
-
 ##DATABASE CONNECTION AND QUERY
 def make_dicts(cursor, row):
     return dict((cursor.description[idx][0], value)
@@ -90,7 +88,7 @@ def get_pdf(id=None):
             else:
                 return "ERROR: no such file exists"
     return redirect(url_for('login'))
-## Submitting marks route
+## Route for instructors/tas to submit marks
 @app.route('/submitMarks', methods=['POST'])
 def submitMarks():
     if 'username' in session and 'password' in session:
@@ -109,6 +107,7 @@ def submitMarks():
                 response = make_response(json.dumps({"nothing":"nothing"}))
                 response.headers['Content-Type'] = "application/json"
                 return response
+
 ##WEB APP ROUTES
 @app.route('/')
 def home():
@@ -140,7 +139,7 @@ def home():
         else:
             return render_template("index.html", name=name[0]["first_name"].lower().capitalize(), tas=tas, instructor=instructor, pdf=None)
     return redirect(url_for('login'))
-
+##Marks Route
 @app.route('/marking')
 def marking():
     if 'username' in session and 'password' in session:
