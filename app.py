@@ -320,12 +320,11 @@ def profile():
             if qi[0]["col"] == 1:
                 instructor_info = query_db("SELECT * FROM instructor WHERE instructor_code=?",[session['username']])
                 syllabus = query_db("SELECT * FROM pdf INNER JOIN instructor ON instructor.syllabus_id = pdf.pdf_id AND instructor.instructor_code=?", [session['username']])
-                """instructor_info = query_db("SELECT * FROM instructor WHERE instructor_code=?",[session['username']])
-                syllabus_id = query_db("SELECT pdf.id FROM instructor, pdf WHERE instructor_code=? AND pdf.pdf_id=instructor.syllabus_id;",[session['username']])
-                syllabus_name = query_db("SELECT pdf.pdf_name FROM instructor, pdf WHERE instructor_code=? AND pdf.pdf_id=instructor.syllabus_id;",[session['username']])"""
                 if request.method == 'POST':
                     #update form info case
-                    return "updating info for instructor"
+                    insert_db("INSERT INTO pdf (pdf_name,pdf_data,username) VALUES (?,?,?)",[request.files["courseWideTutPdf"].filename, request.files["courseWideTutPdf"].read(), "all"])
+                    insert_db("INSERT INTO tut_pdfs (week, pdf_id) VALUES (?,(SELECT last_insert_rowid()))",[request.form["week"]])
+                    return redirect(url_for(".tutorials",id=id))
                 return render_template("profile.html", 
                     user_type=0,
                     user_info=instructor_info,

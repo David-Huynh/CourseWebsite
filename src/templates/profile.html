@@ -49,6 +49,20 @@
                                             <input type="text" name="week" placeholder="Enter Office Hours Meeting Link">
                                         {% else %}
                                             <!-- add student profile attributes-->
+                                            <label class="subtitle">Change Instructor</label>
+                                            <select name="prof" id="prof">
+                                                <option value="" selected disabled hidden>Please select an Instructor...</option>
+                                                {% for prof in prof_list %}
+                                                    <option value="{{prof["instructor_code"]}}">{{prof["first_name"]}} {{prof["last_name"]}}</option>
+                                                {% endfor %}
+                                              </select>
+                                              <label class="subtitle">Change TA</label>
+                                            <select name="ta" id="ta">
+                                                <option value="" selected disabled hidden>Please select a TA...</option>
+                                                {% for ta in ta_list %}
+                                                    <option value="{{ta["ta_code"]}}">{{ta["first_name"]}} {{ta["last_name"]}}</option>
+                                                {% endfor %}
+                                              </select>
                                         {% endif %}
                                         <input type="submit" value="Update" id="createButton">
                                     </form>
