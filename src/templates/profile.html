@@ -36,31 +36,46 @@
                                     <form method="post" enctype="multipart/form-data">
                                         {% if user_type != 2 %}
                                             <label class="subtitle">Update Profile Picture</label>
+                                            <input type="file" class="fileInput" name="courseWidePdf" accept="image/*">
                                             {% if user_type == 0 %}
-                                                <input type="file" class="fileInput" name="courseWidePdf" accept="image/*">
                                                 <label for="courseWidePdf" class="subtitle">Update Syllabus</label>
-                                                <input type="file" class="fileInput" name="courseWidePdf" accept=".pdf">
-                                                <label class="subtitle" for="week">Update Office</label>
+                                                <input type="file" class="fileInput" name="syllabus" accept=".pdf">
+                                                <label class="subtitle" for="week">Update Office</label>                                            
+                                                <input type="text" name="office" placeholder="Enter Office Location">
                                             {% endif %}
-                                            <input type="text" name="week" placeholder="Enter Office Location">
                                             <label class="subtitle" for="week">Update Office Hours</label>
-                                            <input type="text" name="week" placeholder="Enter Office Hours Schedule">
+                                            <input type="text" name="office_hours" placeholder="Enter Office Hours Schedule">
                                             <label class="subtitle" for="week">Update Office Hours Link</label>
-                                            <input type="text" name="week" placeholder="Enter Office Hours Meeting Link">
+                                            <input type="text" name="office_hours_link" placeholder="Enter Office Hours Meeting Link">
                                         {% else %}
-                                            <!-- add student profile attributes-->
                                             <label class="subtitle">Change Instructor</label>
                                             <select name="prof" id="prof">
-                                                <option value="" selected disabled hidden>Please select an Instructor...</option>
+                                                {% if user_info[0]["instructor_code"] %}
+                                                    <option value="NULL">None selected</option>
+                                                {% else %}
+                                                    <option value="NULL" selected>None selected</option>
+                                                {% endif %}
                                                 {% for prof in prof_list %}
-                                                    <option value="{{prof["instructor_code"]}}">{{prof["first_name"]}} {{prof["last_name"]}}</option>
+                                                    {% if prof["instructor_code"] == user_info[0]["instructor_code"] %}
+                                                        <option value="{{prof["instructor_code"]}}" selected>{{prof["first_name"]}} {{prof["last_name"]}}</option>
+                                                    {% else %}
+                                                        <option value="{{prof["instructor_code"]}}">{{prof["first_name"]}} {{prof["last_name"]}}</option>
+                                                    {% endif %}
                                                 {% endfor %}
-                                              </select>
-                                              <label class="subtitle">Change TA</label>
+                                            </select>
+                                            <label class="subtitle">Change TA</label>
                                             <select name="ta" id="ta">
-                                                <option value="" selected disabled hidden>Please select a TA...</option>
+                                                {% if user_info[0]["ta_code"] %}
+                                                    <option value="NULL">None selected</option>
+                                                {% else %}
+                                                    <option value="NULL" selected>None selected</option>
+                                                {% endif %}
                                                 {% for ta in ta_list %}
-                                                    <option value="{{ta["ta_code"]}}">{{ta["first_name"]}} {{ta["last_name"]}}</option>
+                                                    {% if ta["ta_code"] == user_info[0]["ta_code"] %}
+                                                        <option value="{{ta["ta_code"]}}" selected>{{ta["first_name"]}} {{ta["last_name"]}}</option>
+                                                    {% else %}
+                                                        <option value="{{ta["ta_code"]}}">{{ta["first_name"]}} {{ta["last_name"]}}</option>
+                                                    {% endif %}
                                                 {% endfor %}
                                               </select>
                                         {% endif %}
@@ -143,21 +158,21 @@
                                         {% endif %}
                                     {% endfor %}
                                 {% else %}
-                                    <span class="data">Coming Soon</span>
+                                    <span class="data">None Selected</span>
                                 {% endif %}
                             </p>
                         </div>
                         <div class="cardSection">
                             <p>
                                 <span class="subtitle">TA:</span> 
-                                {% if user_info[0]["instructor_code"] %}
+                                {% if user_info[0]["ta_code"] %}
                                     {% for ta in ta_list %}
                                         {% if ta["ta_code"] == user_info[0]["ta_code"] %}
                                             <span class="data"> {{ta["first_name"]}} {{ta["last_name"]}} </span>
                                         {% endif %}
                                     {% endfor %}
                                 {% else %}
-                                    <span class="data">Coming Soon</span>
+                                    <span class="data">None Selected</span>
                                 {% endif %}
                             </p>
                         </div>
