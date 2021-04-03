@@ -18,6 +18,9 @@
                 <nav>
                     <ul class="desktopList">
                         <li><a href="{{url_for('.home')}}">Home</a></li>
+                        {% if ta_level %}
+                            <li><a href="{{url_for('.marking')}}">Marking</a></li>
+                        {% endif %}
                         {% if instructor_id %}
                             <li><a href="{{url_for('.lectures',id=instructor_id)}}">Lectures</a></li>
                         {% endif %}

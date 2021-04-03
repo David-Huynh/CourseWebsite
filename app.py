@@ -47,9 +47,9 @@ def inject_ta_instructor():
         first_instructor = query_db("SELECT instructor_code FROM instructor",one=True)
         first_ta = query_db("SELECT ta_code FROM ta",one=True)
         if qi[0]["col"] == 1:
-            return dict(ta_id=first_ta["ta_code"],instructor_id=session['username'])
+            return dict(ta_id=first_ta["ta_code"],instructor_id=session['username'],ta_level=True)
         elif qt[0]["col"] == 1:
-            return dict(ta_id=session['username'],instructor_id=first_instructor["instructor_code"])
+            return dict(ta_id=session['username'],instructor_id=first_instructor["instructor_code"],ta_level=True)
         else:
             student = query_db("SELECT * FROM student WHERE (student_no=?)",[session['username']])
             if student[0]["ta_code"] and student[0]["instructor_code"]:
@@ -122,6 +122,20 @@ def home():
             return render_template("index.html", name=name[0]["first_name"].lower().capitalize(), tas=tas, instructor=instructor, pdf=None)
     return redirect(url_for('login'))
 
+@app.route('/marking')
+def marking():
+    if 'username' in session and 'password' in session:
+        ##Queries whether there is a username match in instructors table
+        qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=?)) AS \"col\"",[session['username']])
+        ##Queries whether there is a username match in ta table
+        qt = query_db("SELECT EXISTS(SELECT ta_code,password FROM ta WHERE (ta_code=?)) AS \"col\"",[session['username']])
+        ## Only show page to instructors or tas
+        if qi[0]["col"]==1 or qt[0]["col"]==1:
+            return render_template("marking.html")
+        else:
+            return "ERROR: insufficient permission to view this page"
+    return redirect(url_for('login'))
+
 @app.route('/lectures/<id>', methods=['GET', 'POST'])
 def lectures(id=None):
     if 'username' in session and 'password' in session:
@@ -130,6 +144,8 @@ def lectures(id=None):
             qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=?)) AS \"col\"",[session['username']])
             ##Queries whether there is a username match in ta table
             qt = query_db("SELECT EXISTS(SELECT ta_code,password FROM ta WHERE (ta_code=?)) AS \"col\"",[session['username']])
+            ##Instructor name
+            name = query_db("SELECT first_name FROM instructor WHERE instructor_code=?",[id],one=True)["first_name"].lower().capitalize()
             ##Instructor User Page
             if qi[0]["col"] == 1:
                 instructor_lecture_material = query_db("SELECT * FROM lectures WHERE instructor_code=? ORDER BY week ASC", [id])
@@ -172,18 +188,20 @@ def lectures(id=None):
                                     insert_db("DELETE FROM instr_notes WHERE week=? AND instructor_code=?",[request.form["week"], session['username']])
                                 for pdf in request.files.getlist("instructor_pdf"):
                                     insert_db("INSERT INTO pdf (pdf_name,pdf_data,username) VALUES (?,?,?)",[pdf.filename, pdf.read(), "all"])
-                                    insert_db("INSERT INTO instr_notes (week, instructor_code, pdf_id) VALUES (?,?,(SELECT last_insert_rowid()))",[request.form["week"],"all"])
+                                    insert_db("INSERT INTO instr_notes (week, instructor_code, pdf_id) VALUES (?,?,(SELECT last_insert_rowid()))",[request.form["week"],session["username"]])
                             return redirect(url_for(".lectures",id=id))
                     return render_template("lectures.html", 
                         instructor_lecture_material=instructor_lecture_material,  
                         general_lecture_material=general_lecture_material, 
                         instructor_pdfs=instructor_pdfs,
                         instructor=qi,
+                        name=name,
                         id=id)
                 return render_template("lectures.html", 
                         instructor_lecture_material=instructor_lecture_material,  
                         general_lecture_material=general_lecture_material, 
                         instructor_pdfs=instructor_pdfs,
+                        name=name,
                         id=id)
             ##TA User Page
             elif qt[0]["col"] == 1:
@@ -194,6 +212,7 @@ def lectures(id=None):
                     instructor_lecture_material=instructor_lecture_material,  
                     general_lecture_material=general_lecture_material, 
                     instructor_pdfs=instructor_pdfs,
+                    name=name,
                     id=id)
             ##Student User Page
             else:
@@ -204,6 +223,7 @@ def lectures(id=None):
                     instructor_lecture_material=instructor_lecture_material,  
                     general_lecture_material=general_lecture_material, 
                     instructor_pdfs=instructor_pdfs,
+                    name=name,
                     id=id)
             return render_template("lectures.html")
     return redirect(url_for('login'))
@@ -216,6 +236,8 @@ def tutorials(id=None):
             qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=?)) AS \"col\"",[session['username']])
             ##Queries whether there is a username match in ta table
             qt = query_db("SELECT EXISTS(SELECT ta_code,password FROM ta WHERE (ta_code=?)) AS \"col\"",[session['username']])
+            ##Query Ta Name
+            name = query_db("SELECT first_name FROM ta WHERE ta_code=?",[id],one=True)["first_name"].lower().capitalize()
             ##Instructor User Page
             if qi[0]["col"] == 1:
                 ta_tutorial_material = query_db("SELECT * FROM tutorials WHERE ta_code=? ORDER BY week ASC", [id])
@@ -224,12 +246,16 @@ def tutorials(id=None):
                 if request.method == 'POST':
                     if request.form.get("courseWideTutPdf"):
                         #Inserts pdfs
-                        
-                        return redirect(url_for(".tutorials",id=id))
+                        insert_db("INSERT INTO pdf (pdf_name,pdf_data,username) VALUES (?,?,?)",[request.files["courseWideTutPdf"].filename, request.files["courseWideTutPdf"].read(), "all"])
+                        insert_db("INSERT INTO tut_pdfs (week, pdf_id) VALUES (?,(SELECT last_insert_rowid()))",[request.form["week"]])
+                    else:
+                        flash("No such post request supported")
+                    return redirect(url_for(".tutorials",id=id))
                 return render_template("tutorials.html", 
                     ta_tutorial_material=ta_tutorial_material,  
                     general_tutorial_material=general_tutorial_material, 
                     ta_pdfs=ta_pdfs,
+                    name=name,
                     qi=qi,
                     id=id)
             ##TA User Page
@@ -264,17 +290,19 @@ def tutorials(id=None):
                                     insert_db("DELETE FROM ta_notes WHERE week=? AND ta_code=?",[request.form["week"], session['username']])
                                 for pdf in request.files.getlist("ta_pdf"):
                                     insert_db("INSERT INTO pdf (pdf_name,pdf_data,username) VALUES (?,?,?)",[pdf.filename, pdf.read(), "all"])
-                                    insert_db("INSERT INTO ta_notes (week, ta_code, pdf_id) VALUES (?,?,(SELECT last_insert_rowid()))",[request.form["week"],"all"])
+                                    insert_db("INSERT INTO ta_notes (week, ta_code, pdf_id) VALUES (?,?,(SELECT last_insert_rowid()))",[request.form["week"],session["username"]])
                         return redirect(url_for(".tutorials",id=id))
                     return render_template("tutorials.html",
                         ta_tutorial_material=ta_tutorial_material,  
                         general_tutorial_material=general_tutorial_material, 
                         ta_pdfs=ta_pdfs, 
+                        name=name,
                         ta=qt,
                         id=id)
                 return render_template("tutorials.html",
                         ta_tutorial_material=ta_tutorial_material,  
                         general_tutorial_material=general_tutorial_material, 
+                        name=name,
                         ta_pdfs=ta_pdfs,
                         id=id)
             ##Student User Page
@@ -285,6 +313,7 @@ def tutorials(id=None):
                 return render_template("tutorials.html", 
                     ta_tutorial_material=ta_tutorial_material,  
                     general_tutorial_material=general_tutorial_material, 
+                    name=name,
                     ta_pdfs=ta_pdfs,
                     id=id)
             return render_template("tutorials.html")
