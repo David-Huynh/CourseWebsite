@@ -368,6 +368,7 @@ def coursework():
                     if assignment:
                         assignmentExists = query_db("SELECT * FROM assignment_submissions WHERE assignment_no=? AND student_no=?",[request.form["assignment_no"],session["username"]],one=True)
                         if not assignmentExists:
+                            ##Inserts username into row first
                             insert_db("INSERT INTO assignment_submissions (assignment_no,student_no,marked) VALUES (?,?,0)",[request.form["assignment_no"],session["username"]])
                             assignmentExists = query_db("SELECT * FROM assignment_submissions WHERE student_no=? AND assignment_no=?",[session["username"], request.form["assignment_no"]],one=True)
                         if request.files.get("assignment_pdf"):
@@ -376,7 +377,9 @@ def coursework():
                                 insert_db("INSERT INTO pdf (pdf_name,pdf_data,username) VALUES (?,?,?)",[request.files["assignment_pdf"].filename, request.files["assignment_pdf"].read(), session["username"]])
                                 insert_db("UPDATE assignment_submissions SET pdf_id=(SELECT last_insert_rowid()) WHERE assignment_no=? AND student_no=?",[request.form["assignment_no"],session["username"]])
                             elif assignmentExists["pdf_id"]:
+                                ##Updates pdf file instead
                                 insert_db("UPDATE pdf SET pdf_name=?,pdf_data=? WHERE pdf_id=?",[request.files["assignment_pdf"].filename, request.files["assignment_pdf"].read(), assignmentExists["pdf_id"]])
+                            ## Checks for late submission and records the time of submission for incremental late penalties if desired
                             if assignment["due_date"]:
                                 if datetime.strptime(assignment["due_date"], "%Y-%m-%dT%H:%M:%S.%f") <= now:
                                     print("DAB")
@@ -387,6 +390,7 @@ def coursework():
                                 insert_db("UPDATE assignment_submissions SET date_submitted=?,late=0 WHERE assignment_no=? AND student_no=?",[now.isoformat(),request.form["assignment_no"],session["username"]])
                     else:
                         flash("No such assignment")
+                ## Test Submission
                 elif "test_no" in request.form:
                     test = query_db("SELECT * FROM tests WHERE test_no=?",[request.form["test_no"]],one=True)
                     if test:
@@ -400,7 +404,9 @@ def coursework():
                                 insert_db("INSERT INTO pdf (pdf_name,pdf_data,username) VALUES (?,?,?)",[request.files["test_pdf"].filename, request.files["test_pdf"].read(), session["username"]])
                                 insert_db("UPDATE test_submissions SET pdf_id=(SELECT last_insert_rowid()) WHERE test_no=? AND student_no=?",[request.form["test_no"],session["username"]])
                             elif testExists["pdf_id"]:
+                                ## Update pdf file
                                 insert_db("UPDATE pdf SET pdf_name=?,pdf_data=? WHERE pdf_id=?",[request.files["test_pdf"].filename, request.files["test_pdf"].read(), testExists["pdf_id"]])
+                            ## Checks for late submission and records the time of submission for incremental late penalties if desired
                             if test["due_date"]:
                                 if datetime.strptime(test["due_date"], "%Y-%m-%dT%H:%M:%S.%f") <= now:
                                     insert_db("UPDATE test_submissions SET date_submitted=?,late=1 WHERE test_no=? AND student_no=?",[now.isoformat(),request.form["test_no"],session["username"]])
@@ -410,6 +416,7 @@ def coursework():
                                 insert_db("UPDATE test_submissions SET date_submitted=?,late=0 WHERE test_no=? AND student_no=?",[now.isoformat(),request.form["test_no"],session["username"]])
                     else:
                         flash("Error: no such test")
+                ##Regrade Request
                 elif "dropmenu" in request.form:
                     if request.form["dropmenu"] == "assignment":
                         assignmentExists = query_db("SELECT * FROM assignment_submissions WHERE assignment_no=? AND student_no=?",[request.form["evaluation_no"],session["username"]],one=True)
