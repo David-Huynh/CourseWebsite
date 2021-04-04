@@ -536,16 +536,13 @@ def profile():
                         insert_db("UPDATE instructor SET instructor_picture=? WHERE instructor_code=?", [pic, session["username"]])
                     if 'syllabus' in request.files and request.files["syllabus"]:
                         # query db to see if theres is a syllabus
-                        fileExists = query_db("SELECT syllabus_id FROM instructor WHERE instructor_code=?", [session["username"]])
-                        #if fileExists:
-                            # delete if there is
-                        #    insert_db()
-                            # replace pdf_data with new request.file
-                        #else:
-                            # create new unique pdf_id
-                            # insert pdf_data
-                        #    insert_db()
-                        #insert_db("")
+                        fileExists = query_db("SELECT * FROM instructor WHERE instructor_code=?", [session["username"]])
+                        if fileExists[0]["syllabus_id"]:
+                            sy_id = fileExists[0]["syllabus_id"]
+                            insert_db("UPDATE pdf SET pdf_name=?, pdf_data=? WHERE pdf_id=?", [request.files["syllabus"].filename, request.files["syllabus"].read(), sy_id])
+                        else:
+                            insert_db("INSERT INTO pdf (pdf_name,pdf_data,username) VALUES (?,?,?)",[request.files["syllabus"].filename, request.files["syllabus"].read(), session["username"]])
+                            insert_db("UPDATE instructor SET syllabus_id=(SELECT last_insert_rowid()) WHERE instructor_code=?",[session["username"]])
                     if 'office' in request.form and request.form["office"]:
                         insert_db("UPDATE instructor SET office=? WHERE instructor_code=?", [request.form["office"], session["username"]])
                     if 'office_hours' in request.form and request.form["office_hours"]:
@@ -555,7 +552,8 @@ def profile():
                     if 'email' in request.form and request.form["email"]:
                         insert_db("UPDATE instructor SET email=? WHERE instructor_code=?", [request.form["email"], session["username"]])
                     if 'password' in request.form and request.form["password"]:
-                       insert_db("UPDATE instructor SET password=? WHERE instructor_code=?", [request.form["password"], session["username"]])
+                        insert_db("UPDATE instructor SET password=? WHERE instructor_code=?", [request.form["password"], session["username"]])
+                        session["password"] = request.form["password"]
                     return redirect(url_for(".profile",id=id))
                 return render_template("profile.html", 
                     user_type=0,
@@ -565,12 +563,24 @@ def profile():
             # Load TA page
             elif qt[0]["col"] == 1:
                 ta_info = query_db("SELECT * FROM ta WHERE ta_code=?",[session["username"]])
-                ta_pic = ta_info[0]["ta_picture"].read()
+                ta_pic = ta_info[0]["ta_picture"]
                 if ta_pic != None:
                     ta_pic = base64.b64encode(ta_info[0]["ta_picture"]).decode("ascii")
                 if request.method == "POST":
                     #update form info case
-                    return "updating info for TA"
+                    if 'picture' in request.files and request.files["picture"]: # if picture key is not in the post request
+                        pic = request.files["picture"].read()
+                        insert_db("UPDATE ta SET ta_picture=? WHERE ta_code=?", [pic, session["username"]])
+                    if 'office_hours' in request.form and request.form["office_hours"]:
+                        insert_db("UPDATE ta SET office_hours=? WHERE ta_code=?", [request.form["office_hours"], session["username"]])
+                    if 'office_hours_link' in request.form and request.form["office_hours_link"]:
+                        insert_db("UPDATE ta SET office_hours_link=? WHERE ta_code=?", [request.form["office_hours_link"], session["username"]])
+                    if 'email' in request.form and request.form["email"]:
+                        insert_db("UPDATE ta SET email=? WHERE ta_code=?", [request.form["email"], session["username"]])
+                    if 'password' in request.form and request.form["password"]:
+                        insert_db("UPDATE ta SET password=? WHERE ta_code=?", [request.form["password"], session["username"]])
+                        session["password"] = request.form["password"]
+                    return redirect(url_for(".profile",id=id))
                 return render_template("profile.html", 
                     user_type=1,
                     user_info=ta_info,
@@ -581,7 +591,16 @@ def profile():
                 ta_list = query_db("SELECT ta_code, first_name, last_name FROM ta")
                 stud_info = query_db("SELECT * FROM student WHERE student_no=?",[session["username"]])
                 if request.method == "POST":
-                    return "updating data for student"
+                    if 'prof' in request.form and request.form["prof"]:
+                        insert_db("UPDATE student SET instructor_code=? WHERE student_no=?", [request.form["prof"], session["username"]])
+                    if 'ta' in request.form and request.form["ta"]:
+                        insert_db("UPDATE student SET ta_code=? WHERE student_no=?", [request.form["ta"], session["username"]])
+                    if 'email' in request.form and request.form["email"]:
+                        insert_db("UPDATE student SET email=? WHERE student_no=?", [request.form["email"], session["username"]])
+                    if 'password' in request.form and request.form["password"]:
+                        insert_db("UPDATE student SET password=? WHERE student_no=?", [request.form["password"], session["username"]])
+                        session["password"] = request.form["password"]
+                    return redirect(url_for(".profile",id=id))
                 return render_template("profile.html",
                     user_type=2,
                     user_info=stud_info, 

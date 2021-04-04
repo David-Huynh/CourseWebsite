@@ -118,8 +118,8 @@
                             <div class="cardSection">
                                 <p>
                                     <span class="subtitle">Syllabus:</span> 
-                                    {% if syllabus["pdf_id"] %}
-                                        <span class="data"><a href="/pdfs/{{syllabus["pdf_id"]}}" class="links" target="_blank">{{syllabus["pdf_name"]}}</a></p>
+                                    {% if user_info[0]["syllabus_id"] %}
+                                        <span class="data"><a href="/pdfs/{{syllabus[0]["pdf_id"]}}" class="links" target="_blank">{{syllabus[0]["pdf_name"]}}</a></p>
                                     {% else %}
                                         <span class="data">Coming Soon</span>
                                     {% endif %}
