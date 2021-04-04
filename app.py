@@ -526,13 +526,14 @@ def profile():
             if qi[0]["col"] == 1:
                 instructor_info = query_db("SELECT * FROM instructor WHERE instructor_code=?",[session["username"]])
                 prof_pic = instructor_info[0]["instructor_picture"]
-                if prof_pic:
-                    prof_pic = base64.encodebytes(instructor_info[0]["instructor_picture"])
+                if prof_pic != None:
+                    prof_pic = base64.b64encode(instructor_info[0]["instructor_picture"]).decode("ascii")
                 syllabus = query_db("SELECT * FROM pdf INNER JOIN instructor ON instructor.syllabus_id = pdf.pdf_id AND instructor.instructor_code=?", [session["username"]])
                 if request.method == "POST":
                     #update instructor form
                     if 'picture' in request.files and request.files["picture"]: # if picture key is not in the post request
-                        insert_db("UPDATE instructor SET instructor_picture=? WHERE instructor_code=?", [request.files["picture"].read(), session["username"]])
+                        pic = request.files["picture"].read()
+                        insert_db("UPDATE instructor SET instructor_picture=? WHERE instructor_code=?", [pic, session["username"]])
                     if 'syllabus' in request.files and request.files["syllabus"]:
                         # query db to see if theres is a syllabus
                         fileExists = query_db("SELECT syllabus_id FROM instructor WHERE instructor_code=?", [session["username"]])
