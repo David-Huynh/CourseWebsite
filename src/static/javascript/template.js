@@ -5,6 +5,5 @@ window.onload = function() {
     navBtn.onclick = function(event) {
         console.log(event)
         links.classList.toggle("navActive")
-
     }
 }
