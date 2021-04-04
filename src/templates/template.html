@@ -7,6 +7,7 @@
         <link rel="stylesheet" href="{{url_for('static', filename ='css/mainlayout.css')}}">
         <link rel="preconnect" href="https://fonts.gstatic.com">
         <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+        <script src="{{url_for('static', filename='javascript/template.js')}}"></script>
     </head>
     <body>
         <!-- TODO:::: ADD A MOBILE FRIENDLY NAVIGATION BAR -->
@@ -33,6 +34,11 @@
                         <li><a href="{{url_for('.links')}}">Links</a></li>
                         <li><a href="{{url_for('.logout')}}" id="logout">Log Out</a></li>
                     </ul>
+                    <div id="barBtn">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
                 </nav>
             </div>
         </header>
