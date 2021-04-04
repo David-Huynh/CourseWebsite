@@ -527,12 +527,31 @@ def profile():
                 instructor_info = query_db("SELECT * FROM instructor WHERE instructor_code=?",[session["username"]])
                 syllabus = query_db("SELECT * FROM pdf INNER JOIN instructor ON instructor.syllabus_id = pdf.pdf_id AND instructor.instructor_code=?", [session["username"]])
                 if request.method == "POST":
-                    #update form info case
-                    if request.form["picture"]:
-                        insert_db()
-                    if request.form["office"]:
-                        insert_db()
-                        
+                    #update instructor form
+                    if 'picture' in request.files and request.files["picture"]: # if picture key is not in the post request
+                        insert_db("UPDATE instructor SET instructor_picture=? WHERE instructor_code=?", [request.files["picture"].read(), session["username"]])
+                    if 'syllabus' in request.files and request.files["syllabus"]:
+                        # query db to see if theres is a syllabus
+                        fileExists = query_db("SELECT syllabus_id FROM instructor WHERE instructor_code=?", [session["username"]])
+                        #if fileExists:
+                            # delete if there is
+                        #    insert_db()
+                            # replace pdf_data with new request.file
+                        #else:
+                            # create new unique pdf_id
+                            # insert pdf_data
+                        #    insert_db()
+                        #insert_db("")
+                    if 'office' in request.form and request.form["office"]:
+                        insert_db("UPDATE instructor SET office=? WHERE instructor_code=?", [request.form["office"], session["username"]])
+                    if 'office_hours' in request.form and request.form["office_hours"]:
+                        insert_db("UPDATE instructor SET office_hours=? WHERE instructor_code=?", [request.form["office_hours"], session["username"]])
+                    if 'office_hours_link' in request.form and request.form["office_hours_link"]:
+                        insert_db("UPDATE instructor SET office_hours_link=? WHERE instructor_code=?", [request.form["office_hours_link"], session["username"]])
+                    if 'email' in request.form and request.form["email"]:
+                        insert_db("UPDATE instructor SET email=? WHERE instructor_code=?", [request.form["email"], session["username"]])
+                    if 'password' in request.form and request.form["password"]:
+                       insert_db("UPDATE instructor SET password=? WHERE instructor_code=?", [request.form["password"], session["username"]])
                     return redirect(url_for(".profile",id=id))
                 return render_template("profile.html", 
                     user_type=0,
