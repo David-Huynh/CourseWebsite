@@ -14,7 +14,7 @@
         {% block content %}
         <!-- Page Content -->
         <div class="content">
-            <h1 class="title">Unmarked Work | Regrade</h1>
+            <h1 class="title">Grading | Regrading</h1>
             <div id="alignRight">
                 <p id="saveText">Auto Saved</p>
             </div>
@@ -31,6 +31,7 @@
                             <div class="tableCell">PDF</div>
                             <div class="tableCell">Grade</div>
                             <div class="tableCell">Date Submitted</div>
+                            <div class="tableCell">Marked</div>
                             <div class="tableCell">Late</div>
                             <div class="tableCell">Regrade</div>
                             {% for submission in assignments_submissions %}
@@ -43,6 +44,13 @@
                                         <input class="tableCell" type="text" value="" id="assignment///{{submission["assignment_no"]}}///{{submission["student_no"]}}">
                                     {%endif%}
                                     <div class="tableCell"><p>{{submission["date_submitted"]}}</p></div>
+                                    <div class="tableCell">
+                                        {% if submission["marked"] == 1 %}
+                                            <p>&check;</p>
+                                        {% else %}
+                                            <p>&#10005;</p>
+                                        {% endif%}
+                                    </div>
                                     <div class="tableCell">
                                         {% if submission["late"] == 1 %}
                                             <p>&check;</p>
@@ -76,6 +84,7 @@
                             <div class="tableCell">PDF</div>
                             <div class="tableCell">Grade</div>
                             <div class="tableCell">Date Submitted</div>
+                            <div class="tableCell">Marked</div>
                             <div class="tableCell">Late</div>
                             <div class="tableCell">Regrade</div>
                             {% for submission in tests_submissions %}
@@ -88,6 +97,13 @@
                                         <input class="tableCell" type="text" value="" id="test///{{submission["test_no"]}}///{{submission["student_no"]}}">
                                     {%endif%}
                                     <div class="tableCell"><p>{{submission["date_submitted"]}}</p></div>
+                                    <div class="tableCell">
+                                        {% if submission["marked"] == 1 %}
+                                            <p>&check;</p>
+                                        {% else %}
+                                            <p>&#10005;</p>
+                                        {% endif%}
+                                    </div>
                                     <div class="tableCell">
                                         {% if submission["late"] == 1 %}
                                             <p>&check;</p>

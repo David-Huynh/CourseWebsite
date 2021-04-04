@@ -151,9 +151,9 @@ def marking():
         ## Only show page to instructors or tas
         if qi[0]["col"]==1 or qt[0]["col"]==1:
             assignments = query_db("SELECT * FROM assignments ORDER BY assignment_no ASC")
-            assignments_submissions = query_db("SELECT * FROM assignment_submissions WHERE marked=0 OR regrade_requested=1 ORDER BY assignment_no ASC")
+            assignments_submissions = query_db("SELECT * FROM assignment_submissions ORDER BY assignment_no ASC")
             tests = query_db("SELECT * FROM tests ORDER BY test_no ASC")
-            tests_submissions = query_db("SELECT * FROM test_submissions WHERE marked=0 OR regrade_requested=1 ORDER BY test_no ASC")
+            tests_submissions = query_db("SELECT * FROM test_submissions ORDER BY test_no ASC")
             return render_template("marking.html", 
                 assignments=assignments,
                 assignments_submissions=assignments_submissions,
@@ -486,7 +486,7 @@ def coursework():
                         testExists = query_db("SELECT * FROM test_submissions WHERE student_no=? AND test_no=?",[session["username"], request.form["evaluation_no"]],one=True)
                         if testExists:
                             if testExists["marked"]:
-                                insert_db("UPDATE test_submissions SET regrade_requested=1 WHERE test_no=? AND student_no=?",[request.form["evaluation_no"],session["username"]])
+                                insert_db("UPDATE test_submissions SET marked=0, regrade_requested=1 WHERE test_no=? AND student_no=?",[request.form["evaluation_no"],session["username"]])
                             else:
                                 flash("This test has yet to be marked")
                         else:
