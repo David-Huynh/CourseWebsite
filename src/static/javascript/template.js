@@ -1,9 +1,11 @@
-window.onload = function() {
+const navSlide = () => {
     const navBtn = document.getElementById("barBtn")
     const links = document.querySelector(".desktopList")
 
     navBtn.onclick = function(event) {
-        console.log(event)
-        links.classList.toggle("navActive")
+        links.classList.toggle("navActive");
+        barBtn.classList.toggle("clicked");
     }
 }
+    
+navSlide();
