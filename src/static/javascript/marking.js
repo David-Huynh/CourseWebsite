@@ -1,5 +1,6 @@
 window.onload = function() {
     var saveText = document.getElementById("saveText")
+    //Sends post request promise to server
     async function postData(url = '', data = {}) {
         const response = await fetch(url, {
           method: 'POST',
@@ -8,10 +9,11 @@ window.onload = function() {
             'Content-Type': 'application/json'
           },
           redirect: 'follow',
-          body: JSON.stringify(data) // body data type must match "Content-Type" header
+          body: JSON.stringify(data) 
         });
-        return response.json(); // parses JSON response into native JavaScript objects
+        return response.json(); 
     }
+    //Adds data on grade change for each grade cell
     document.querySelectorAll("input").forEach((element)=>{
         element.onchange = () => {
             saveText.innerHTML="Saving"
