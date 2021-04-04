@@ -20,13 +20,34 @@
         <!-- Page Content -->
         <div class="content">
             <h1 class="title" id="assignmentPageTitle">My Profile</h1>
-            <button id="editB" class="customButton" style="align-self: flex-end;margin-bottom: 20px;">Edit Profile</button>
+            <div id="alignRight">
+                <button id="editA" class="customButton">Edit Account</button>
+                <button id="editB" class="customButton">Edit Profile</button>
+            </div>
             <!-- Tests Card -->
             <div class="card">
                 <h1 class="cardTitle"> {{user_info[0]["first_name"].lower().capitalize()+' '+user_info[0]["last_name"].lower().capitalize()}} </h1>
                 <div class="cardContent">
-                    <!-- The Modal -->
-                    <div id="myModal" class="modal">
+                    <div id="account_modal" class="modal">
+                        <div class="modal-content">
+                            <span class="close">&times;</span>
+                            <p class="cardTitle">Editing Account...</p>
+                            <div class="cardContent">
+                                <p>
+                                    <form method="post" enctype="multipart/form-data">
+                                        <label for="username" class="subtitle">Change Email</label>
+                                        <input type="text" name="email" placeholder="Enter new email">
+                                        <label for="password" class="subtitle">Change Password</label>
+                                        <input type="text" name="password" placeholder="Enter new password">
+                                        <input type="submit" value="Update" id="createButton">
+                                    </form>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Edit Profile Modal -->
+                    <div id="profile_modal" class="modal">
                         <!-- Instructor Modal content -->
                         <div class="modal-content">
                             <span class="close">&times;</span>
