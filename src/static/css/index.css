@@ -10,6 +10,9 @@ p {
     margin-right: 20px;
 }
 .picture{
+    border: 5px solid #002A5C;
+    border-radius: 50%;
+    object-fit: cover;
     width: 150px;
     height: 150px;
 }

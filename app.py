@@ -129,12 +129,12 @@ def home():
             instructor[0]["first_name"] = instructor[0]["first_name"].lower().capitalize()
             instructor[0]["last_name"] = instructor[0]["last_name"].lower().capitalize()
             if instructor[0]["instructor_picture"] != None:
-                instructor[0]["instructor_picture"] = base64.encodebytes(instructor[0]["instructor_picture"])
+                instructor[0]["instructor_picture"] = base64.b64encode(instructor[0]["instructor_picture"]).decode("ascii")
         for ta in tas:
-            ta["first_name"] =  ta["first_name"].lower().capitalize()
-            ta["last_name"] =  ta["last_name"].lower().capitalize()
+            ta["first_name"] = ta["first_name"].lower().capitalize()
+            ta["last_name"] = ta["last_name"].lower().capitalize()
             if ta["ta_picture"] != None:
-                ta["ta_picture"]= base64.encodebytes(ta["ta_picture"])
+                ta["ta_picture"]= base64.b64encode(ta["ta_picture"]).decode("ascii")
         if instructor:
             return render_template("index.html", name=name[0]["first_name"].lower().capitalize(), tas=tas, instructor=instructor, pdf=instructor[0]["syllabus_id"])
         else:
@@ -565,9 +565,9 @@ def profile():
             # Load TA page
             elif qt[0]["col"] == 1:
                 ta_info = query_db("SELECT * FROM ta WHERE ta_code=?",[session["username"]])
-                ta_pic = ta_info[0]["ta_picture"]
-                if ta_pic:
-                    ta_pic = base64.encodebytes(ta_info[0]["ta_picture"])
+                ta_pic = ta_info[0]["ta_picture"].read()
+                if ta_pic != None:
+                    ta_pic = base64.b64encode(ta_info[0]["ta_picture"]).decode("ascii")
                 if request.method == "POST":
                     #update form info case
                     return "updating info for TA"
