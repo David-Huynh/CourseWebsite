@@ -525,6 +525,9 @@ def profile():
             # Load Instructor page
             if qi[0]["col"] == 1:
                 instructor_info = query_db("SELECT * FROM instructor WHERE instructor_code=?",[session["username"]])
+                prof_pic = instructor_info[0]["instructor_picture"]
+                if prof_pic:
+                    prof_pic = base64.encodebytes(instructor_info[0]["instructor_picture"])
                 syllabus = query_db("SELECT * FROM pdf INNER JOIN instructor ON instructor.syllabus_id = pdf.pdf_id AND instructor.instructor_code=?", [session["username"]])
                 if request.method == "POST":
                     #update instructor form
@@ -556,16 +559,21 @@ def profile():
                 return render_template("profile.html", 
                     user_type=0,
                     user_info=instructor_info,
+                    pic=prof_pic,
                     syllabus=syllabus)
             # Load TA page
             elif qt[0]["col"] == 1:
                 ta_info = query_db("SELECT * FROM ta WHERE ta_code=?",[session["username"]])
+                ta_pic = ta_info[0]["ta_picture"]
+                if ta_pic:
+                    ta_pic = base64.encodebytes(ta_info[0]["ta_picture"])
                 if request.method == "POST":
                     #update form info case
                     return "updating info for TA"
                 return render_template("profile.html", 
                     user_type=1,
-                    user_info=ta_info)
+                    user_info=ta_info,
+                    pic=ta_pic)
             # Load Student page
             else:
                 prof_list = query_db("SELECT instructor_code, first_name, last_name FROM instructor")

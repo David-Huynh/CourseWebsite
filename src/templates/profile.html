@@ -108,10 +108,8 @@
                     </div>
                     {% if user_type != 2 %}
                         <div class="cardPicture">
-                            {% if user_type == 1 and user_info[0]["ta_picture"] %}
-                                <img src="data:image/png;base64,{{user_info[0]["ta_picture"]}}" alt="Picture of Instructor"> 
-                            {% elif user_type == 0 and user_info[0]["instructor_picture"] %}
-                                <img src="data:image/png;base64,{{user_info[0]["instructor_picture"]}}" alt="Picture of Instructor"> 
+                            {% if pic %}
+                                <img src="data:image/png;base64,{{pic}}" alt="Picture of Instructor"> 
                             {% else %}
                                 <img src="../static/placeholder.png" class="picture" alt="Picture of Instructor">
                             {% endif %}
