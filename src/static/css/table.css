@@ -1,6 +1,6 @@
 .table{
     display: grid;
-    grid-template-columns: repeat(6, auto);
+    grid-template-columns: repeat(7, auto);
     gap: 0 0;
     align-items: stretch;
     justify-items: stretch;
@@ -10,5 +10,5 @@
     border: 1px solid #2D3B45;
 }
 .table#coursework{
-    grid-template-columns: repeat(6, auto);
+    grid-template-columns: repeat(7, auto);
 }
