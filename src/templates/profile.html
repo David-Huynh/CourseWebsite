@@ -74,6 +74,11 @@
                                                 <input type="text" name="second_lecture_link" placeholder="Enter Second Lecture Link (ie. https://...)" pattern="https://.*">
                                                 <label class="subtitle" for="office">Update Office</label>                                            
                                                 <input type="text" name="office" placeholder="Enter Office Location">
+                                            {% elif user_type == 1 %}
+                                                <label class="subtitle" for="tutorial_time">Update Tutorial Time</label>
+                                                <input type="text" name="tutorial_time" placeholder="Enter Tutorial Time">
+                                                <label class="subtitle" for="tutorial_link">Update Tutorial Link</label>
+                                                <input type="text" name="tutorial_link" placeholder="Enter Tutorial Meeting Link (ie. https://...)" pattern="https://.*">
                                             {% endif %}
                                             <label class="subtitle" for="office_hours">Update Office Hours</label>
                                             <input type="text" name="office_hours" placeholder="Enter Office Hours Schedule">
@@ -183,6 +188,27 @@
                                         <span class="data"> {{user_info[0]["office"]}} </span>
                                     {% else %}
                                         <span class="data">Coming Soon</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        {% elif user_type == 1 %}        
+                            <div class="cardSection">
+                                <p>
+                                    <span class="subtitle">Tutorial Time:</span> 
+                                    {% if user_info[0]["tutorial_hours"] %}
+                                        <span class="data"> {{user_info[0]["tutorial_hours"]}} </span>
+                                    {% else %}
+                                        <span class="data">Coming Soon</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                            <div class="cardSection">
+                                <p>
+                                    <span class="subtitle">Tutorial Link:</span> 
+                                    {% if user_info[0]["tutorial_link"] %}
+                                        <a href="{{user_info[0]["tutorial_link"]}}" class="links" target="_blank">[Link]</a> 
+                                    {% else %}
+                                        <span class="data">Link Coming Soon</span>
                                     {% endif %}
                                 </p>
                             </div>

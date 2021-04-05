@@ -629,6 +629,10 @@ def profile():
                     if 'picture' in request.files and request.files["picture"]: # if picture key is not in the post request
                         pic = request.files["picture"].read()
                         insert_db("UPDATE ta SET ta_picture=? WHERE ta_code=?", [pic, session["username"]])
+                    if 'tutorial_time' in request.form and request.form["tutorial_time"]:
+                        insert_db("UPDATE ta SET tutorial_hours=? WHERE ta_code=?", [request.form["tutorial_time"], session["username"]])
+                    if 'tutorial_link' in request.form and request.form["tutorial_link"]:
+                        insert_db("UPDATE ta SET tutorial_link=? WHERE ta_code=?", [request.form["tutorial_link"], session["username"]])
                     if 'office_hours' in request.form and request.form["office_hours"]:
                         insert_db("UPDATE ta SET office_hours=? WHERE ta_code=?", [request.form["office_hours"], session["username"]])
                     if 'office_hours_link' in request.form and request.form["office_hours_link"]:
