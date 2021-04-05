@@ -576,12 +576,12 @@ def profile():
                         insert_db("UPDATE instructor SET instructor_picture=? WHERE instructor_code=?", [pic, session["username"]])
                     if 'syllabus' in request.files and request.files["syllabus"]:
                         # query db to see if theres is a syllabus
-                        fileExists = query_db("SELECT * FROM instructor WHERE instructor_code=?", [session["username"]])
-                        if fileExists[0]["syllabus_id"]:
+                        fileExists = query_db("SELECT * FROM instructor WHERE instructor_code=?", ["all"])
+                        if fileExists:
                             sy_id = fileExists[0]["syllabus_id"]
                             insert_db("UPDATE pdf SET pdf_name=?, pdf_data=? WHERE pdf_id=?", [request.files["syllabus"].filename, request.files["syllabus"].read(), sy_id])
                         else:
-                            insert_db("INSERT INTO pdf (pdf_name,pdf_data,username) VALUES (?,?,?)",[request.files["syllabus"].filename, request.files["syllabus"].read(), session["username"]])
+                            insert_db("INSERT INTO pdf (pdf_name,pdf_data,username) VALUES (?,?,?)",[request.files["syllabus"].filename, request.files["syllabus"].read(), "all"])
                             insert_db("UPDATE instructor SET syllabus_id=(SELECT last_insert_rowid()) WHERE instructor_code=?",[session["username"]])
                     if 'first_lecture_time' in request.form and request.form["first_lecture_time"]:
                         insert_db("UPDATE instructor SET first_lecture_time=? WHERE instructor_code=?", [request.form["first_lecture_time"], session["username"]])

@@ -144,7 +144,7 @@
                                 <p>TA</p>
                                 {% if ta["office_hours"]%}
                                     {% if ta["office_hours_link"] %}
-                                        <p>OH: <a href="{{ta["office_hours_link"]}}" class="links">{{ta["office_hours"]}}</a></p>
+                                        <p>OH: <a href="{{ta["office_hours_link"]}}" class="links" target="_blank">{{ta["office_hours"]}}</a></p>
                                     {% else %}
                                         <p>OH: {{ta["office_hours"]}} </p>
                                     {% endif %}
@@ -153,14 +153,14 @@
                                 {% endif %} 
                                 {% if ta["tutorial_hours"]%}
                                     {% if ta["tutorial_link"] %}
-                                        <p>Tutorial: <a href="{{ta["tutorial_link"]}}" class="links"> {{ta["tutorial_hours"]}}</a></p>
+                                        <p>Tutorial: <a href="{{ta["tutorial_link"]}}" class="links" target="_blank"> {{ta["tutorial_hours"]}}</a></p>
                                     {% else %}
                                         <p>Tutorial: {{ta["tutorial_hours"]}}</p>
                                     {% endif %}
                                 {% else %}
                                     <p>Tutorials: None</p>
                                 {% endif %}
-                                <p>Email: <a href="mailto:{{ta["email"]}}" class="links">{{ta["email"]}}</a></p>
+                                <p>Email: <a href="mailto:{{ta["email"]}}" target="_blank" class="links">{{ta["email"]}}</a></p>
                             </div>
                         {% endif %}
                     {% endfor %}
