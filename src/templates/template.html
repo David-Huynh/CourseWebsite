@@ -33,6 +33,11 @@
                         <li><a href="{{url_for('.links')}}">Links</a></li>
                         <li><a href="{{url_for('.logout')}}" id="logout">Log Out</a></li>
                     </ul>
+                    <div id="barBtn">
+                        <div class="line1"></div>
+                        <div class="line2"></div>
+                        <div class="line3"></div>
+                    </div>
                 </nav>
             </div>
         </header>
@@ -43,5 +48,7 @@
             Created by David Huynh and Collin Chan
             <a href="https://www.utsc.utoronto.ca/cms/faculty-of-computer-science" target="_blank" class="links" id="faculty">Faculty of Computer Science at UofT</a>
         </footer>
+        <script src="{{url_for('static', filename='javascript/template.js')}}"></script>
+
     </body>
 </html>

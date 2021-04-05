@@ -9,6 +9,8 @@ window.onload = function() {
 
     acc_btn.onclick = function(event) {
         acc_modal.style.display = "block";
+        console.log('Hello now')
+
     }
 
     span1.onclick = function(event) {
@@ -17,6 +19,8 @@ window.onload = function() {
    
     prof_btn.onclick = function(event) {
         prof_modal.style.display = "block";
+        console.log('Hello now')
+
     }
 
     span2.onclick = function(event) {
