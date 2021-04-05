@@ -71,7 +71,7 @@
                                             <label class="subtitle">Change Instructor</label>
                                             <select name="prof" id="prof">
                                                 {% if user_info[0]["instructor_code"] %}
-                                                    <option value="NULL">None selected</option>
+                                                    <option value="NULL" disabled>None selected</option>
                                                 {% else %}
                                                     <option value="NULL" selected>None selected</option>
                                                 {% endif %}
