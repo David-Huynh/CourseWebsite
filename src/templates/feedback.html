@@ -2,7 +2,7 @@
 <html lang="en" dir="ltr">
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8">
-        <title>Tutorials</title>
+        <title>Feedback</title>
         <link rel="stylesheet" href="{{url_for('static', filename ='css/lectures.css')}}">
         <link rel="stylesheet" href="{{url_for('static', filename ='css/card.css')}}">
         <link rel="stylesheet" href="{{url_for('static', filename ='css/form.css')}}">
@@ -17,7 +17,64 @@
         {% block content %}
         <!-- Page Content -->
         <div class="content">
-        
+            <h1 class="title" id="assignmentPageTitle">Feedback</h1>
+            <div class="card"> 
+                <a name="feedback1" href="{{url_for('.feedback')}}#feedback1" class="links">
+                    <h1 class="cardTitle">
+                        
+                        Anonymous Feedback Form for Current Instructor
+                        
+                    </h1>
+                </a>
+                <div class="cardContent">
+                    {% if instructor %}
+                        <form method="post" enctype="multipart/form-data">
+                            <label for="iq1" class="subtitle requiredInput">What did you think about {{instructor[0]["first_name"].lower().capitalize()}} {{instructor[0]["last_name"].lower().capitalize()}}'s' lectures?</label>
+                            <textarea name="iq1" placeholder="Tell us what you think" rows="4" cols="30" required></textarea>
+                            <label for="iq2" class="subtitle requiredInput">What did {{instructor[0]["first_name"].lower().capitalize()}} {{instructor[0]["last_name"].lower().capitalize()}} do that you preferred?</label>
+                            <textarea name="iq2" placeholder="Tell us what you think" rows="4" cols="30" required></textarea>
+                            <label for="iq3" class="subtitle requiredInput">What did {{instructor[0]["first_name"].lower().capitalize()}} {{instructor[0]["last_name"].lower().capitalize()}} do that you did not prefer?</label>
+                            <textarea name="iq3" placeholder="Tell us what you think" rows="4" cols="30" required></textarea>
+                            <label for="iq4" class="subtitle">Any additional comments...</label>
+                            <textarea name="iq4" placeholder="Tell us what you think" rows="4" cols="30"></textarea>
+                            <input type="submit" value="Submit" id="createButton">
+                        </form>
+                    {% else %}
+                        <span class="subtitle">Please enroll in an instructor before giving them feedback</span> 
+                        <br>
+                        <span>Go to > <a class="links" href="{{url_for('.profile')}}">My Profile</a> > click on "Edit Profile" to enroll into an instructor</span> 
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card">
+                <a name="feedback2" href="{{url_for('.feedback')}}#feedback2" class="links">
+                    <h1 class="cardTitle">
+                        
+                        Anonymous Feedback Form for Current TA
+                        
+                    </h1>
+                </a>
+                <div class="cardContent">
+                    {% if ta %}
+                        <form method="post" enctype="multipart/form-data">
+                            <label for="taq1" class="subtitle requiredInput">What did you think about {{ta[0]["first_name"].lower().capitalize()}} {{ta[0]["last_name"].lower().capitalize()}}'s' tutorials?</label>
+                            <textarea name="ta1" placeholder="Tell us what you think" rows="4" cols="30" required></textarea>
+                            <label for="taq2" class="subtitle requiredInput">What did {{ta[0]["first_name"].lower().capitalize()}} {{ta[0]["last_name"].lower().capitalize()}} do that you preferred?</label>
+                            <textarea name="taq2" placeholder="Tell us what you think" rows="4" cols="30"required></textarea>
+                            <label for="taq3" class="subtitle requiredInput">What did {{ta[0]["first_name"].lower().capitalize()}} {{ta[0]["last_name"].lower().capitalize()}} do that you did not prefer?</label>
+                            <textarea name="taq3" placeholder="Tell us what you think" rows="4" cols="30"required></textarea>
+                            <label for="taq4" class="subtitle">Any additional comments...</label>
+                            <textarea name="taq4" placeholder="Tell us what you think" rows="4" cols="30"></textarea>
+                            <input type="submit" value="Submit" id="createButton">
+                        </form>
+                    {% else %}
+                        <span class="subtitle">Please enroll in a TA before giving them feedback</span> 
+                        <br>
+                        <span>Go to > <a class="links" href="{{url_for('.profile')}}">My Profile</a> > click on "Edit Profile" to enroll into a TA</span>
+                    {% endif %} 
+                </div>
+            </div>
         </div>
         {% endblock %}
     </body>

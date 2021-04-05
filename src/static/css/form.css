@@ -1,4 +1,15 @@
 /*GENERAL INPUT FORM SYLING*/
+textarea {
+    resize: none;
+    width: 100%;
+    font-family: 'Roboto', sans-serif;
+    font-size: medium;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    padding: 10px 5px;
+}
+
 input, select{
     width: 100%;
     box-sizing: border-box;

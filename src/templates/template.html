@@ -28,7 +28,9 @@
                             <li><a href="{{url_for('.tutorials',id=ta_id)}}">Tutorials</a></li>
                         {% endif %}
                         <li><a href="{{url_for('.coursework')}}">Course Work</a></li>
-                        <li><a href="{{url_for('.feedback')}}">Feedback</a></li>
+                        {% if not ta_level %}
+                            <li><a href="{{url_for('.feedback')}}">Feedback</a></li>
+                        {% endif %}
                         <li><a href="{{url_for('.profile')}}">My Profile</a></li>
                         <li><a href="{{url_for('.links')}}">Links</a></li>
                         <li><a href="{{url_for('.logout')}}" id="logout">Log Out</a></li>

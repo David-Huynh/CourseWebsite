@@ -39,7 +39,7 @@ def before_request():
 ##Injects instructor and ta information into context of every template (Defaults to first ta and instructor in database if none set)
 @app.context_processor
 def inject_ta_instructor():
-    if "username" in session and "password" in session:
+    if "username" in session :
         ##Queries whether there is a username match in instructors table
         qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=?)) AS \"col\"",[session["username"]])
         ##Queries whether there is a username match in ta table
@@ -71,7 +71,7 @@ def close_connection(exception):
 ## PDF Display Route
 @app.route("/pdfs/<id>")
 def get_pdf(id=None):
-    if "username" in session and "password" in session:
+    if "username" in session :
         if id is not None:
             pdf = query_db("SELECT pdf_name, pdf_data, username FROM pdf WHERE pdf_id=?",[id])
             qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=?)) AS \"col\"",[session["username"]])
@@ -92,7 +92,7 @@ def get_pdf(id=None):
 ## Route for instructors/tas to submit marks
 @app.route("/submitMarks", methods=["POST"])
 def submitMarks():
-    if "username" in session and "password" in session:
+    if "username" in session :
         ##Queries whether there is a username match in instructors table
         qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=?)) AS \"col\"",[session["username"]])
         ##Queries whether there is a username match in ta table
@@ -112,7 +112,7 @@ def submitMarks():
 ##WEB APP ROUTES
 @app.route("/")
 def home():
-    if "username" in session and "password" in session:
+    if "username" in session :
         name = query_db("SELECT first_name FROM (SELECT instructor_code as username,first_name FROM instructor UNION SELECT ta_code as username,first_name FROM ta UNION SELECT student_no as username,first_name FROM student) WHERE username=?",[session["username"]])
         tas = query_db("SELECT * FROM ta")
         student = query_db("SELECT * FROM student WHERE student_no=?",[session["username"]])
@@ -143,7 +143,7 @@ def home():
 ##Marks Route
 @app.route("/marking")
 def marking():
-    if "username" in session and "password" in session:
+    if "username" in session :
         ##Queries whether there is a username match in instructors table
         qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=?)) AS \"col\"",[session["username"]])
         ##Queries whether there is a username match in ta table
@@ -166,7 +166,7 @@ def marking():
 
 @app.route("/lectures/<id>", methods=["GET", "POST"])
 def lectures(id=None):
-    if "username" in session and "password" in session:
+    if "username" in session :
         if id is not None:
             ##Queries whether there is a username match in instructors table
             qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=?)) AS \"col\"",[session["username"]])
@@ -258,7 +258,7 @@ def lectures(id=None):
 
 @app.route("/tutorials/<id>", methods=["GET", "POST"])
 def tutorials(id=None):
-    if "username" in session and "password" in session:
+    if "username" in session :
         if id is not None:
             ##Queries whether there is a username match in instructors table
             qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=?)) AS \"col\"",[session["username"]])
@@ -349,7 +349,7 @@ def tutorials(id=None):
 
 @app.route("/coursework", methods=["GET", "POST"])
 def coursework():
-    if "username" in session and "password" in session:
+    if "username" in session :
         ##Queries whether there is a username match in instructors table
         qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=?)) AS \"col\"",[session["username"]])
         ##Queries whether there is a username match in ta table
@@ -504,19 +504,46 @@ def coursework():
 
 @app.route("/links")
 def links():
-    if "username" in session and "password" in session:
+    if "username" in session :
         return render_template("links.html")
     return redirect(url_for("login"))
 
-@app.route("/feedback")
+@app.route("/feedback", methods=["GET", "POST"])
 def feedback():
-    if "username" in session and "password" in session:
+<<<<<<< HEAD
+    if "username" in session:
+        ##Queries whether there is a username match in instructors table
+        qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=?)) AS \"col\"",[session["username"]])
+        ##Queries whether there is a username match in ta table
+        qt = query_db("SELECT EXISTS(SELECT ta_code,password FROM ta WHERE (ta_code=?)) AS \"col\"",[session["username"]])
+        # user is a student
+        if qi[0]["col"] != 1 and qt[0]["col"] != 1:
+            instructor = query_db("SELECT instructor.instructor_code, instructor.first_name, instructor.last_name FROM instructor, student WHERE student.student_no=? AND student.instructor_code=instructor.instructor_code", [session["username"]])
+            ta = query_db("SELECT ta.ta_code, ta.first_name, ta.last_name FROM ta, student WHERE student.student_no=? AND student.ta_code=ta.ta_code", [session["username"]])
+            if request.method == "POST":
+                if 'iq1' in request.form and request.form['iq1']:
+                    insert_db("INSERT INTO instr_feedback (instructor_code, question_1, question_2, question_3) VALUES (?,?,?,?)", [instructor[0]["instructor_code"], request.form["iq1"], request.form["iq2"], request.form["iq3"]])
+                    if request.form['iq4']:
+                        insert_db("UPDATE instr_feedback SET question_4=? WHERE feedback_no=(SELECT last_insert_rowid())", [request.form["iq4"]])
+                if 'taq1' in request.form and request.form['taq1']:
+                    insert_db("INSERT INTO ta_feedback (ta_code, question_1, question_2, question_3) VALUES (?,?,?,?)", [ta[0]["ta_code"], request.form["taq1"], request.form["taq2"], request.form["taq3"]])
+                    if request.form['taq4']:
+                        insert_db("UPDATE instr_feedback SET question_4=? WHERE feedback_no=(SELECT last_insert_rowid())", [request.form["taq4"]])
+                return redirect(url_for("feedback"))
+            return render_template("feedback.html",
+            instructor=instructor,
+            ta=ta)
+        else: 
+            return "ERROR: you do not have permission to view this page"
+=======
+    if "username" in session :
         return render_template("feedback.html")
+>>>>>>> 6df42f8815b4f02fcb004fdadcddca46c9ebb267
     return redirect(url_for("login"))
 
 @app.route("/profile", methods=["GET","POST"])
 def profile():
-    if "username" in session and "password" in session:
+    if "username" in session :
         if id is not None:
             ##Queries whether there is a username match in instructors table
             qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=?)) AS \"col\"",[session["username"]])
@@ -553,7 +580,6 @@ def profile():
                         insert_db("UPDATE instructor SET email=? WHERE instructor_code=?", [request.form["email"], session["username"]])
                     if 'password' in request.form and request.form["password"]:
                         insert_db("UPDATE instructor SET password=? WHERE instructor_code=?", [request.form["password"], session["username"]])
-                        session["password"] = request.form["password"]
                     return redirect(url_for(".profile",id=id))
                 return render_template("profile.html", 
                     user_type=0,
@@ -579,7 +605,6 @@ def profile():
                         insert_db("UPDATE ta SET email=? WHERE ta_code=?", [request.form["email"], session["username"]])
                     if 'password' in request.form and request.form["password"]:
                         insert_db("UPDATE ta SET password=? WHERE ta_code=?", [request.form["password"], session["username"]])
-                        session["password"] = request.form["password"]
                     return redirect(url_for(".profile",id=id))
                 return render_template("profile.html", 
                     user_type=1,
@@ -599,7 +624,6 @@ def profile():
                         insert_db("UPDATE student SET email=? WHERE student_no=?", [request.form["email"], session["username"]])
                     if 'password' in request.form and request.form["password"]:
                         insert_db("UPDATE student SET password=? WHERE student_no=?", [request.form["password"], session["username"]])
-                        session["password"] = request.form["password"]
                     return redirect(url_for(".profile",id=id))
                 return render_template("profile.html",
                     user_type=2,
@@ -626,7 +650,6 @@ def login():
                 error = "Invalid credentials"
             elif t==1:
                 session["username"] = request.form["username"]
-                session["password"] = request.form["password"]
                 return redirect(url_for("home"))
         ##else: register the user then add the user to session and redirect them to home route and handle duplicate username error/ 
         else:
@@ -647,7 +670,6 @@ def login():
                         insert_db("INSERT INTO student (student_no ,first_name ,last_name ,email ,password,instructor_code) VALUES (?,?,?,?,?,?)",
                         [request.form["username"],request.form["firstname"],request.form["lastname"],request.form["email"],request.form["password"],request.form["InstructorsCode"]])
                         session["username"] = request.form["username"]
-                        session["password"] = request.form["password"]
                         return redirect(url_for("home"))
                     else:
                         error="Invalid instructor code"
@@ -655,13 +677,11 @@ def login():
                     insert_db("INSERT INTO instructor (instructor_code, first_name, last_name, email, password) VALUES (?,?,?,?,?)",
                         [request.form["username"],request.form["firstname"],request.form["lastname"],request.form["email"],request.form["password"]])
                     session["username"] = request.form["username"]
-                    session["password"] = request.form["password"]
                     return redirect(url_for("home"))
                 elif request.form["creationcode"] == "2" and not request.form["InstructorsCode"]:
                     insert_db("INSERT INTO ta (ta_code,first_name ,last_name ,email ,password) VALUES (?,?,?,?,?)",
                         [request.form["username"],request.form["firstname"],request.form["lastname"],request.form["email"],request.form["password"]])
                     session["username"] = request.form["username"]
-                    session["password"] = request.form["password"]
                     return redirect(url_for("home"))
                 else:
                     error="invalid user type"
@@ -670,9 +690,8 @@ def login():
 ##LOGOUT REQUESTS
 @app.route("/logout")
 def logout():
-   ## Removes the username and password from the session if it exists
+   ## Removes the username from the session if it exists
    session.pop("username", None)
-   session.pop("password", None)
    return redirect(url_for("login"))
     
 if __name__ == "__main__":
