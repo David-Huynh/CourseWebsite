@@ -9,7 +9,6 @@ body {
     display: grid;
     grid-template-rows: 1fr auto;
     min-height: 100%;
-
     color: #002A5C;
     background-color: #F8F8F8;
 }
@@ -18,6 +17,11 @@ body {
     color: #002A5C;
     font-weight: bold;
     font-size: 18px;
+}
+
+.data {
+    color: black;
+    font-size: 13px;
 }
 
 .links{

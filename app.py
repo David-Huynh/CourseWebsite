@@ -516,7 +516,19 @@ def feedback():
         ##Queries whether there is a username match in ta table
         qt = query_db("SELECT EXISTS(SELECT ta_code,password FROM ta WHERE (ta_code=?)) AS \"col\"",[session["username"]])
         # user is a student
-        if qi[0]["col"] != 1 and qt[0]["col"] != 1:
+        if qi[0]["col"] == 1:
+            instr_feedback = query_db("SELECT * FROM instr_feedback WHERE instructor_code=?", [session["username"]])
+            return render_template("feedback.html", 
+                user_type=0,
+                data=instr_feedback,
+                saved=False)
+        elif qt[0]["col"] == 1:
+            ta_feedback = query_db("SELECT * FROM ta_feedback WHERE ta_code=?", [session["username"]])
+            return render_template("feedback.html",
+                user_type=1,
+                data=ta_feedback,
+                saved=False)
+        else:
             instructor = query_db("SELECT instructor.instructor_code, instructor.first_name, instructor.last_name FROM instructor, student WHERE student.student_no=? AND student.instructor_code=instructor.instructor_code", [session["username"]])
             ta = query_db("SELECT ta.ta_code, ta.first_name, ta.last_name FROM ta, student WHERE student.student_no=? AND student.ta_code=ta.ta_code", [session["username"]])
             if request.method == "POST":
@@ -527,19 +539,19 @@ def feedback():
                 if 'taq1' in request.form and request.form['taq1']:
                     insert_db("INSERT INTO ta_feedback (ta_code, question_1, question_2, question_3) VALUES (?,?,?,?)", [ta[0]["ta_code"], request.form["taq1"], request.form["taq2"], request.form["taq3"]])
                     if request.form['taq4']:
-                        insert_db("UPDATE instr_feedback SET question_4=? WHERE feedback_no=(SELECT last_insert_rowid())", [request.form["taq4"]])
+                        insert_db("UPDATE ta_feedback SET question_4=? WHERE feedback_no=(SELECT last_insert_rowid())", [request.form["taq4"]])
                 instructor = query_db("SELECT instructor.instructor_code, instructor.first_name, instructor.last_name FROM instructor, student WHERE student.student_no=? AND student.instructor_code=instructor.instructor_code", [session["username"]])
                 ta = query_db("SELECT ta.ta_code, ta.first_name, ta.last_name FROM ta, student WHERE student.student_no=? AND student.ta_code=ta.ta_code", [session["username"]])
                 return render_template("feedback.html",
+                    user_type=2,
                     instructor=instructor,
                     ta=ta, 
                     saved=True)
             return render_template("feedback.html",
+                user_type=2,
                 instructor=instructor,
                 ta=ta,
                 saved=False)
-        else: 
-            return "ERROR: you do not have permission to view this page"
     return redirect(url_for("login"))
 
 @app.route("/profile", methods=["GET","POST"])
