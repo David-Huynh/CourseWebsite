@@ -553,7 +553,6 @@ def profile():
                         insert_db("UPDATE instructor SET email=? WHERE instructor_code=?", [request.form["email"], session["username"]])
                     if 'password' in request.form and request.form["password"]:
                         insert_db("UPDATE instructor SET password=? WHERE instructor_code=?", [request.form["password"], session["username"]])
-                        session["password"] = request.form["password"]
                     return redirect(url_for(".profile",id=id))
                 return render_template("profile.html", 
                     user_type=0,
@@ -579,7 +578,6 @@ def profile():
                         insert_db("UPDATE ta SET email=? WHERE ta_code=?", [request.form["email"], session["username"]])
                     if 'password' in request.form and request.form["password"]:
                         insert_db("UPDATE ta SET password=? WHERE ta_code=?", [request.form["password"], session["username"]])
-                        session["password"] = request.form["password"]
                     return redirect(url_for(".profile",id=id))
                 return render_template("profile.html", 
                     user_type=1,
@@ -599,7 +597,6 @@ def profile():
                         insert_db("UPDATE student SET email=? WHERE student_no=?", [request.form["email"], session["username"]])
                     if 'password' in request.form and request.form["password"]:
                         insert_db("UPDATE student SET password=? WHERE student_no=?", [request.form["password"], session["username"]])
-                        session["password"] = request.form["password"]
                     return redirect(url_for(".profile",id=id))
                 return render_template("profile.html",
                     user_type=2,
@@ -626,7 +623,6 @@ def login():
                 error = "Invalid credentials"
             elif t==1:
                 session["username"] = request.form["username"]
-                session["password"] = request.form["password"]
                 return redirect(url_for("home"))
         ##else: register the user then add the user to session and redirect them to home route and handle duplicate username error/ 
         else:
@@ -667,7 +663,7 @@ def login():
 ##LOGOUT REQUESTS
 @app.route("/logout")
 def logout():
-   ## Removes the username and password from the session if it exists
+   ## Removes the username from the session if it exists
    session.pop("username", None)
    return redirect(url_for("login"))
     
