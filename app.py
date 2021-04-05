@@ -121,9 +121,9 @@ def home():
         ##Queries whether there is a username match in ta table
         qt = query_db("SELECT EXISTS(SELECT ta_code,password FROM ta WHERE (ta_code=?)) AS \"col\"",[session["username"]])
         if qi[0]["col"] == 1:
-            instructor = None
+            instructor = None;
         elif qt[0]["col"] == 1:
-            instructor = None
+            instructor = None;
         else:
             instructor = query_db("SELECT * FROM instructor WHERE instructor_code=?",[student[0]["instructor_code"]])
             instructor[0]["first_name"] = instructor[0]["first_name"].lower().capitalize()
