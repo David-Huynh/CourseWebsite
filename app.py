@@ -516,21 +516,23 @@ def feedback():
         ##Queries whether there is a username match in ta table
         qt = query_db("SELECT EXISTS(SELECT ta_code,password FROM ta WHERE (ta_code=?)) AS \"col\"",[session["username"]])
         # user is a student
+        saved = False
         if qi[0]["col"] == 1:
             instr_feedback = query_db("SELECT * FROM instr_feedback WHERE instructor_code=?", [session["username"]])
             return render_template("feedback.html", 
                 user_type=0,
                 data=instr_feedback,
-                saved=False)
+                saved=saved)
         elif qt[0]["col"] == 1:
             ta_feedback = query_db("SELECT * FROM ta_feedback WHERE ta_code=?", [session["username"]])
             return render_template("feedback.html",
                 user_type=1,
                 data=ta_feedback,
-                saved=False)
+                saved=saved)
         else:
             instructor = query_db("SELECT instructor.instructor_code, instructor.first_name, instructor.last_name FROM instructor, student WHERE student.student_no=? AND student.instructor_code=instructor.instructor_code", [session["username"]])
             ta = query_db("SELECT ta.ta_code, ta.first_name, ta.last_name FROM ta, student WHERE student.student_no=? AND student.ta_code=ta.ta_code", [session["username"]])
+            saved = False
             if request.method == "POST":
                 if 'iq1' in request.form and request.form['iq1']:
                     insert_db("INSERT INTO instr_feedback (instructor_code, question_1, question_2, question_3) VALUES (?,?,?,?)", [instructor[0]["instructor_code"], request.form["iq1"], request.form["iq2"], request.form["iq3"]])
@@ -542,16 +544,17 @@ def feedback():
                         insert_db("UPDATE ta_feedback SET question_4=? WHERE feedback_no=(SELECT last_insert_rowid())", [request.form["taq4"]])
                 instructor = query_db("SELECT instructor.instructor_code, instructor.first_name, instructor.last_name FROM instructor, student WHERE student.student_no=? AND student.instructor_code=instructor.instructor_code", [session["username"]])
                 ta = query_db("SELECT ta.ta_code, ta.first_name, ta.last_name FROM ta, student WHERE student.student_no=? AND student.ta_code=ta.ta_code", [session["username"]])
+                saved = True
                 return render_template("feedback.html",
                     user_type=2,
                     instructor=instructor,
                     ta=ta, 
-                    saved=True)
+                    saved=saved)
             return render_template("feedback.html",
                 user_type=2,
                 instructor=instructor,
                 ta=ta,
-                saved=False)
+                saved=saved)
     return redirect(url_for("login"))
 
 @app.route("/profile", methods=["GET","POST"])
@@ -569,6 +572,7 @@ def profile():
                 if prof_pic != None:
                     prof_pic = base64.b64encode(instructor_info[0]["instructor_picture"]).decode("ascii")
                 syllabus = query_db("SELECT * FROM pdf INNER JOIN instructor ON instructor.syllabus_id = pdf.pdf_id AND instructor.instructor_code=?", [session["username"]])
+                saved = False
                 if request.method == "POST":
                     #update instructor form
                     if 'picture' in request.files and request.files["picture"]: # if picture key is not in the post request
@@ -606,24 +610,26 @@ def profile():
                     if prof_pic != None:
                         prof_pic = base64.b64encode(instructor_info[0]["instructor_picture"]).decode("ascii")
                     syllabus = query_db("SELECT * FROM pdf INNER JOIN instructor ON instructor.syllabus_id = pdf.pdf_id AND instructor.instructor_code=?", [session["username"]])
+                    saved = True
                     return render_template("profile.html", 
                         user_type=0,
                         user_info=instructor_info,
                         pic=prof_pic,
                         syllabus=syllabus,
-                        saved=True)
+                        saved=saved)
                 return render_template("profile.html", 
                     user_type=0,
                     user_info=instructor_info,
                     pic=prof_pic,
                     syllabus=syllabus,
-                    saved=False)
+                    saved=saved)
             # Load TA page
             elif qt[0]["col"] == 1:
                 ta_info = query_db("SELECT * FROM ta WHERE ta_code=?",[session["username"]])
                 ta_pic = ta_info[0]["ta_picture"]
                 if ta_pic != None:
                     ta_pic = base64.b64encode(ta_info[0]["ta_picture"]).decode("ascii")
+                saved = False
                 if request.method == "POST":
                     #update form info case
                     if 'picture' in request.files and request.files["picture"]: # if picture key is not in the post request
@@ -645,21 +651,23 @@ def profile():
                     ta_pic = ta_info[0]["ta_picture"]
                     if ta_pic != None:
                         ta_pic = base64.b64encode(ta_info[0]["ta_picture"]).decode("ascii")
+                    saved = True
                     return render_template("profile.html", 
                         user_type=1,
                         user_info=ta_info,
                         pic=ta_pic, 
-                        saved=True)
+                        saved=saved)
                 return render_template("profile.html", 
                     user_type=1,
                     user_info=ta_info,
                     pic=ta_pic,
-                    saved=False)
+                    saved=saved)
             # Load Student page
             else:
                 prof_list = query_db("SELECT instructor_code, first_name, last_name FROM instructor")
                 ta_list = query_db("SELECT ta_code, first_name, last_name FROM ta")
                 stud_info = query_db("SELECT * FROM student WHERE student_no=?",[session["username"]])
+                saved = False
                 if request.method == "POST":
                     if 'prof' in request.form and request.form["prof"]:
                         insert_db("UPDATE student SET instructor_code=? WHERE student_no=?", [request.form["prof"], session["username"]])
@@ -672,18 +680,19 @@ def profile():
                     prof_list = query_db("SELECT instructor_code, first_name, last_name FROM instructor")
                     ta_list = query_db("SELECT ta_code, first_name, last_name FROM ta")
                     stud_info = query_db("SELECT * FROM student WHERE student_no=?",[session["username"]])
+                    saved = True
                     return render_template("profile.html",
                         user_type=2,
                         user_info=stud_info, 
                         prof_list=prof_list,
                         ta_list=ta_list, 
-                        saved=True)  
+                        saved=saved)  
                 return render_template("profile.html",
                     user_type=2,
                     user_info=stud_info, 
                     prof_list=prof_list,
                     ta_list=ta_list, 
-                    saved=False)    
+                    saved=saved)    
     return redirect(url_for("login"))
 
 ##LOGIN/SIGNUP REQUESTS
