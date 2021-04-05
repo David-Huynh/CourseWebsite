@@ -60,13 +60,21 @@
                                             {% if user_type == 0 %}
                                                 <label for="syllabus" class="subtitle">Update Syllabus</label>
                                                 <input type="file" class="fileInput" name="syllabus" accept=".pdf">
+                                                <label class="subtitle" for="first_lecture_time">Update First Lecture Time</label>                                            
+                                                <input type="text" name="first_lecture_time" placeholder="Enter First Lecture Time">
+                                                <label class="subtitle" for="first_lecture_link">Update First Lecture Link</label>                                            
+                                                <input type="text" name="first_lecture_link" placeholder="Enter First Lecture Link (ie. https://...)" pattern="https://.*">
+                                                <label class="subtitle" for="second_lecture_time">Update Second Lecture Time</label>                                            
+                                                <input type="text" name="second_lecture_time" placeholder="Enter Second Lecture Time">
+                                                <label class="subtitle" for="second_lecture_link">Update Second Lecture Link</label>                                            
+                                                <input type="text" name="second_lecture_link" placeholder="Enter Second Lecture Link (ie. https://...)" pattern="https://.*">
                                                 <label class="subtitle" for="office">Update Office</label>                                            
                                                 <input type="text" name="office" placeholder="Enter Office Location">
                                             {% endif %}
                                             <label class="subtitle" for="office_hours">Update Office Hours</label>
                                             <input type="text" name="office_hours" placeholder="Enter Office Hours Schedule">
                                             <label class="subtitle" for="office_hours_link">Update Office Hours Link</label>
-                                            <input type="text" name="office_hours_link" placeholder="Enter Office Hours Meeting Link">
+                                            <input type="text" name="office_hours_link" placeholder="Enter Office Hours Meeting Link (ie. https://...)" pattern="https://.*">
                                         {% else %}
                                             <label class="subtitle">Change Instructor</label>
                                             <select name="prof" id="prof">
@@ -77,9 +85,9 @@
                                                 {% endif %}
                                                 {% for prof in prof_list %}
                                                     {% if prof["instructor_code"] == user_info[0]["instructor_code"] %}
-                                                        <option value="{{prof["instructor_code"]}}" selected>{{prof["first_name"]}} {{prof["last_name"]}}</option>
+                                                        <option value="{{prof["instructor_code"]}}" selected>{{prof["first_name"].lower().capitalize()}} {{prof["last_name"].lower().capitalize()}}</option>
                                                     {% else %}
-                                                        <option value="{{prof["instructor_code"]}}">{{prof["first_name"]}} {{prof["last_name"]}}</option>
+                                                        <option value="{{prof["instructor_code"]}}">{{prof["first_name"].lower().capitalize()}} {{prof["last_name"].lower().capitalize()}}</option>
                                                     {% endif %}
                                                 {% endfor %}
                                             </select>
@@ -92,9 +100,9 @@
                                                 {% endif %}
                                                 {% for ta in ta_list %}
                                                     {% if ta["ta_code"] == user_info[0]["ta_code"] %}
-                                                        <option value="{{ta["ta_code"]}}" selected>{{ta["first_name"]}} {{ta["last_name"]}}</option>
+                                                        <option value="{{ta["ta_code"]}}" selected>{{ta["first_name"].lower().capitalize()}} {{ta["last_name"].lower().capitalize()}}</option>
                                                     {% else %}
-                                                        <option value="{{ta["ta_code"]}}">{{ta["first_name"]}} {{ta["last_name"]}}</option>
+                                                        <option value="{{ta["ta_code"]}}">{{ta["first_name"].lower().capitalize()}} {{ta["last_name"].lower().capitalize()}}</option>
                                                     {% endif %}
                                                 {% endfor %}
                                               </select>
@@ -126,6 +134,46 @@
                             </div>
                             <div class="cardSection">
                                 <p>
+                                    <span class="subtitle">First Lecture Time:</span> 
+                                    {% if user_info[0]["first_lecture_time"] %}
+                                        <span class="data"> {{user_info[0]["first_lecture_time"]}} </span>
+                                    {% else %}
+                                        <span class="data">Coming Soon</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                            <div class="cardSection">
+                                <p>
+                                    <span class="subtitle">First Lecture link:</span> 
+                                    {% if user_info[0]["first_lecture_link"] %}
+                                        <a href="{{user_info[0]["first_lecture_link"]}}" class="links" target="_blank">[Link]</a> 
+                                    {% else %}
+                                        <span class="data">Link Coming Soon</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                            <div class="cardSection">
+                                <p>
+                                    <span class="subtitle">Second Lecture Time:</span> 
+                                    {% if user_info[0]["second_lecture_time"] %}
+                                        <span class="data"> {{user_info[0]["second_lecture_time"]}} </span>
+                                    {% else %}
+                                        <span class="data">Coming Soon</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                            <div class="cardSection">
+                                <p>
+                                    <span class="subtitle">Second Lecture link:</span> 
+                                    {% if user_info[0]["second_lecture_link"] %}
+                                        <a href="{{user_info[0]["second_lecture_link"]}}" class="links" target="_blank">[Link]</a> 
+                                    {% else %}
+                                        <span class="data">Link Coming Soon</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                            <div class="cardSection">
+                                <p>
                                     <span class="subtitle">Office:</span> 
                                     {% if user_info[0]["office"] %}
                                         <span class="data"> {{user_info[0]["office"]}} </span>
@@ -151,7 +199,7 @@
                                 {% if user_info[0]["office_hours_link"] %}
                                     <a href="{{user_info[0]["office_hours_link"]}}" class="links" target="_blank">[Link]</a> 
                                 {% else %}
-                                    <span class="data">Coming Soon</span>
+                                    <span class="data">Link Coming Soon</span>
                                 {% endif %}
                             </p>
                         </div>
@@ -172,7 +220,7 @@
                                 {% if user_info[0]["instructor_code"] %}
                                     {% for prof in prof_list %}
                                         {% if prof["instructor_code"] == user_info[0]["instructor_code"] %}
-                                            <span class="data"> {{prof["first_name"]}} {{prof["last_name"]}} </span>
+                                            <span class="data"> {{prof["first_name"].lower().capitalize()}} {{prof["last_name"].lower().capitalize()}} </span>
                                         {% endif %}
                                     {% endfor %}
                                 {% else %}
@@ -186,7 +234,7 @@
                                 {% if user_info[0]["ta_code"] %}
                                     {% for ta in ta_list %}
                                         {% if ta["ta_code"] == user_info[0]["ta_code"] %}
-                                            <span class="data"> {{ta["first_name"]}} {{ta["last_name"]}} </span>
+                                            <span class="data"> {{ta["first_name"].lower().capitalize()}} {{ta["last_name"].lower().capitalize()}} </span>
                                         {% endif %}
                                     {% endfor %}
                                 {% else %}

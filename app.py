@@ -565,6 +565,14 @@ def profile():
                         else:
                             insert_db("INSERT INTO pdf (pdf_name,pdf_data,username) VALUES (?,?,?)",[request.files["syllabus"].filename, request.files["syllabus"].read(), session["username"]])
                             insert_db("UPDATE instructor SET syllabus_id=(SELECT last_insert_rowid()) WHERE instructor_code=?",[session["username"]])
+                    if 'first_lecture_time' in request.form and request.form["first_lecture_time"]:
+                        insert_db("UPDATE instructor SET first_lecture_time=? WHERE instructor_code=?", [request.form["first_lecture_time"], session["username"]])
+                    if 'first_lecture_link' in request.form and request.form["first_lecture_link"]:
+                        insert_db("UPDATE instructor SET first_lecture_link=? WHERE instructor_code=?", [request.form["first_lecture_link"], session["username"]])
+                    if 'second_lecture_time' in request.form and request.form["second_lecture_time"]:
+                        insert_db("UPDATE instructor SET second_lecture_time=? WHERE instructor_code=?", [request.form["second_lecture_time"], session["username"]])
+                    if 'second_lecture_link' in request.form and request.form["second_lecture_link"]:
+                        insert_db("UPDATE instructor SET second_lecture_link=? WHERE instructor_code=?", [request.form["second_lecture_link"], session["username"]])
                     if 'office' in request.form and request.form["office"]:
                         insert_db("UPDATE instructor SET office=? WHERE instructor_code=?", [request.form["office"], session["username"]])
                     if 'office_hours' in request.form and request.form["office_hours"]:
