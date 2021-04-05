@@ -528,10 +528,16 @@ def feedback():
                     insert_db("INSERT INTO ta_feedback (ta_code, question_1, question_2, question_3) VALUES (?,?,?,?)", [ta[0]["ta_code"], request.form["taq1"], request.form["taq2"], request.form["taq3"]])
                     if request.form['taq4']:
                         insert_db("UPDATE instr_feedback SET question_4=? WHERE feedback_no=(SELECT last_insert_rowid())", [request.form["taq4"]])
-                return redirect(url_for("feedback"))
+                instructor = query_db("SELECT instructor.instructor_code, instructor.first_name, instructor.last_name FROM instructor, student WHERE student.student_no=? AND student.instructor_code=instructor.instructor_code", [session["username"]])
+                ta = query_db("SELECT ta.ta_code, ta.first_name, ta.last_name FROM ta, student WHERE student.student_no=? AND student.ta_code=ta.ta_code", [session["username"]])
+                return render_template("feedback.html",
+                    instructor=instructor,
+                    ta=ta, 
+                    saved=True)
             return render_template("feedback.html",
-            instructor=instructor,
-            ta=ta)
+                instructor=instructor,
+                ta=ta,
+                saved=False)
         else: 
             return "ERROR: you do not have permission to view this page"
     return redirect(url_for("login"))
