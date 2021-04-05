@@ -17,10 +17,14 @@
         {% block content %}
         <!-- Page Content -->
         <div class="content">
-            {% if saved %}
-                <h1 class="title" id="assignmentPageTitle">Feedback(Saved)</h1>
+            {% if user_type != 2 %}
+                <h1 class="title" id="assignmentPageTitle">My Feedback</h1>
             {% else %}
-                <h1 class="title" id="assignmentPageTitle">Feedback</h1>
+                {% if saved %}
+                    <h1 class="title" id="assignmentPageTitle">Feedback(Saved)</h1>
+                {% else %}
+                    <h1 class="title" id="assignmentPageTitle">Feedback</h1>
+                {% endif %}
             {% endif %}
             {% if user_type == 2 %}
                 <div class="card"> 
