@@ -18,7 +18,11 @@
         {% block content %}
         <!-- Page Content -->
         <div class="content">
-            <h1 class="title" id="assignmentPageTitle">My Profile</h1>
+            {% if saved %}
+                <h1 class="title" id="assignmentPageTitle">My Profile(Saved)</h1>
+            {% else %}
+                <h1 class="title" id="assignmentPageTitle">My Profile</h1>
+            {% endif %}
             <div id="alignRight">
                 <button id="editA" class="customButton">Edit Account</button>
                 <button id="editB" class="customButton">Edit Profile</button>

@@ -583,12 +583,23 @@ def profile():
                         insert_db("UPDATE instructor SET email=? WHERE instructor_code=?", [request.form["email"], session["username"]])
                     if 'password' in request.form and request.form["password"]:
                         insert_db("UPDATE instructor SET password=? WHERE instructor_code=?", [request.form["password"], session["username"]])
-                    return redirect(url_for(".profile",id=id))
+                    instructor_info = query_db("SELECT * FROM instructor WHERE instructor_code=?",[session["username"]])
+                    prof_pic = instructor_info[0]["instructor_picture"]
+                    if prof_pic != None:
+                        prof_pic = base64.b64encode(instructor_info[0]["instructor_picture"]).decode("ascii")
+                    syllabus = query_db("SELECT * FROM pdf INNER JOIN instructor ON instructor.syllabus_id = pdf.pdf_id AND instructor.instructor_code=?", [session["username"]])
+                    return render_template("profile.html", 
+                        user_type=0,
+                        user_info=instructor_info,
+                        pic=prof_pic,
+                        syllabus=syllabus,
+                        saved=True)
                 return render_template("profile.html", 
                     user_type=0,
                     user_info=instructor_info,
                     pic=prof_pic,
-                    syllabus=syllabus)
+                    syllabus=syllabus,
+                    saved=False)
             # Load TA page
             elif qt[0]["col"] == 1:
                 ta_info = query_db("SELECT * FROM ta WHERE ta_code=?",[session["username"]])
@@ -608,11 +619,20 @@ def profile():
                         insert_db("UPDATE ta SET email=? WHERE ta_code=?", [request.form["email"], session["username"]])
                     if 'password' in request.form and request.form["password"]:
                         insert_db("UPDATE ta SET password=? WHERE ta_code=?", [request.form["password"], session["username"]])
-                    return redirect(url_for(".profile",id=id))
+                    ta_info = query_db("SELECT * FROM ta WHERE ta_code=?",[session["username"]])
+                    ta_pic = ta_info[0]["ta_picture"]
+                    if ta_pic != None:
+                        ta_pic = base64.b64encode(ta_info[0]["ta_picture"]).decode("ascii")
+                    return render_template("profile.html", 
+                        user_type=1,
+                        user_info=ta_info,
+                        pic=ta_pic, 
+                        saved=True)
                 return render_template("profile.html", 
                     user_type=1,
                     user_info=ta_info,
-                    pic=ta_pic)
+                    pic=ta_pic,
+                    saved=False)
             # Load Student page
             else:
                 prof_list = query_db("SELECT instructor_code, first_name, last_name FROM instructor")
@@ -627,12 +647,21 @@ def profile():
                         insert_db("UPDATE student SET email=? WHERE student_no=?", [request.form["email"], session["username"]])
                     if 'password' in request.form and request.form["password"]:
                         insert_db("UPDATE student SET password=? WHERE student_no=?", [request.form["password"], session["username"]])
-                    return redirect(url_for(".profile",id=id))
+                    prof_list = query_db("SELECT instructor_code, first_name, last_name FROM instructor")
+                    ta_list = query_db("SELECT ta_code, first_name, last_name FROM ta")
+                    stud_info = query_db("SELECT * FROM student WHERE student_no=?",[session["username"]])
+                    return render_template("profile.html",
+                        user_type=2,
+                        user_info=stud_info, 
+                        prof_list=prof_list,
+                        ta_list=ta_list, 
+                        saved=True)  
                 return render_template("profile.html",
                     user_type=2,
                     user_info=stud_info, 
                     prof_list=prof_list,
-                    ta_list=ta_list)    
+                    ta_list=ta_list, 
+                    saved=False)    
     return redirect(url_for("login"))
 
 ##LOGIN/SIGNUP REQUESTS
