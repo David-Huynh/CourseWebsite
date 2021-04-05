@@ -510,7 +510,6 @@ def links():
 
 @app.route("/feedback", methods=["GET", "POST"])
 def feedback():
-<<<<<<< HEAD
     if "username" in session:
         ##Queries whether there is a username match in instructors table
         qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=?)) AS \"col\"",[session["username"]])
@@ -535,10 +534,6 @@ def feedback():
             ta=ta)
         else: 
             return "ERROR: you do not have permission to view this page"
-=======
-    if "username" in session :
-        return render_template("feedback.html")
->>>>>>> 6df42f8815b4f02fcb004fdadcddca46c9ebb267
     return redirect(url_for("login"))
 
 @app.route("/profile", methods=["GET","POST"])
