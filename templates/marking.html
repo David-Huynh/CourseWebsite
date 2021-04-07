@@ -10,6 +10,7 @@
         <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
     </head>
     <body>
+        <!-- TODO: Render new student submissions -->
         {% extends "template.html" %}
         {% block content %}
         <!-- Page Content -->
@@ -46,23 +47,23 @@
                                     <div class="tableCell"><p>{{submission["date_submitted"]}}</p></div>
                                     <div class="tableCell">
                                         {% if submission["marked"] == 1 %}
-                                            <p>&check;</p>
+                                            <p name="assignment///{{submission["test_no"]}}///marked">&check;</p>
                                         {% else %}
-                                            <p>&#10005;</p>
+                                            <p name="assignment///{{submission["test_no"]}}///marked">&#10005;</p>
                                         {% endif%}
                                     </div>
                                     <div class="tableCell">
                                         {% if submission["late"] == 1 %}
-                                            <p>&check;</p>
+                                            <p name="assignment///{{submission["test_no"]}}///late">&check;</p>
                                         {% else %}
-                                            <p>&#10005;</p>
+                                            <p name="assignment///{{submission["test_no"]}}///late">&#10005;</p>
                                         {% endif%}
                                     </div>
                                     <div class="tableCell">
                                         {% if submission["regrade_requested"]%}
-                                            <p>&check;</p>
+                                            <p name="assignment///{{submission["test_no"]}}///regrade">&check;</p>
                                         {% else %}
-                                            <p>&#10005;</p>
+                                            <p name="assignment///{{submission["test_no"]}}///regrade">&#10005;</p>
                                         {% endif %}
                                     </div>
                                 {% endif %}
@@ -99,23 +100,23 @@
                                     <div class="tableCell"><p>{{submission["date_submitted"]}}</p></div>
                                     <div class="tableCell">
                                         {% if submission["marked"] == 1 %}
-                                            <p>&check;</p>
+                                            <p name="test///{{submission["test_no"]}}///marked">&check;</p>
                                         {% else %}
-                                            <p>&#10005;</p>
+                                            <p name="test///{{submission["test_no"]}}///marked">&#10005;</p>
                                         {% endif%}
                                     </div>
                                     <div class="tableCell">
                                         {% if submission["late"] == 1 %}
-                                            <p>&check;</p>
+                                            <p name="test///{{submission["test_no"]}}///late">&check;</p>
                                         {% else %}
-                                            <p>&#10005;</p>
+                                            <p name="test///{{submission["test_no"]}}///late">&#10005;</p>
                                         {% endif%}
                                     </div>
                                     <div class="tableCell">
                                         {% if submission["regrade_requested"]%}
-                                            <p>&check;</p>
+                                            <p name="test///{{submission["test_no"]}}///regrade">&check;</p>
                                         {% else %}
-                                            <p>&#10005;</p>
+                                            <p name="test///{{submission["test_no"]}}///regrade">&#10005;</p>
                                         {% endif %}
                                     </div>
                                 {% endif %}
@@ -125,6 +126,7 @@
                 </div>
             {% endfor %}
         </div>
+        <script src="https://cdn.socket.io/4.0.0/socket.io.min.js" integrity="sha384-DkkWv9oJFWLIydBXXjkBWnG1/fuVhw8YPBq37uvvD6WSYRFRqr21eY5Dg9ZhmWdy" crossorigin="anonymous"></script>
         <script src="{{url_for('static', filename='javascript/marking.js')}}"></script>
         {% endblock %}
     </body>

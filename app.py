@@ -1,4 +1,5 @@
 from flask import Flask, render_template, session, url_for, redirect, request, flash, g, make_response
+from flask_socketio import SocketIO, ConnectionRefusedError,send,emit
 import sqlite3
 
 import base64
@@ -7,7 +8,28 @@ from datetime import datetime
 
 app = Flask(__name__, template_folder="./templates", static_folder="./static")
 app.secret_key = "b'\x1a\xe3$e=(\xdc$\xf6\x95}\x00z\x1c\xae\xc2\n\x1a\x08\x85\x1f#9M\xff\xef=x\rg\x9c\xc9'"
+socketio = SocketIO(app)
 DATABASE = "./assignment3.db"
+
+## On socket connect request
+@socketio.on('connect')
+def connect():
+    if "username" in session:
+        ##Queries whether there is a username match in instructors table
+        qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=?)) AS \"col\"",[session["username"]])
+        ##Queries whether there is a username match in ta table
+        qt = query_db("SELECT EXISTS(SELECT ta_code,password FROM ta WHERE (ta_code=?)) AS \"col\"",[session["username"]])
+        ## Only allow requests from instructors or tas
+        if qi[0]["col"]==1 or qt[0]["col"]==1:
+            print("connected")
+        else:
+            raise ConnectionRefusedError('unauthorized!')
+    else:
+        raise ConnectionRefusedError('unauthorized!')
+##On socket disconnect request
+@socketio.on('disconnect')
+def disconnect():
+    print("Disconnected")
 
 ##DATABASE CONNECTION AND QUERY
 def make_dicts(cursor, row):
@@ -108,6 +130,25 @@ def submitMarks():
                 response = make_response(json.dumps({"nothing":"nothing"}))
                 response.headers["Content-Type"] = "application/json"
                 return response
+
+##TODO: Automatically detect new student submissions and broadcast it
+## Handles submission of grades from TAs/Instructors
+@socketio.on('json')
+def handle_json(json):
+    if "username" in session :
+        ##Queries whether there is a username match in instructors table
+        qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=?)) AS \"col\"",[session["username"]])
+        ##Queries whether there is a username match in ta table
+        qt = query_db("SELECT EXISTS(SELECT ta_code,password FROM ta WHERE (ta_code=?)) AS \"col\"",[session["username"]])
+        ## Only allow requests from instructors or tas
+        if qi[0]["col"]==1 or qt[0]["col"]==1:
+            print("Inserted grades into assessment")
+            if json["type"] == "assignment":
+                insert_db("UPDATE assignment_submissions SET grade=?, marked=1, regrade_requested=0 WHERE assignment_no=? AND student_no=?",[json["grade"], json["assessment_no"], json["student_no"]])
+            elif json["type"] == "test":
+                insert_db("UPDATE test_submissions SET grade=?, marked=1, regrade_requested=0 WHERE test_no=? AND student_no=?",[json["grade"], json["assessment_no"], json["student_no"]])
+            ##Broadcasts the change in data to all users on the socket
+            socketio.emit("json", data=json, broadcast=True)
 
 ##WEB APP ROUTES
 @app.route("/")
@@ -347,6 +388,8 @@ def tutorials(id=None):
             return render_template("tutorials.html")
     return redirect(url_for("login"))
 
+## TODO: Broadcast student submissions to users on socket
+##Handles student assessment submissions and regrade requests
 @app.route("/coursework", methods=["GET", "POST"])
 def coursework():
     if "username" in session :
@@ -758,4 +801,4 @@ def logout():
    return redirect(url_for("login"))
     
 if __name__ == "__main__":
-    app.run(debug=True)
+    socketio.run(app, debug=True)
