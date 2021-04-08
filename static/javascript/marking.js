@@ -1,5 +1,4 @@
 window.onload = function() {
-    //TODO: Automatically handle broadcast of new student submissions and render it
     var saveText = document.getElementById("saveText")
     var socket = io();
     //Establishes connection to socket on server

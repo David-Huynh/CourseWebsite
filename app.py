@@ -111,27 +111,7 @@ def get_pdf(id=None):
             else:
                 return "ERROR: no such file exists"
     return redirect(url_for("login"))
-## Route for instructors/tas to submit marks
-@app.route("/submitMarks", methods=["POST"])
-def submitMarks():
-    if "username" in session :
-        ##Queries whether there is a username match in instructors table
-        qi = query_db("SELECT EXISTS(SELECT instructor_code FROM instructor WHERE (instructor_code=?)) AS \"col\"",[session["username"]])
-        ##Queries whether there is a username match in ta table
-        qt = query_db("SELECT EXISTS(SELECT ta_code,password FROM ta WHERE (ta_code=?)) AS \"col\"",[session["username"]])
-        ## Only allow requests from instructors or tas
-        if qi[0]["col"]==1 or qt[0]["col"]==1:
-            if request.method == "POST":
-                print(request.json)
-                if request.json["type"] == "assignment":
-                    insert_db("UPDATE assignment_submissions SET grade=?, marked=1, regrade_requested=0 WHERE assignment_no=? AND student_no=?",[request.json["grade"], request.json["assessment_no"], request.json["student_no"]])
-                elif request.json["type"] == "test":
-                    insert_db("UPDATE test_submissions SET grade=?, marked=1, regrade_requested=0 WHERE test_no=? AND student_no=?",[request.json["grade"], request.json["assessment_no"], request.json["student_no"]])
-                response = make_response(json.dumps({"nothing":"nothing"}))
-                response.headers["Content-Type"] = "application/json"
-                return response
 
-##TODO: Automatically detect new student submissions and broadcast it
 ## Handles submission of grades from TAs/Instructors
 @socketio.on('json')
 def handle_json(json):
